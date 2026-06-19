@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="ms" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pengurusan Tuntutan HR</title>
+    
+    <!-- Fonts: Inter untuk rupa korporat dan profesional -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        // Power BI inspired palette
+                        pbi: {
+                            blue: '#118DFF',
+                            darkblue: '#12239E',
+                            orange: '#E66C37',
+                            purple: '#6B007B',
+                            green: '#00B01A',
+                            teal: '#00A638',
+                            cyan: '#33A1FD',
+                            yellow: '#FFA300'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar untuk rupa yang lebih kemas */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        
+        /* Transition untuk penukaran tema */
+        body {
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Hilangkan input number arrows */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200 font-sans h-screen flex overflow-hidden selection:bg-pbi-blue selection:text-white">
+
+    <!-- Sidebar / Navigasi -->
+    <aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-colors z-20 hidden md:flex flex-shrink-0">
+        <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
+            <i class="ph-fill ph-wallet text-pbi-blue text-2xl mr-3"></i>
+            <h1 class="text-lg font-bold tracking-tight">Claim<span class="text-pbi-blue">Pro</span></h1>
+        </div>
+        
+        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+            <button onclick="navigate('submit')" id="nav-submit" class="nav-btn w-full flex items-center px-4 py-2.5 rounded-md text-sm font-medium transition-colors bg-blue-50 text-pbi-blue dark:bg-blue-900/30 dark:text-pbi-cyan">
+                <i class="ph ph-paper-plane-right text-lg mr-3"></i>
+                Hantar Tuntutan
+            </button>
+            <button onclick="navigate('admin')" id="nav-admin" class="nav-btn w-full flex items-center px-4 py-2.5 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/50 transition-colors">
+                <i class="ph ph-clipboard-text text-lg mr-3"></i>
+                Semakan HR
+                <span id="pending-badge" class="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full hidden">0</span>
+            </button>
+            <button onclick="navigate('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center px-4 py-2.5 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/50 transition-colors">
+                <i class="ph ph-chart-pie-slice text-lg mr-3"></i>
+                Papan Pemuka
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pbi-blue to-pbi-cyan flex items-center justify-center text-white font-bold text-sm">
+                        AD
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium">Admin HR</p>
+                    </div>
+                </div>
+                <button onclick="toggleTheme()" class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors" title="Tukar Tema">
+                    <i id="theme-icon" class="ph ph-moon text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Mobile Header & Nav -->
+    <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 z-30">
+        <div class="flex items-center">
+            <i class="ph-fill ph-wallet text-pbi-blue text-xl mr-2"></i>
+            <h1 class="text-base font-bold">Claim<span class="text-pbi-blue">Pro</span></h1>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="toggleTheme()" class="p-2 text-gray-500"><i id="theme-icon-mobile" class="ph ph-moon text-lg"></i></button>
+            <!-- Mobile Menu Toggle (Simplified for demo) -->
+        </div>
+    </div>
+    
+    <!-- Mobile Bottom Nav -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex justify-around items-center z-30 px-2 pb-safe">
+        <button onclick="navigate('submit')" id="nav-submit-mob" class="nav-btn-mob flex flex-col items-center p-2 text-pbi-blue">
+            <i class="ph ph-paper-plane-right text-xl"></i>
+            <span class="text-[10px] mt-1">Hantar</span>
+        </button>
+        <button onclick="navigate('admin')" id="nav-admin-mob" class="nav-btn-mob flex flex-col items-center p-2 text-gray-500">
+            <div class="relative">
+                <i class="ph ph-clipboard-text text-xl"></i>
+                <span id="pending-badge-mob" class="absolute -top-1 -right-2 bg-red-500 text-white text-[8px] font-bold px-1 rounded-full hidden">0</span>
+            </div>
+            <span class="text-[10px] mt-1">Semakan</span>
+        </button>
+        <button onclick="navigate('dashboard')" id="nav-dashboard-mob" class="nav-btn-mob flex flex-col items-center p-2 text-gray-500">
+            <i class="ph ph-chart-pie-slice text-xl"></i>
+            <span class="text-[10px] mt-1">Laporan</span>
+        </button>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative pt-16 md:pt-0 pb-16 md:pb-0">
+        
+        <!-- Notifikasi Toast -->
+        <div id="toast" class="absolute top-4 right-4 z-50 transform transition-all duration-300 translate-y-[-150%] opacity-0 bg-white dark:bg-gray-800 border-l-4 border-green-500 shadow-lg rounded px-4 py-3 flex items-center">
+            <i class="ph-fill ph-check-circle text-green-500 text-xl mr-3"></i>
+            <div>
+                <p id="toast-title" class="text-sm font-bold text-gray-800 dark:text-white">Berjaya</p>
+                <p id="toast-msg" class="text-xs text-gray-600 dark:text-gray-400">Tindakan selesai.</p>
+            </div>
+        </div>
+
+        <!-- VIEW 1: Borang Tuntutan Pekerja -->
+        <div id="view-submit" class="view-section flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-3xl mx-auto">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Borang Tuntutan Pekerja</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Sila isikan maklumat perbelanjaan pendahuluan anda untuk tujuan pembayaran semula.</p>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+                <form id="claimForm" onsubmit="submitClaim(event)" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Nama -->
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Pekerja <span class="text-red-500">*</span></label>
+                            <input type="text" id="cName" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue focus:border-transparent transition-shadow" placeholder="Nama penuh">
+                        </div>
+                        
+                        <!-- Tarikh -->
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tarikh Perbelanjaan <span class="text-red-500">*</span></label>
+                            <input type="date" id="cDate" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue focus:border-transparent">
+                        </div>
+
+                        <!-- Jenis Claim -->
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jenis Tuntutan <span class="text-red-500">*</span></label>
+                            <select id="cType" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue focus:border-transparent">
+                                <option value="" disabled selected>Pilih jenis...</option>
+                                <option value="Perjalanan">Perjalanan (Tol, Minyak, Parkir)</option>
+                                <option value="Keraian">Keraian Pelanggan (Makanan/Minuman)</option>
+                                <option value="Penginapan">Penginapan (Hotel)</option>
+                                <option value="Perubatan">Perubatan & Klinik</option>
+                                <option value="Lain-lain">Lain-lain Bekalan/Servis</option>
+                            </select>
+                        </div>
+
+                        <!-- Bilangan Pax -->
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bilangan Pax (Orang) <span class="text-red-500">*</span></label>
+                            <input type="number" id="cPax" min="1" value="1" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <!-- Keterangan -->
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Keterangan Tujuan</label>
+                        <input type="text" id="cDesc" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue focus:border-transparent" placeholder="Cth: Jumpa client ABC SDN BHD">
+                    </div>
+
+                    <!-- Jumlah RM -->
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jumlah Tuntutan (RM) <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500 sm:text-sm">RM</span>
+                            </div>
+                            <input type="number" id="cAmount" step="0.01" min="0.01" required class="w-full pl-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue focus:border-transparent text-lg font-semibold" placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <!-- Upload Resit -->
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Muat Naik Resit (Format PDF) <span class="text-red-500">*</span></label>
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md hover:border-pbi-blue dark:hover:border-pbi-blue transition-colors group cursor-pointer" onclick="document.getElementById('cReceipt').click()">
+                            <div class="space-y-1 text-center">
+                                <i class="ph ph-file-pdf text-4xl text-gray-400 group-hover:text-pbi-blue mb-2"></i>
+                                <div class="flex text-sm text-gray-600 dark:text-gray-400 justify-center">
+                                    <span class="relative cursor-pointer bg-transparent rounded-md font-medium text-pbi-blue hover:text-pbi-darkblue focus-within:outline-none">
+                                        <span id="file-name-display">Klik untuk muat naik PDF</span>
+                                        <input id="cReceipt" name="cReceipt" type="file" accept=".pdf" class="sr-only" required onchange="updateFileName(this)">
+                                    </span>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-500">Maksimum 5MB</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex justify-end">
+                        <button type="button" onclick="document.getElementById('claimForm').reset(); document.getElementById('file-name-display').innerText = 'Klik untuk muat naik PDF';" class="mr-3 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            Set Semula
+                        </button>
+                        <button type="submit" class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pbi-blue hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pbi-blue transition-colors flex items-center">
+                            <i class="ph ph-paper-plane-tilt mr-2"></i> Hantar Tuntutan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- VIEW 2: Semakan HR / Admin -->
+        <div id="view-admin" class="view-section hidden flex-1 overflow-y-auto p-4 md:p-8 w-full">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Semakan Tuntutan HR</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Uruskan permohonan tuntutan pekerja. Semak resit dan laksanakan pembayaran.</p>
+                </div>
+                
+                <!-- Filter Status ringkas -->
+                <div class="flex rounded-md shadow-sm" role="group">
+                    <button type="button" onclick="filterAdminTable('Semua')" id="filter-all" class="px-4 py-2 text-sm font-medium rounded-l-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:z-10 bg-gray-100 dark:bg-gray-700">Semua</button>
+                    <button type="button" onclick="filterAdminTable('Menunggu')" id="filter-pending" class="px-4 py-2 text-sm font-medium border-t border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:z-10">Menunggu</button>
+                    <button type="button" onclick="filterAdminTable('Selesai Dibayar')" id="filter-paid" class="px-4 py-2 text-sm font-medium rounded-r-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:z-10">Selesai</button>
+                </div>
+            </div>
+
+            <!-- Jadual -->
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-900/50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID / Tarikh</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pekerja</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Jenis & Pax</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Jumlah (RM)</th>
+                                <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Resit</th>
+                                <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tindakan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            <!-- Data akan diisi oleh JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Empty State -->
+                <div id="adminEmptyState" class="hidden py-12 text-center">
+                    <i class="ph ph-folder-open text-4xl text-gray-400 mb-2"></i>
+                    <p class="text-gray-500 dark:text-gray-400">Tiada rekod tuntutan ditemui.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: Dashboard Pihak Pengurusan -->
+        <div id="view-dashboard" class="view-section hidden flex-1 overflow-y-auto p-4 md:p-8 w-full bg-gray-100 dark:bg-[#1e1e1e]">
+            
+            <!-- Header & Filter PBI Style -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-gray-300 dark:border-gray-700 pb-4">
+                <div>
+                    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">Laporan Eksekutif Tuntutan</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wider font-semibold">Tinjauan Syarikat</p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-end sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                    <div class="flex items-center space-x-2 bg-white dark:bg-[#252525] p-2 rounded shadow-sm border border-gray-200 dark:border-gray-700">
+                        <label class="text-xs text-gray-500 dark:text-gray-400 font-medium">Mula:</label>
+                        <input type="date" id="dashStartDate" onchange="updateDashboard()" class="text-sm border-none bg-transparent focus:ring-0 text-gray-700 dark:text-gray-300 font-medium outline-none">
+                    </div>
+                    <div class="flex items-center space-x-2 bg-white dark:bg-[#252525] p-2 rounded shadow-sm border border-gray-200 dark:border-gray-700">
+                        <label class="text-xs text-gray-500 dark:text-gray-400 font-medium">Akhir:</label>
+                        <input type="date" id="dashEndDate" onchange="updateDashboard()" class="text-sm border-none bg-transparent focus:ring-0 text-gray-700 dark:text-gray-300 font-medium outline-none">
+                    </div>
+                    <button onclick="resetDashFilter()" class="p-2 bg-white dark:bg-[#252525] text-gray-600 dark:text-gray-300 rounded shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-sm font-medium" title="Set Semula Filter">
+                        <i class="ph ph-arrows-counter-clockwise"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Cards (Power BI Style Cards) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <!-- Card 1 -->
+                <div class="bg-white dark:bg-[#252525] p-5 rounded shadow-sm border-l-4 border-pbi-blue relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 -mr-4 -mt-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="ph-fill ph-sigma text-8xl text-pbi-blue"></i>
+                    </div>
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Jumlah Tuntutan (Kasar)</p>
+                    <h3 class="text-3xl font-bold text-gray-800 dark:text-white" id="kpi-total-amount">RM 0.00</h3>
+                    <p class="text-xs text-gray-400 mt-2"><span id="kpi-total-count" class="font-bold">0</span> rekod dihantar</p>
+                </div>
+                
+                <!-- Card 2 -->
+                <div class="bg-white dark:bg-[#252525] p-5 rounded shadow-sm border-l-4 border-pbi-orange relative overflow-hidden">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Perlu Dibayar (Menunggu)</p>
+                    <h3 class="text-3xl font-bold text-gray-800 dark:text-white" id="kpi-pending-amount">RM 0.00</h3>
+                    <p class="text-xs text-pbi-orange mt-2 font-medium flex items-center">
+                        <i class="ph ph-warning-circle mr-1"></i> Memerlukan tindakan HR
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white dark:bg-[#252525] p-5 rounded shadow-sm border-l-4 border-pbi-green relative overflow-hidden">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Selesai Dibayar (YTD)</p>
+                    <h3 class="text-3xl font-bold text-gray-800 dark:text-white" id="kpi-paid-amount">RM 0.00</h3>
+                    <p class="text-xs text-pbi-green mt-2 font-medium flex items-center">
+                        <i class="ph ph-check-circle mr-1"></i> Wang telah disalurkan
+                    </p>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- Bar Chart -->
+                <div class="bg-white dark:bg-[#252525] p-4 rounded shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 text-center">Jumlah Perbelanjaan Mengikut Kategori</h3>
+                    <div class="relative h-64 w-full">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Doughnut Chart -->
+                <div class="bg-white dark:bg-[#252525] p-4 rounded shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 text-center">Status Pembayaran Keseluruhan</h3>
+                    <div class="relative h-64 w-full flex justify-center">
+                        <canvas id="doughnutChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Table (Data Grid) -->
+            <div class="bg-white dark:bg-[#252525] rounded shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="p-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#2a2a2a]">
+                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Jadual Terperinci Tuntutan</h3>
+                </div>
+                <div class="overflow-x-auto max-h-80">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+                        <thead class="bg-white dark:bg-[#252525] sticky top-0">
+                            <tr>
+                                <th scope="col" class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-400 border-b-2 border-gray-300 dark:border-gray-600">ID</th>
+                                <th scope="col" class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-400 border-b-2 border-gray-300 dark:border-gray-600">Nama Pekerja</th>
+                                <th scope="col" class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-400 border-b-2 border-gray-300 dark:border-gray-600">Tarikh</th>
+                                <th scope="col" class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-400 border-b-2 border-gray-300 dark:border-gray-600">Kategori</th>
+                                <th scope="col" class="px-4 py-2 text-right font-semibold text-gray-600 dark:text-gray-400 border-b-2 border-gray-300 dark:border-gray-600">Jumlah (RM)</th>
+                                <th scope="col" class="px-4 py-2 text-center font-semibold text-gray-600 dark:text-gray-400 border-b-2 border-gray-300 dark:border-gray-600">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashTableBody" class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-[#252525]">
+                            <!-- Data -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Modal Kelulusan Pembayaran (Selesai Payment) -->
+    <div id="paymentModal" class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 hidden z-50 flex items-center justify-center backdrop-blur-sm transition-opacity">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 transform scale-95 transition-transform duration-200 m-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Sahkan Pembayaran</h3>
+                <button onclick="closePaymentModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="ph ph-x text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-100 dark:border-blue-800/30">
+                <p class="text-sm text-gray-600 dark:text-gray-300">Pembayaran kepada: <strong id="modalPayee" class="text-gray-900 dark:text-white"></strong></p>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Jumlah: <strong id="modalAmount" class="text-pbi-blue text-lg"></strong></p>
+            </div>
+
+            <form id="paymentForm" onsubmit="confirmPayment(event)">
+                <input type="hidden" id="modalClaimId">
+                
+                <div class="space-y-2 mb-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Muat Naik Bukti Pembayaran (PDF) <span class="text-red-500">*</span></label>
+                    <input type="file" id="pReceipt" accept=".pdf" required class="block w-full text-sm text-gray-500 dark:text-gray-400
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-md file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-pbi-blue file:text-white
+                        hover:file:bg-blue-600 cursor-pointer border border-gray-300 dark:border-gray-600 rounded-md">
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="closePaymentModal()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pbi-green hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pbi-green">
+                        Sahkan & Tandakan Selesai
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // --- DATA STATE (In-Memory Simulation) ---
+        // Mock data awal untuk tujuan pembentangan
+        let claimsData = [
+            { id: 'CLM-001', name: 'Ahmad Ali', date: '2023-10-25', type: 'Perjalanan', pax: 1, desc: 'Lawat tapak projek', amount: 120.50, receiptName: 'tol_minyak.pdf', status: 'Selesai Dibayar', payReceiptName: 'txn_001.pdf', timestamp: new Date('2023-10-25T10:00:00').getTime() },
+            { id: 'CLM-002', name: 'Siti Nurhaliza', date: '2023-10-28', type: 'Keraian', pax: 4, desc: 'Makan tengahari dengan bakal pelabur', amount: 450.00, receiptName: 'resit_makan.pdf', status: 'Menunggu', payReceiptName: null, timestamp: new Date('2023-10-28T14:30:00').getTime() },
+            { id: 'CLM-003', name: 'Chong Wei', date: '2023-11-02', type: 'Penginapan', pax: 1, desc: 'Hotel mesyuarat tahunan', amount: 350.00, receiptName: 'inv_hotel.pdf', status: 'Selesai Dibayar', payReceiptName: 'txn_002.pdf', timestamp: new Date('2023-11-02T09:15:00').getTime() },
+            { id: 'CLM-004', name: 'Muthusamy', date: '2023-11-05', type: 'Perubatan', pax: 1, desc: 'Klinik panel', amount: 65.00, receiptName: 'resit_klinik.pdf', status: 'Menunggu', payReceiptName: null, timestamp: new Date('2023-11-05T11:20:00').getTime() }
+        ];
+
+        let currentFilter = 'Semua';
+        
+        // Chart Instances
+        let barChartInstance = null;
+        let doughnutChartInstance = null;
+
+        // Power BI Color Palette for Charts
+        const pbiColors = ['#118DFF', '#12239E', '#E66C37', '#6B007B', '#00B01A', '#00A638', '#33A1FD', '#FFA300'];
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set tarikh form submit kepada hari ini secara default
+            document.getElementById('cDate').valueAsDate = new Date();
+            
+            // Check system theme preference
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                // Untuk demo, kita kekalkan default Light seperti diminta, kecuali user tukar
+            }
+            
+            updateAdminTable();
+            updateDashboard();
+            updatePendingBadge();
+        });
+
+        // --- NAVIGATION ---
+        function navigate(viewId) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            
+            // Reset nav styles
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('bg-blue-50', 'text-pbi-blue', 'dark:bg-blue-900/30', 'dark:text-pbi-cyan');
+                el.classList.add('text-gray-600', 'dark:text-gray-400');
+            });
+            document.querySelectorAll('.nav-btn-mob').forEach(el => {
+                el.classList.remove('text-pbi-blue');
+                el.classList.add('text-gray-500');
+            });
+
+            // Show selected view
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            
+            // Active state desktop
+            const activeNav = document.getElementById(`nav-${viewId}`);
+            activeNav.classList.remove('text-gray-600', 'dark:text-gray-400');
+            activeNav.classList.add('bg-blue-50', 'text-pbi-blue', 'dark:bg-blue-900/30', 'dark:text-pbi-cyan');
+            
+            // Active state mobile
+            const activeNavMob = document.getElementById(`nav-${viewId}-mob`);
+            if(activeNavMob) {
+                activeNavMob.classList.remove('text-gray-500');
+                activeNavMob.classList.add('text-pbi-blue');
+            }
+
+            // Specific View Logic
+            if (viewId === 'admin') updateAdminTable();
+            if (viewId === 'dashboard') {
+                // Sedikit delay untuk pastikan div tidak display:none sebelum render chart
+                setTimeout(updateDashboard, 50); 
+            }
+        }
+
+        // --- THEME TOGGLE ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark');
+            const icons = [document.getElementById('theme-icon'), document.getElementById('theme-icon-mobile')];
+            
+            if (isDark) {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                icons.forEach(i => { if(i) { i.classList.remove('ph-sun'); i.classList.add('ph-moon'); }});
+            } else {
+                html.classList.remove('light');
+                html.classList.add('dark');
+                icons.forEach(i => { if(i) { i.classList.remove('ph-moon'); i.classList.add('ph-sun'); }});
+            }
+            
+            // Update charts colors if dashboard is active
+            if(!document.getElementById('view-dashboard').classList.contains('hidden')){
+                updateDashboard();
+            }
+        }
+
+        // --- UI HELPERS ---
+        function updateFileName(input) {
+            const display = document.getElementById('file-name-display');
+            if (input.files && input.files.length > 0) {
+                display.innerText = input.files[0].name;
+            } else {
+                display.innerText = 'Klik untuk muat naik PDF';
+            }
+        }
+
+        function showToast(title, msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            
+            toast.classList.remove('translate-y-[-150%]', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-[-150%]', 'opacity-0');
+            }, 3000);
+        }
+
+        function formatRM(amount) {
+            return new Intl.NumberFormat('ms-MY', { style: 'currency', currency: 'MYR' }).format(amount);
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('ms-MY', options);
+        }
+
+        function updatePendingBadge() {
+            const pendingCount = claimsData.filter(c => c.status === 'Menunggu').length;
+            const badges = [document.getElementById('pending-badge'), document.getElementById('pending-badge-mob')];
+            
+            badges.forEach(b => {
+                if(b) {
+                    if (pendingCount > 0) {
+                        b.innerText = pendingCount;
+                        b.classList.remove('hidden');
+                    } else {
+                        b.classList.add('hidden');
+                    }
+                }
+            });
+        }
+
+        // --- FORM SUBMISSION ---
+        function submitClaim(e) {
+            e.preventDefault();
+            
+            // Generate ID
+            const newId = 'CLM-' + String(claimsData.length + 1).padStart(3, '0');
+            
+            const fileInput = document.getElementById('cReceipt');
+            const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : 'tiada_resit.pdf';
+
+            const newClaim = {
+                id: newId,
+                name: document.getElementById('cName').value,
+                date: document.getElementById('cDate').value,
+                type: document.getElementById('cType').value,
+                pax: parseInt(document.getElementById('cPax').value),
+                desc: document.getElementById('cDesc').value,
+                amount: parseFloat(document.getElementById('cAmount').value),
+                receiptName: fileName,
+                status: 'Menunggu',
+                payReceiptName: null,
+                timestamp: Date.now()
+            };
+
+            claimsData.unshift(newClaim); // Masuk di atas
+            
+            document.getElementById('claimForm').reset();
+            document.getElementById('file-name-display').innerText = 'Klik untuk muat naik PDF';
+            
+            updatePendingBadge();
+            showToast('Tuntutan Berjaya Dihantar', `ID Rujukan: ${newId}. Sila tunggu semakan HR.`);
+        }
+
+        // --- ADMIN VIEW LOGIC ---
+        function filterAdminTable(status) {
+            currentFilter = status;
+            
+            // Update button styles
+            ['all', 'pending', 'paid'].forEach(id => {
+                const btn = document.getElementById(`filter-${id}`);
+                btn.classList.remove('bg-gray-100', 'dark:bg-gray-700');
+            });
+            
+            let activeId = 'all';
+            if(status === 'Menunggu') activeId = 'pending';
+            if(status === 'Selesai Dibayar') activeId = 'paid';
+            
+            document.getElementById(`filter-${activeId}`).classList.add('bg-gray-100', 'dark:bg-gray-700');
+            
+            updateAdminTable();
+        }
+
+        function updateAdminTable() {
+            const tbody = document.getElementById('adminTableBody');
+            const emptyState = document.getElementById('adminEmptyState');
+            tbody.innerHTML = '';
+
+            let filteredData = claimsData;
+            if (currentFilter !== 'Semua') {
+                filteredData = claimsData.filter(c => c.status === currentFilter);
+            }
+
+            if (filteredData.length === 0) {
+                emptyState.classList.remove('hidden');
+                tbody.parentNode.classList.add('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                tbody.parentNode.classList.remove('hidden');
+
+                filteredData.forEach(claim => {
+                    const statusClass = claim.status === 'Menunggu' 
+                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                        : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+                    
+                    const actionBtn = claim.status === 'Menunggu'
+                        ? `<button onclick="openPaymentModal('${claim.id}')" class="text-sm bg-pbi-blue hover:bg-blue-600 text-white px-3 py-1.5 rounded transition-colors shadow-sm">Buat Bayaran</button>`
+                        : `<button class="text-sm text-gray-400 cursor-not-allowed px-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded bg-gray-50 dark:bg-gray-800" disabled>Selesai</button>`;
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors';
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900 dark:text-white">${claim.id}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">${formatDate(claim.date)}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-900 dark:text-white font-medium">${claim.name}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]" title="${claim.desc}">${claim.desc || '-'}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                ${claim.type}
+                            </span>
+                            <div class="text-xs text-gray-500 mt-1">${claim.pax} Pax</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-gray-900 dark:text-white">
+                            ${formatRM(claim.amount)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <a href="#" class="text-pbi-blue hover:text-pbi-darkblue transition-colors" title="Lihat Resit Pekerja">
+                                <i class="ph ph-file-pdf text-2xl"></i>
+                            </a>
+                            ${claim.payReceiptName ? `
+                                <a href="#" class="text-pbi-green hover:text-green-700 ml-2 transition-colors" title="Resit Bayaran HR">
+                                    <i class="ph-fill ph-receipt text-2xl"></i>
+                                </a>
+                            ` : ''}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
+                                ${claim.status}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                            ${actionBtn}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        // --- PAYMENT MODAL LOGIC ---
+        function openPaymentModal(id) {
+            const claim = claimsData.find(c => c.id === id);
+            if(!claim) return;
+
+            document.getElementById('modalClaimId').value = id;
+            document.getElementById('modalPayee').innerText = claim.name;
+            document.getElementById('modalAmount').innerText = formatRM(claim.amount);
+            document.getElementById('paymentModal').classList.remove('hidden');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+            document.getElementById('paymentForm').reset();
+        }
+
+        function confirmPayment(e) {
+            e.preventDefault();
+            const id = document.getElementById('modalClaimId').value;
+            const fileInput = document.getElementById('pReceipt');
+            const receiptName = fileInput.files.length > 0 ? fileInput.files[0].name : 'bukti_bayaran.pdf';
+
+            // Kemaskini Data
+            const claimIndex = claimsData.findIndex(c => c.id === id);
+            if (claimIndex !== -1) {
+                claimsData[claimIndex].status = 'Selesai Dibayar';
+                claimsData[claimIndex].payReceiptName = receiptName;
+            }
+
+            closePaymentModal();
+            updateAdminTable();
+            updatePendingBadge();
+            showToast('Pembayaran Direkod', `Status tuntutan ${id} telah ditukar kepada Selesai.`);
+        }
+
+        // --- DASHBOARD LOGIC (Chart.js & Power BI Styling) ---
+        function resetDashFilter() {
+            document.getElementById('dashStartDate').value = '';
+            document.getElementById('dashEndDate').value = '';
+            updateDashboard();
+        }
+
+        function getFilteredDashboardData() {
+            const startDateVal = document.getElementById('dashStartDate').value;
+            const endDateVal = document.getElementById('dashEndDate').value;
+
+            return claimsData.filter(claim => {
+                const claimDate = new Date(claim.date);
+                
+                if (startDateVal && endDateVal) {
+                    const start = new Date(startDateVal);
+                    const end = new Date(endDateVal);
+                    end.setHours(23, 59, 59, 999); // Memastikan merangkumi hujung hari
+                    return claimDate >= start && claimDate <= end;
+                } else if (startDateVal) {
+                    const start = new Date(startDateVal);
+                    return claimDate >= start;
+                } else if (endDateVal) {
+                    const end = new Date(endDateVal);
+                    end.setHours(23, 59, 59, 999);
+                    return claimDate <= end;
+                }
+                
+                return true; // Jika tiada filter dipilih, kembalikan semua data
+            });
+        }
+
+        function updateDashboard() {
+            const data = getFilteredDashboardData();
+            
+            // 1. Kemaskini KPI Cards
+            const totalAmount = data.reduce((sum, c) => sum + c.amount, 0);
+            const pendingAmount = data.filter(c => c.status === 'Menunggu').reduce((sum, c) => sum + c.amount, 0);
+            const paidAmount = data.filter(c => c.status === 'Selesai Dibayar').reduce((sum, c) => sum + c.amount, 0);
+
+            document.getElementById('kpi-total-amount').innerText = formatRM(totalAmount);
+            document.getElementById('kpi-total-count').innerText = data.length;
+            document.getElementById('kpi-pending-amount').innerText = formatRM(pendingAmount);
+            document.getElementById('kpi-paid-amount').innerText = formatRM(paidAmount);
+
+            // 2. Kemaskini Jadual Terperinci
+            const tbody = document.getElementById('dashTableBody');
+            tbody.innerHTML = '';
+            data.forEach(claim => {
+                const statusColor = claim.status === 'Menunggu' ? 'text-pbi-orange' : 'text-pbi-green';
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50 dark:hover:bg-[#2e2e2e] transition-colors';
+                tr.innerHTML = `
+                    <td class="px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200">${claim.id}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200">${claim.name}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-gray-500 dark:text-gray-400">${formatDate(claim.date)}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-gray-500 dark:text-gray-400">${claim.type}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-right font-medium text-gray-800 dark:text-gray-200">${formatRM(claim.amount)}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-center font-semibold ${statusColor}">${claim.status}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Theme colors for charts
+            const isDark = document.documentElement.classList.contains('dark');
+            const gridColor = isDark ? '#404040' : '#e5e7eb';
+            const textColor = isDark ? '#d1d5db' : '#374151';
+
+            // 3. Kemaskini Bar Chart (Kategori)
+            const categories = {};
+            data.forEach(c => {
+                categories[c.type] = (categories[c.type] || 0) + c.amount;
+            });
+            
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            if (barChartInstance) barChartInstance.destroy();
+            
+            barChartInstance = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(categories),
+                    datasets: [{
+                        label: 'Jumlah RM',
+                        data: Object.values(categories),
+                        backgroundColor: pbiColors[0],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { color: gridColor },
+                            ticks: { color: textColor, callback: function(value) { return 'RM ' + value; } }
+                        },
+                        x: { 
+                            grid: { display: false },
+                            ticks: { color: textColor }
+                        }
+                    }
+                }
+            });
+
+            // 4. Kemaskini Doughnut Chart (Status)
+            const statusCounts = { 'Menunggu': 0, 'Selesai Dibayar': 0 };
+            data.forEach(c => { statusCounts[c.status]++; });
+
+            const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+            if (doughnutChartInstance) doughnutChartInstance.destroy();
+
+            doughnutChartInstance = new Chart(doughnutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Menunggu', 'Selesai Dibayar'],
+                    datasets: [{
+                        data: [statusCounts['Menunggu'], statusCounts['Selesai Dibayar']],
+                        backgroundColor: [
+                            tailwind.config.theme.extend.colors.pbi.orange, 
+                            tailwind.config.theme.extend.colors.pbi.green
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: textColor, usePointStyle: true, padding: 20 }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
