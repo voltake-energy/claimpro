@@ -76,7 +76,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200 font-sans h-screen flex overflow-hidden selection:bg-pbi-blue selection:text-white">
 
-    <!-- Sidebar / Navigasi -->
+    <!-- Sidebar / Navigasi (Desktop) -->
     <aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-colors z-20 hidden md:flex flex-shrink-0">
         <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
             <i class="ph-fill ph-wallet text-pbi-blue text-2xl mr-3"></i>
@@ -89,8 +89,8 @@
                 Hantar Tuntutan
             </button>
             <button onclick="navigate('admin')" id="nav-admin" class="nav-btn w-full flex items-center px-4 py-2.5 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/50 transition-colors">
-                <i class="ph ph-clipboard-text text-lg mr-3"></i>
-                Semakan HR
+                <i class="ph ph-users-three text-lg mr-3"></i>
+                Semakan Pukal HR
                 <span id="pending-badge" class="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full hidden">0</span>
             </button>
             <button onclick="navigate('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center px-4 py-2.5 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/50 transition-colors">
@@ -123,8 +123,9 @@
             <h1 class="text-base font-bold">Claim<span class="text-pbi-blue">Pro</span></h1>
         </div>
         <div class="flex gap-2">
-            <button onclick="toggleTheme()" class="p-2 text-gray-500"><i id="theme-icon-mobile" class="ph ph-moon text-lg"></i></button>
-            <!-- Mobile Menu Toggle (Simplified for demo) -->
+            <button onclick="toggleTheme()" class="p-2 text-gray-500">
+                <i id="theme-icon-mobile" class="ph ph-moon text-lg"></i>
+            </button>
         </div>
     </div>
     
@@ -136,7 +137,7 @@
         </button>
         <button onclick="navigate('admin')" id="nav-admin-mob" class="nav-btn-mob flex flex-col items-center p-2 text-gray-500">
             <div class="relative">
-                <i class="ph ph-clipboard-text text-xl"></i>
+                <i class="ph ph-users-three text-xl"></i>
                 <span id="pending-badge-mob" class="absolute -top-1 -right-2 bg-red-500 text-white text-[8px] font-bold px-1 rounded-full hidden">0</span>
             </div>
             <span class="text-[10px] mt-1">Semakan</span>
@@ -163,16 +164,23 @@
         <div id="view-submit" class="view-section flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-3xl mx-auto">
             <div class="mb-6">
                 <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Borang Tuntutan Pekerja</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Sila isikan maklumat perbelanjaan pendahuluan anda untuk tujuan pembayaran semula.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Sila isikan maklumat dan muat naik bukti perbelanjaan pendahuluan anda.</p>
             </div>
 
             <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
                 <form id="claimForm" onsubmit="submitClaim(event)" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Nama -->
-                        <div class="space-y-1.5">
+                        
+                        <!-- Nama Pekerja (Searchable Dropdown Google Sheets) -->
+                        <div class="space-y-1.5 relative" id="employeeSearchContainer">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Pekerja <span class="text-red-500">*</span></label>
-                            <input type="text" id="cName" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue focus:border-transparent transition-shadow" placeholder="Nama penuh">
+                            <input type="text" id="cNameInput" autocomplete="off" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue focus:border-transparent transition-shadow" placeholder="Cari ID atau Nama...">
+                            <input type="hidden" id="cName">
+                            
+                            <!-- Dropdown List -->
+                            <ul id="employeeDropdown" class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg max-h-48 overflow-y-auto hidden">
+                                <li class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">Memuatkan data...</li>
+                            </ul>
                         </div>
                         
                         <!-- Tarikh -->
@@ -218,25 +226,32 @@
                         </div>
                     </div>
 
-                    <!-- Upload Resit -->
+                    <!-- Upload Resit & Camera -->
                     <div class="space-y-1.5">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Muat Naik Resit (Format PDF) <span class="text-red-500">*</span></label>
-                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md hover:border-pbi-blue dark:hover:border-pbi-blue transition-colors group cursor-pointer" onclick="document.getElementById('cReceipt').click()">
-                            <div class="space-y-1 text-center">
-                                <i class="ph ph-file-pdf text-4xl text-gray-400 group-hover:text-pbi-blue mb-2"></i>
-                                <div class="flex text-sm text-gray-600 dark:text-gray-400 justify-center">
-                                    <span class="relative cursor-pointer bg-transparent rounded-md font-medium text-pbi-blue hover:text-pbi-darkblue focus-within:outline-none">
-                                        <span id="file-name-display">Klik untuk muat naik PDF</span>
-                                        <input id="cReceipt" name="cReceipt" type="file" accept=".pdf" class="sr-only" required onchange="updateFileName(this)">
-                                    </span>
-                                </div>
-                                <p class="text-xs text-gray-500 dark:text-gray-500">Maksimum 5MB</p>
-                            </div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Muat Naik Resit (PDF/Imej) atau Tangkap Gambar <span class="text-red-500">*</span></label>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                            <!-- Regular Upload (PDF/Image) -->
+                            <label class="flex flex-col items-center justify-center p-4 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md hover:border-pbi-blue transition-colors group cursor-pointer bg-gray-50 dark:bg-gray-800/50">
+                                <i class="ph ph-upload-simple text-3xl text-gray-400 group-hover:text-pbi-blue mb-2"></i>
+                                <span id="file-name-display" class="text-sm font-medium text-pbi-blue text-center">Pilih Fail / Gambar</span>
+                                <input type="file" id="cReceiptFile" accept=".pdf, image/png, image/jpeg, image/jpg" class="hidden" onchange="handleFileSelect('file')">
+                            </label>
+                            
+                            <!-- Camera Capture (Mobile) -->
+                            <label class="flex flex-col items-center justify-center p-4 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md hover:border-pbi-blue transition-colors group cursor-pointer bg-gray-50 dark:bg-gray-800/50">
+                                <i class="ph ph-camera text-3xl text-gray-400 group-hover:text-pbi-blue mb-2"></i>
+                                <span id="camera-name-display" class="text-sm font-medium text-pbi-blue text-center">Buka Kamera</span>
+                                <!-- capture="environment" forces back camera on mobile -->
+                                <input type="file" id="cReceiptCam" accept="image/*" capture="environment" class="hidden" onchange="handleFileSelect('cam')">
+                            </label>
                         </div>
+                        <p id="receiptError" class="text-red-500 text-xs mt-1 hidden">Sila muat naik satu fail atau tangkap gambar resit.</p>
+                        <input type="hidden" id="selectedFileName"> <!-- To keep track of chosen file name -->
                     </div>
 
                     <div class="pt-4 flex justify-end">
-                        <button type="button" onclick="document.getElementById('claimForm').reset(); document.getElementById('file-name-display').innerText = 'Klik untuk muat naik PDF';" class="mr-3 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <button type="button" onclick="resetForm()" class="mr-3 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                             Set Semula
                         </button>
                         <button type="submit" class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pbi-blue hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pbi-blue transition-colors flex items-center">
@@ -247,33 +262,33 @@
             </div>
         </div>
 
-        <!-- VIEW 2: Semakan HR / Admin -->
+        <!-- VIEW 2: Semakan HR / Admin (Bulk Grouping) -->
         <div id="view-admin" class="view-section hidden flex-1 overflow-y-auto p-4 md:p-8 w-full">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Semakan Tuntutan HR</h2>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Uruskan permohonan tuntutan pekerja. Semak resit dan laksanakan pembayaran.</p>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Semakan Tuntutan Pukal (Kumpulan)</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Jadual dikumpulkan mengikut nama pekerja. Uruskan pembayaran penuh atau separa mengikut turutan FIFO.</p>
                 </div>
                 
                 <!-- Filter Status ringkas -->
                 <div class="flex rounded-md shadow-sm" role="group">
-                    <button type="button" onclick="filterAdminTable('Semua')" id="filter-all" class="px-4 py-2 text-sm font-medium rounded-l-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:z-10 bg-gray-100 dark:bg-gray-700">Semua</button>
-                    <button type="button" onclick="filterAdminTable('Menunggu')" id="filter-pending" class="px-4 py-2 text-sm font-medium border-t border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:z-10">Menunggu</button>
-                    <button type="button" onclick="filterAdminTable('Selesai Dibayar')" id="filter-paid" class="px-4 py-2 text-sm font-medium rounded-r-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:z-10">Selesai</button>
+                    <button type="button" onclick="filterAdminTable('Semua')" id="filter-all" class="px-4 py-2 text-sm font-medium rounded-l-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">Semua</button>
+                    <button type="button" onclick="filterAdminTable('Ada Baki')" id="filter-pending" class="px-4 py-2 text-sm font-medium border-t border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Ada Baki</button>
+                    <button type="button" onclick="filterAdminTable('Selesai')" id="filter-paid" class="px-4 py-2 text-sm font-medium rounded-r-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Selesai</button>
                 </div>
             </div>
 
-            <!-- Jadual -->
+            <!-- Jadual Grouping -->
             <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-900/50">
                             <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID / Tarikh</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pekerja</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Jenis & Pax</th>
-                                <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Jumlah (RM)</th>
-                                <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Resit</th>
+                                <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bil. Tuntutan</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Kasar (RM)</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Telah Dibayar (RM)</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Baki Terkini (RM)</th>
                                 <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                                 <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tindakan</th>
                             </tr>
@@ -323,26 +338,26 @@
                     <div class="absolute top-0 right-0 -mr-4 -mt-4 opacity-10 group-hover:opacity-20 transition-opacity">
                         <i class="ph-fill ph-sigma text-8xl text-pbi-blue"></i>
                     </div>
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Jumlah Tuntutan (Kasar)</p>
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Jumlah Tuntutan Kasar</p>
                     <h3 class="text-3xl font-bold text-gray-800 dark:text-white" id="kpi-total-amount">RM 0.00</h3>
-                    <p class="text-xs text-gray-400 mt-2"><span id="kpi-total-count" class="font-bold">0</span> rekod dihantar</p>
+                    <p class="text-xs text-gray-400 mt-2"><span id="kpi-total-count" class="font-bold">0</span> rekod individu dihantar</p>
                 </div>
                 
                 <!-- Card 2 -->
                 <div class="bg-white dark:bg-[#252525] p-5 rounded shadow-sm border-l-4 border-pbi-orange relative overflow-hidden">
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Perlu Dibayar (Menunggu)</p>
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Baki Perlu Dibayar</p>
                     <h3 class="text-3xl font-bold text-gray-800 dark:text-white" id="kpi-pending-amount">RM 0.00</h3>
                     <p class="text-xs text-pbi-orange mt-2 font-medium flex items-center">
-                        <i class="ph ph-warning-circle mr-1"></i> Memerlukan tindakan HR
+                        <i class="ph ph-warning-circle mr-1"></i> Jumlah belum dilunaskan
                     </p>
                 </div>
 
                 <!-- Card 3 -->
                 <div class="bg-white dark:bg-[#252525] p-5 rounded shadow-sm border-l-4 border-pbi-green relative overflow-hidden">
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Selesai Dibayar (YTD)</p>
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Telah Dibayar (YTD)</p>
                     <h3 class="text-3xl font-bold text-gray-800 dark:text-white" id="kpi-paid-amount">RM 0.00</h3>
                     <p class="text-xs text-pbi-green mt-2 font-medium flex items-center">
-                        <i class="ph ph-check-circle mr-1"></i> Wang telah disalurkan
+                        <i class="ph ph-check-circle mr-1"></i> Wang yang disalurkan
                     </p>
                 </div>
             </div>
@@ -359,90 +374,107 @@
 
                 <!-- Doughnut Chart -->
                 <div class="bg-white dark:bg-[#252525] p-4 rounded shadow-sm border border-gray-200 dark:border-gray-700">
-                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 text-center">Status Pembayaran Keseluruhan</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 text-center">Taburan Status Pembayaran</h3>
                     <div class="relative h-64 w-full flex justify-center">
                         <canvas id="doughnutChart"></canvas>
                     </div>
                 </div>
             </div>
-
-            <!-- Detailed Table (Data Grid) -->
-            <div class="bg-white dark:bg-[#252525] rounded shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <div class="p-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#2a2a2a]">
-                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Jadual Terperinci Tuntutan</h3>
-                </div>
-                <div class="overflow-x-auto max-h-80">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
-                        <thead class="bg-white dark:bg-[#252525] sticky top-0">
-                            <tr>
-                                <th scope="col" class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-400 border-b-2 border-gray-300 dark:border-gray-600">ID</th>
-                                <th scope="col" class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-400 border-b-2 border-gray-300 dark:border-gray-600">Nama Pekerja</th>
-                                <th scope="col" class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-400 border-b-2 border-gray-300 dark:border-gray-600">Tarikh</th>
-                                <th scope="col" class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-400 border-b-2 border-gray-300 dark:border-gray-600">Kategori</th>
-                                <th scope="col" class="px-4 py-2 text-right font-semibold text-gray-600 dark:text-gray-400 border-b-2 border-gray-300 dark:border-gray-600">Jumlah (RM)</th>
-                                <th scope="col" class="px-4 py-2 text-center font-semibold text-gray-600 dark:text-gray-400 border-b-2 border-gray-300 dark:border-gray-600">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dashTableBody" class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-[#252525]">
-                            <!-- Data -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
         </div>
 
     </main>
 
-    <!-- Modal Kelulusan Pembayaran (Selesai Payment) -->
+    <!-- Modal Kelulusan Pembayaran (Bulk / Partial) -->
     <div id="paymentModal" class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 hidden z-50 flex items-center justify-center backdrop-blur-sm transition-opacity">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 transform scale-95 transition-transform duration-200 m-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 transform transition-transform duration-200 m-4">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Sahkan Pembayaran</h3>
-                <button onclick="closePaymentModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Sahkan Pembayaran Pukal / Separa</h3>
+                <button onclick="closePaymentModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                     <i class="ph ph-x text-xl"></i>
                 </button>
             </div>
             
             <div class="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-100 dark:border-blue-800/30">
-                <p class="text-sm text-gray-600 dark:text-gray-300">Pembayaran kepada: <strong id="modalPayee" class="text-gray-900 dark:text-white"></strong></p>
-                <p class="text-sm text-gray-600 dark:text-gray-300">Jumlah: <strong id="modalAmount" class="text-pbi-blue text-lg"></strong></p>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Pekerja: <strong id="modalPayee" class="text-gray-900 dark:text-white"></strong></p>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Baki Perlu Dibayar: <strong id="modalMaxAmount" class="text-pbi-blue text-lg"></strong></p>
             </div>
 
             <form id="paymentForm" onsubmit="confirmPayment(event)">
-                <input type="hidden" id="modalClaimId">
+                <input type="hidden" id="modalPayeeName">
+                <input type="hidden" id="modalMaxBalance">
                 
-                <div class="space-y-2 mb-6">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Muat Naik Bukti Pembayaran (PDF) <span class="text-red-500">*</span></label>
-                    <input type="file" id="pReceipt" accept=".pdf" required class="block w-full text-sm text-gray-500 dark:text-gray-400
-                        file:mr-4 file:py-2 file:px-4
-                        file:rounded-md file:border-0
-                        file:text-sm file:font-semibold
-                        file:bg-pbi-blue file:text-white
-                        hover:file:bg-blue-600 cursor-pointer border border-gray-300 dark:border-gray-600 rounded-md">
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jumlah Ingin Dibayar (RM) <span class="text-red-500">*</span></label>
+                        <input type="number" id="pAmount" step="0.01" min="0.01" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow" placeholder="Masukkan jumlah bayaran">
+                        <p class="text-xs text-gray-500 mt-1">Sistem akan menolak tuntutan mengikut turutan tarikh terlama (FIFO).</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Muat Naik Bukti Pembayaran <span class="text-red-500">*</span></label>
+                        <input type="file" id="pReceipt" accept=".pdf,image/*" required class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pbi-blue file:text-white hover:file:bg-blue-600 cursor-pointer border border-gray-300 dark:border-gray-600 rounded-md transition-colors">
+                    </div>
                 </div>
 
                 <div class="flex justify-end gap-3">
-                    <button type="button" onclick="closePaymentModal()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <button type="button" onclick="closePaymentModal()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                         Batal
                     </button>
-                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pbi-green hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pbi-green">
-                        Sahkan & Tandakan Selesai
+                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pbi-green hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pbi-green transition-colors">
+                        Sahkan Bayaran
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Application Logic -->
+    <!-- Modal Perincian Tuntutan Pekerja -->
+    <div id="detailsModal" class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 hidden z-50 flex items-center justify-center backdrop-blur-sm transition-opacity">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl p-6 m-4 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Perincian Tuntutan: <span id="detailName" class="text-pbi-blue"></span></h3>
+                <button onclick="closeDetailsModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                    <i class="ph ph-x text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="overflow-y-auto flex-1 border border-gray-200 dark:border-gray-700 rounded-md">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+                    <thead class="bg-gray-50 dark:bg-gray-900 sticky top-0 shadow-sm z-10">
+                        <tr>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">ID / Tarikh</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">Keterangan</th>
+                            <th class="px-4 py-3 text-right font-semibold text-gray-600 dark:text-gray-400">Kasar (RM)</th>
+                            <th class="px-4 py-3 text-right font-semibold text-gray-600 dark:text-gray-400">Dibayar (RM)</th>
+                            <th class="px-4 py-3 text-right font-semibold text-gray-600 dark:text-gray-400">Baki (RM)</th>
+                            <th class="px-4 py-3 text-center font-semibold text-gray-600 dark:text-gray-400">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailsTableBody" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        <!-- Data akan diisi oleh JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4 flex justify-end">
+                <button onclick="closeDetailsModal()" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic (JavaScript) -->
     <script>
         // --- DATA STATE (In-Memory Simulation) ---
-        // Mock data awal untuk tujuan pembentangan
+        let employeesList = []; // Array untuk simpan data dari Google Sheet
+        
+        // Mock data awal. Perhatikan penambahan attribute 'paid' untuk fungsi separa bayaran
         let claimsData = [
-            { id: 'CLM-001', name: 'Ahmad Ali', date: '2023-10-25', type: 'Perjalanan', pax: 1, desc: 'Lawat tapak projek', amount: 120.50, receiptName: 'tol_minyak.pdf', status: 'Selesai Dibayar', payReceiptName: 'txn_001.pdf', timestamp: new Date('2023-10-25T10:00:00').getTime() },
-            { id: 'CLM-002', name: 'Siti Nurhaliza', date: '2023-10-28', type: 'Keraian', pax: 4, desc: 'Makan tengahari dengan bakal pelabur', amount: 450.00, receiptName: 'resit_makan.pdf', status: 'Menunggu', payReceiptName: null, timestamp: new Date('2023-10-28T14:30:00').getTime() },
-            { id: 'CLM-003', name: 'Chong Wei', date: '2023-11-02', type: 'Penginapan', pax: 1, desc: 'Hotel mesyuarat tahunan', amount: 350.00, receiptName: 'inv_hotel.pdf', status: 'Selesai Dibayar', payReceiptName: 'txn_002.pdf', timestamp: new Date('2023-11-02T09:15:00').getTime() },
-            { id: 'CLM-004', name: 'Muthusamy', date: '2023-11-05', type: 'Perubatan', pax: 1, desc: 'Klinik panel', amount: 65.00, receiptName: 'resit_klinik.pdf', status: 'Menunggu', payReceiptName: null, timestamp: new Date('2023-11-05T11:20:00').getTime() }
+            { id: 'CLM-001', name: 'Ahmad Ali', date: '2023-10-25', type: 'Perjalanan', pax: 1, desc: 'Lawat tapak projek 1', amount: 100.00, paid: 100.00, status: 'Selesai Dibayar', receiptName: 'tol1.pdf', payReceiptName: 'txn_001.pdf', timestamp: Date.now() - 10000 },
+            { id: 'CLM-002', name: 'Ahmad Ali', date: '2023-11-05', type: 'Perjalanan', pax: 1, desc: 'Minyak kereta', amount: 50.00, paid: 0, status: 'Menunggu', receiptName: 'minyak.jpg', payReceiptName: null, timestamp: Date.now() - 5000 },
+            { id: 'CLM-003', name: 'Ahmad Ali', date: '2023-11-10', type: 'Keraian', pax: 2, desc: 'Makan client', amount: 75.00, paid: 0, status: 'Menunggu', receiptName: 'resit_makan.png', payReceiptName: null, timestamp: Date.now() - 2000 },
+            { id: 'CLM-004', name: 'Siti Nurhaliza', date: '2023-10-28', type: 'Keraian', pax: 4, desc: 'Makan tengahari VIP', amount: 450.00, paid: 200.00, status: 'Separa Dibayar', receiptName: 'resit_vip.pdf', payReceiptName: 'txn_002.pdf', timestamp: Date.now() - 8000 },
+            { id: 'CLM-005', name: 'Chong Wei', date: '2023-11-02', type: 'Penginapan', pax: 1, desc: 'Hotel mesyuarat', amount: 350.00, paid: 350.00, status: 'Selesai Dibayar', receiptName: 'inv_hotel.pdf', payReceiptName: 'txn_003.pdf', timestamp: Date.now() - 7000 }
         ];
 
         let currentFilter = 'Semua';
@@ -451,22 +483,22 @@
         let barChartInstance = null;
         let doughnutChartInstance = null;
 
-        // Power BI Color Palette for Charts
+        // Power BI Color Palette
         const pbiColors = ['#118DFF', '#12239E', '#E66C37', '#6B007B', '#00B01A', '#00A638', '#33A1FD', '#FFA300'];
 
-        // --- INIT ---
+        // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Set tarikh form submit kepada hari ini secara default
+            // Set default date to today
             document.getElementById('cDate').valueAsDate = new Date();
             
-            // Check system theme preference
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                // Untuk demo, kita kekalkan default Light seperti diminta, kecuali user tukar
-            }
-            
+            // Render Initial Views
             updateAdminTable();
             updateDashboard();
             updatePendingBadge();
+            
+            // Initialize Dropdown
+            fetchEmployees();
+            setupEmployeeSearch();
         });
 
         // --- NAVIGATION ---
@@ -474,11 +506,12 @@
             // Hide all views
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
             
-            // Reset nav styles
+            // Reset nav styles Desktop
             document.querySelectorAll('.nav-btn').forEach(el => {
                 el.classList.remove('bg-blue-50', 'text-pbi-blue', 'dark:bg-blue-900/30', 'dark:text-pbi-cyan');
                 el.classList.add('text-gray-600', 'dark:text-gray-400');
             });
+            // Reset nav styles Mobile
             document.querySelectorAll('.nav-btn-mob').forEach(el => {
                 el.classList.remove('text-pbi-blue');
                 el.classList.add('text-gray-500');
@@ -487,88 +520,191 @@
             // Show selected view
             document.getElementById(`view-${viewId}`).classList.remove('hidden');
             
-            // Active state desktop
+            // Active state Desktop
             const activeNav = document.getElementById(`nav-${viewId}`);
-            activeNav.classList.remove('text-gray-600', 'dark:text-gray-400');
-            activeNav.classList.add('bg-blue-50', 'text-pbi-blue', 'dark:bg-blue-900/30', 'dark:text-pbi-cyan');
+            if(activeNav) activeNav.classList.add('bg-blue-50', 'text-pbi-blue', 'dark:bg-blue-900/30', 'dark:text-pbi-cyan');
             
-            // Active state mobile
+            // Active state Mobile
             const activeNavMob = document.getElementById(`nav-${viewId}-mob`);
-            if(activeNavMob) {
-                activeNavMob.classList.remove('text-gray-500');
-                activeNavMob.classList.add('text-pbi-blue');
-            }
+            if(activeNavMob) activeNavMob.classList.add('text-pbi-blue');
 
-            // Specific View Logic
+            // View Specific Callbacks
             if (viewId === 'admin') updateAdminTable();
             if (viewId === 'dashboard') {
-                // Sedikit delay untuk pastikan div tidak display:none sebelum render chart
-                setTimeout(updateDashboard, 50); 
+                setTimeout(updateDashboard, 50); // slight delay to ensure canvas is visible
             }
         }
 
         // --- THEME TOGGLE ---
         function toggleTheme() {
             const html = document.documentElement;
+            html.classList.toggle('dark');
+            html.classList.toggle('light');
+            
             const isDark = html.classList.contains('dark');
             const icons = [document.getElementById('theme-icon'), document.getElementById('theme-icon-mobile')];
             
-            if (isDark) {
-                html.classList.remove('dark');
-                html.classList.add('light');
-                icons.forEach(i => { if(i) { i.classList.remove('ph-sun'); i.classList.add('ph-moon'); }});
-            } else {
-                html.classList.remove('light');
-                html.classList.add('dark');
-                icons.forEach(i => { if(i) { i.classList.remove('ph-moon'); i.classList.add('ph-sun'); }});
-            }
+            icons.forEach(i => { 
+                if(i) { 
+                    i.className = isDark ? 'ph ph-sun text-lg' : 'ph ph-moon text-lg'; 
+                }
+            });
             
-            // Update charts colors if dashboard is active
-            if(!document.getElementById('view-dashboard').classList.contains('hidden')){
+            // Rerender charts to update grid/text colors
+            if(!document.getElementById('view-dashboard').classList.contains('hidden')) {
                 updateDashboard();
             }
         }
 
-        // --- UI HELPERS ---
-        function updateFileName(input) {
-            const display = document.getElementById('file-name-display');
-            if (input.files && input.files.length > 0) {
-                display.innerText = input.files[0].name;
-            } else {
-                display.innerText = 'Klik untuk muat naik PDF';
+        // --- EMPLOYEE SEARCH (GOOGLE SHEETS) LOGIC ---
+        // Pautan Google Sheets dalam format CSV
+        const sheetCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?output=csv';
+
+        async function fetchEmployees() {
+            try {
+                const response = await fetch(sheetCSVUrl);
+                const data = await response.text();
+                
+                const rows = data.split('\n');
+                employeesList = [];
+                
+                // Mula index 1 untuk abaikan Header
+                for(let i = 1; i < rows.length; i++) {
+                    if(!rows[i].trim()) continue;
+                    
+                    // Pisahkan berdasarkan koma (mengambil kira quote "" jika ada koma di dalam nama)
+                    const cols = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
+                    
+                    if(cols.length >= 2) {
+                        const id = cols[0].replace(/"/g, '').trim();
+                        const name = cols[1].replace(/"/g, '').trim();
+                        employeesList.push({ 
+                            id: id, 
+                            name: name, 
+                            displayText: `${id} - ${name}` 
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Gagal memuatkan data pekerja:', error);
+                employeesList = [{ id: 'Ralat', name: 'Gagal muat turun data', displayText: 'Gagal muat turun data Google Sheet. Sila taip nama secara manual.' }];
             }
         }
 
-        function showToast(title, msg, type = 'success') {
+        function setupEmployeeSearch() {
+            const input = document.getElementById('cNameInput');
+            const hiddenInput = document.getElementById('cName');
+            const dropdown = document.getElementById('employeeDropdown');
+            const container = document.getElementById('employeeSearchContainer');
+
+            // Tunjuk dropdown bila input di klik
+            input.addEventListener('focus', () => {
+                renderDropdown(input.value);
+                dropdown.classList.remove('hidden');
+            });
+
+            // Tapis data apabila user menaip
+            input.addEventListener('input', (e) => {
+                renderDropdown(e.target.value);
+                hiddenInput.value = ''; // Reset hidden value apabila user ubah secara manual
+            });
+
+            // Tutup dropdown jika klik di luar
+            document.addEventListener('click', (e) => {
+                if (!container.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        function renderDropdown(searchTerm) {
+            const dropdown = document.getElementById('employeeDropdown');
+            dropdown.innerHTML = '';
+            
+            const term = searchTerm.toLowerCase();
+            const filtered = employeesList.filter(emp => emp.displayText.toLowerCase().includes(term));
+
+            if(filtered.length === 0) {
+                dropdown.innerHTML = `<li class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">Tiada padanan ditemui. Taip untuk teruskan.</li>`;
+                return;
+            }
+
+            filtered.forEach(emp => {
+                const li = document.createElement('li');
+                li.className = 'px-3 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-pbi-blue hover:text-white cursor-pointer transition-colors';
+                li.innerText = emp.displayText;
+                
+                li.onclick = () => {
+                    document.getElementById('cNameInput').value = emp.displayText; // Paparan untuk UI
+                    document.getElementById('cName').value = emp.name; // Simpan nilai sebenar ke input hidden
+                    dropdown.classList.add('hidden');
+                };
+                dropdown.appendChild(li);
+            });
+        }
+
+        // --- UPLOAD / CAMERA LOGIC ---
+        function handleFileSelect(source) {
+            const fileInput = document.getElementById(source === 'file' ? 'cReceiptFile' : 'cReceiptCam');
+            const otherInput = document.getElementById(source === 'file' ? 'cReceiptCam' : 'cReceiptFile');
+            const displayId = source === 'file' ? 'file-name-display' : 'camera-name-display';
+            const otherDisplayId = source === 'file' ? 'camera-name-display' : 'file-name-display';
+            
+            if (fileInput.files && fileInput.files.length > 0) {
+                // Kemaskini text dengan nama fail yang dipilih
+                document.getElementById(displayId).innerText = fileInput.files[0].name;
+                document.getElementById('selectedFileName').value = fileInput.files[0].name;
+                
+                // Kosongkan input yang satu lagi supaya tidak clash
+                otherInput.value = "";
+                document.getElementById(otherDisplayId).innerText = source === 'file' ? 'Buka Kamera' : 'Pilih Fail / Gambar';
+                document.getElementById('receiptError').classList.add('hidden');
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('claimForm').reset();
+            
+            // Reset custom field states
+            document.getElementById('cName').value = "";
+            document.getElementById('cReceiptFile').value = "";
+            document.getElementById('cReceiptCam').value = "";
+            document.getElementById('file-name-display').innerText = 'Pilih Fail / Gambar';
+            document.getElementById('camera-name-display').innerText = 'Buka Kamera';
+            document.getElementById('selectedFileName').value = "";
+            document.getElementById('receiptError').classList.add('hidden');
+        }
+
+        // --- GENERAL HELPERS ---
+        function showToast(title, msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-title').innerText = title;
             document.getElementById('toast-msg').innerText = msg;
             
             toast.classList.remove('translate-y-[-150%]', 'opacity-0');
-            
             setTimeout(() => {
                 toast.classList.add('translate-y-[-150%]', 'opacity-0');
             }, 3000);
         }
 
-        function formatRM(amount) {
-            return new Intl.NumberFormat('ms-MY', { style: 'currency', currency: 'MYR' }).format(amount);
+        function formatRM(amount) { 
+            return new Intl.NumberFormat('ms-MY', { style: 'currency', currency: 'MYR' }).format(amount); 
         }
 
-        function formatDate(dateString) {
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('ms-MY', options);
+        function formatDate(dStr) { 
+            return new Date(dStr).toLocaleDateString('ms-MY', { year: 'numeric', month: 'short', day: 'numeric' }); 
         }
 
         function updatePendingBadge() {
-            const pendingCount = claimsData.filter(c => c.status === 'Menunggu').length;
+            // Check ada tak sebarang baki yang perlu dibayar (amount > paid)
+            const hasPending = claimsData.some(c => (c.amount - c.paid) > 0);
             const badges = [document.getElementById('pending-badge'), document.getElementById('pending-badge-mob')];
             
             badges.forEach(b => {
                 if(b) {
-                    if (pendingCount > 0) {
-                        b.innerText = pendingCount;
+                    if(hasPending) {
                         b.classList.remove('hidden');
+                        b.innerText = '!'; // Letak simbol seruan untuk tanda alert
                     } else {
                         b.classList.add('hidden');
                     }
@@ -576,54 +712,94 @@
             });
         }
 
-        // --- FORM SUBMISSION ---
+        // --- FORM SUBMISSION (NEW CLAIM) ---
         function submitClaim(e) {
             e.preventDefault();
             
-            // Generate ID
+            const fileName = document.getElementById('selectedFileName').value;
+            if(!fileName) {
+                document.getElementById('receiptError').classList.remove('hidden');
+                return;
+            }
+
+            // Dapatkan nama: Utamakan 'hidden' input (jika guna dropdown), jika tidak ambil nilai input raw dan buang ID
+            let finalName = document.getElementById('cName').value.trim();
+            if(!finalName) {
+                let rawInput = document.getElementById('cNameInput').value.trim();
+                // Jika user type manual "EMP001 - Ahmad Ali", cuba extract nama sahaja
+                if(rawInput.includes(' - ')) {
+                    finalName = rawInput.split(' - ').slice(1).join(' - ').trim();
+                } else {
+                    finalName = rawInput;
+                }
+            }
+
             const newId = 'CLM-' + String(claimsData.length + 1).padStart(3, '0');
             
-            const fileInput = document.getElementById('cReceipt');
-            const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : 'tiada_resit.pdf';
-
             const newClaim = {
                 id: newId,
-                name: document.getElementById('cName').value,
+                name: finalName,
                 date: document.getElementById('cDate').value,
                 type: document.getElementById('cType').value,
                 pax: parseInt(document.getElementById('cPax').value),
                 desc: document.getElementById('cDesc').value,
                 amount: parseFloat(document.getElementById('cAmount').value),
+                paid: 0, // Nilai default belum dibayar
                 receiptName: fileName,
                 status: 'Menunggu',
                 payReceiptName: null,
                 timestamp: Date.now()
             };
 
-            claimsData.unshift(newClaim); // Masuk di atas
+            // Masukkan pada bahagian paling atas data array
+            claimsData.unshift(newClaim);
             
-            document.getElementById('claimForm').reset();
-            document.getElementById('file-name-display').innerText = 'Klik untuk muat naik PDF';
-            
+            resetForm();
             updatePendingBadge();
-            showToast('Tuntutan Berjaya Dihantar', `ID Rujukan: ${newId}. Sila tunggu semakan HR.`);
+            showToast('Tuntutan Berjaya Dihantar', `ID Rujukan: ${newId} direkodkan.`);
         }
 
-        // --- ADMIN VIEW LOGIC ---
+        // --- ADMIN VIEW (BULK / GROUPING LOGIC) ---
+        function getGroupedData() {
+            const groups = {};
+            
+            claimsData.forEach(c => {
+                const name = c.name;
+                if(!groups[name]) {
+                    groups[name] = { 
+                        name: name, 
+                        count: 0, 
+                        totalAmount: 0, 
+                        totalPaid: 0, 
+                        balance: 0, 
+                        claims: [] 
+                    };
+                }
+                
+                groups[name].count++;
+                groups[name].totalAmount += c.amount;
+                groups[name].totalPaid += (c.paid || 0);
+                groups[name].balance += (c.amount - (c.paid || 0));
+                groups[name].claims.push(c);
+            });
+            
+            return Object.values(groups);
+        }
+
         function filterAdminTable(status) {
             currentFilter = status;
             
-            // Update button styles
+            // Update filter buttons styling
             ['all', 'pending', 'paid'].forEach(id => {
                 const btn = document.getElementById(`filter-${id}`);
                 btn.classList.remove('bg-gray-100', 'dark:bg-gray-700');
+                btn.classList.add('bg-white', 'dark:bg-gray-800');
             });
             
-            let activeId = 'all';
-            if(status === 'Menunggu') activeId = 'pending';
-            if(status === 'Selesai Dibayar') activeId = 'paid';
-            
-            document.getElementById(`filter-${activeId}`).classList.add('bg-gray-100', 'dark:bg-gray-700');
+            let activeId = status === 'Ada Baki' ? 'pending' : (status === 'Selesai' ? 'paid' : 'all');
+            let activeBtn = document.getElementById(`filter-${activeId}`);
+            activeBtn.classList.remove('bg-white', 'dark:bg-gray-800');
+            activeBtn.classList.add('bg-gray-100', 'dark:bg-gray-700');
             
             updateAdminTable();
         }
@@ -633,64 +809,48 @@
             const emptyState = document.getElementById('adminEmptyState');
             tbody.innerHTML = '';
 
-            let filteredData = claimsData;
-            if (currentFilter !== 'Semua') {
-                filteredData = claimsData.filter(c => c.status === currentFilter);
+            let groups = getGroupedData();
+            
+            // Proses filter
+            if (currentFilter === 'Ada Baki') {
+                groups = groups.filter(g => g.balance > 0);
+            }
+            if (currentFilter === 'Selesai') {
+                groups = groups.filter(g => g.balance === 0);
             }
 
-            if (filteredData.length === 0) {
+            if (groups.length === 0) {
                 emptyState.classList.remove('hidden');
                 tbody.parentNode.classList.add('hidden');
             } else {
                 emptyState.classList.add('hidden');
                 tbody.parentNode.classList.remove('hidden');
 
-                filteredData.forEach(claim => {
-                    const statusClass = claim.status === 'Menunggu' 
+                groups.forEach(g => {
+                    const statusClass = g.balance > 0 
                         ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
                         : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
                     
-                    const actionBtn = claim.status === 'Menunggu'
-                        ? `<button onclick="openPaymentModal('${claim.id}')" class="text-sm bg-pbi-blue hover:bg-blue-600 text-white px-3 py-1.5 rounded transition-colors shadow-sm">Buat Bayaran</button>`
-                        : `<button class="text-sm text-gray-400 cursor-not-allowed px-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded bg-gray-50 dark:bg-gray-800" disabled>Selesai</button>`;
+                    const statusText = g.balance > 0 ? (g.totalPaid > 0 ? 'Separa Bayar' : 'Ada Baki') : 'Selesai';
+                    
+                    const actionBtn = g.balance > 0
+                        ? `<button onclick="openPaymentModal('${g.name}', ${g.balance})" class="text-sm bg-pbi-blue hover:bg-blue-600 text-white px-3 py-1.5 rounded shadow-sm mr-2 mb-1 sm:mb-0 transition-colors">Bayar</button>`
+                        : `<span class="text-sm text-gray-400 px-3 py-1.5 mr-2 bg-gray-50 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">Selesai</span>`;
 
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors';
                     tr.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900 dark:text-white">${claim.id}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">${formatDate(claim.date)}</div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="text-sm text-gray-900 dark:text-white font-medium">${claim.name}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]" title="${claim.desc}">${claim.desc || '-'}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                ${claim.type}
-                            </span>
-                            <div class="text-xs text-gray-500 mt-1">${claim.pax} Pax</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-gray-900 dark:text-white">
-                            ${formatRM(claim.amount)}
-                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-white">${g.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-600 dark:text-gray-300">${g.count} Tuntutan</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600 dark:text-gray-400">${formatRM(g.totalAmount)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-pbi-green font-medium">${formatRM(g.totalPaid)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-red-500 font-bold">${formatRM(g.balance)}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <a href="#" class="text-pbi-blue hover:text-pbi-darkblue transition-colors" title="Lihat Resit Pekerja">
-                                <i class="ph ph-file-pdf text-2xl"></i>
-                            </a>
-                            ${claim.payReceiptName ? `
-                                <a href="#" class="text-pbi-green hover:text-green-700 ml-2 transition-colors" title="Resit Bayaran HR">
-                                    <i class="ph-fill ph-receipt text-2xl"></i>
-                                </a>
-                            ` : ''}
+                            <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusText}</span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
-                                ${claim.status}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                        <td class="px-6 py-4 whitespace-nowrap text-right flex justify-end items-center flex-wrap gap-2">
                             ${actionBtn}
+                            <button onclick="viewDetails('${g.name}')" class="text-sm border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded transition-colors">Perincian</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -698,14 +858,18 @@
             }
         }
 
-        // --- PAYMENT MODAL LOGIC ---
-        function openPaymentModal(id) {
-            const claim = claimsData.find(c => c.id === id);
-            if(!claim) return;
-
-            document.getElementById('modalClaimId').value = id;
-            document.getElementById('modalPayee').innerText = claim.name;
-            document.getElementById('modalAmount').innerText = formatRM(claim.amount);
+        // --- PAYMENT LOGIC (BULK & PARTIAL) ---
+        function openPaymentModal(name, maxBalance) {
+            document.getElementById('modalPayeeName').value = name;
+            document.getElementById('modalMaxBalance').value = maxBalance;
+            
+            document.getElementById('modalPayee').innerText = name;
+            document.getElementById('modalMaxAmount').innerText = formatRM(maxBalance);
+            
+            const amountInput = document.getElementById('pAmount');
+            amountInput.value = maxBalance; // By default, suggest full balance payment
+            amountInput.max = maxBalance;   // System prevent overpaying
+            
             document.getElementById('paymentModal').classList.remove('hidden');
         }
 
@@ -716,24 +880,85 @@
 
         function confirmPayment(e) {
             e.preventDefault();
-            const id = document.getElementById('modalClaimId').value;
+            
+            const payeeName = document.getElementById('modalPayeeName').value;
+            let paymentAmt = parseFloat(document.getElementById('pAmount').value);
             const fileInput = document.getElementById('pReceipt');
-            const receiptName = fileInput.files.length > 0 ? fileInput.files[0].name : 'bukti_bayaran.pdf';
+            const receiptName = fileInput.files.length > 0 ? fileInput.files[0].name : 'resit_pukal.pdf';
 
-            // Kemaskini Data
-            const claimIndex = claimsData.findIndex(c => c.id === id);
-            if (claimIndex !== -1) {
-                claimsData[claimIndex].status = 'Selesai Dibayar';
-                claimsData[claimIndex].payReceiptName = receiptName;
+            // Dapatkan tuntutan pekerja ini yang masih berbaki, kemudian susun ikut tarikh lama (FIFO)
+            let userPendingClaims = claimsData.filter(c => c.name === payeeName && (c.amount - c.paid) > 0);
+            userPendingClaims.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            // Sebarkan jumlah bayaran kepada tuntutan-tuntutan tersebut (FIFO Logic)
+            for (let c of userPendingClaims) {
+                if (paymentAmt <= 0) break; // Bayaran dah habis diagihkan
+
+                let claimBalance = c.amount - c.paid;
+                
+                if (paymentAmt >= claimBalance) {
+                    // Bayaran ini cukup untuk selesaikan tuntutan spesifik ini (Full)
+                    c.paid = c.amount;
+                    c.status = 'Selesai Dibayar';
+                    c.payReceiptName = receiptName;
+                    paymentAmt -= claimBalance; // Tolak baki bayaran yang tinggal
+                } else {
+                    // Bayaran ini tidak cukup menampung tuntutan ini sepenuhnya (Partial)
+                    c.paid += paymentAmt;
+                    c.status = 'Separa Dibayar';
+                    c.payReceiptName = receiptName;
+                    paymentAmt = 0; // Bayaran sudah habis diagihkan
+                }
             }
 
             closePaymentModal();
             updateAdminTable();
             updatePendingBadge();
-            showToast('Pembayaran Direkod', `Status tuntutan ${id} telah ditukar kepada Selesai.`);
+            showToast('Pembayaran Direkodkan', `Bayaran pukal/separa untuk ${payeeName} berjaya dimasukkan ke dalam sistem.`);
         }
 
-        // --- DASHBOARD LOGIC (Chart.js & Power BI Styling) ---
+        // --- DETAILS MODAL ---
+        function viewDetails(name) {
+            document.getElementById('detailName').innerText = name;
+            const tbody = document.getElementById('detailsTableBody');
+            tbody.innerHTML = '';
+            
+            const userClaims = claimsData.filter(c => c.name === name);
+            // Susun dari terbaru ke lama untuk paparan
+            userClaims.sort((a,b) => b.timestamp - a.timestamp); 
+
+            userClaims.forEach(c => {
+                const bal = c.amount - c.paid;
+                
+                let statusColor = '';
+                if (bal === 0) statusColor = 'text-pbi-green';
+                else if (c.paid > 0) statusColor = 'text-yellow-600 dark:text-yellow-500';
+                else statusColor = 'text-red-500';
+                
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors';
+                tr.innerHTML = `
+                    <td class="px-4 py-3 whitespace-nowrap text-xs text-gray-800 dark:text-gray-200">
+                        <div class="font-bold">${c.id}</div>
+                        <div class="text-gray-500 dark:text-gray-400 mt-1">${formatDate(c.date)}</div>
+                    </td>
+                    <td class="px-4 py-3 text-xs text-gray-600 dark:text-gray-400 max-w-[150px] truncate" title="${c.desc}">${c.desc || c.type}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-xs text-right font-medium text-gray-800 dark:text-gray-200">${formatRM(c.amount)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-xs text-right text-gray-600 dark:text-gray-400">${formatRM(c.paid)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-xs text-right font-bold ${bal > 0 ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}">${formatRM(bal)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-center text-xs font-semibold ${statusColor}">${c.status}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            document.getElementById('detailsModal').classList.remove('hidden');
+        }
+
+        function closeDetailsModal() {
+            document.getElementById('detailsModal').classList.add('hidden');
+        }
+
+        // --- DASHBOARD CHARTS & LOGIC ---
         function resetDashFilter() {
             document.getElementById('dashStartDate').value = '';
             document.getElementById('dashEndDate').value = '';
@@ -741,67 +966,47 @@
         }
 
         function getFilteredDashboardData() {
-            const startDateVal = document.getElementById('dashStartDate').value;
-            const endDateVal = document.getElementById('dashEndDate').value;
-
-            return claimsData.filter(claim => {
-                const claimDate = new Date(claim.date);
+            const startVal = document.getElementById('dashStartDate').value;
+            const endVal = document.getElementById('dashEndDate').value;
+            
+            return claimsData.filter(c => {
+                const cDate = new Date(c.date);
                 
-                if (startDateVal && endDateVal) {
-                    const start = new Date(startDateVal);
-                    const end = new Date(endDateVal);
-                    end.setHours(23, 59, 59, 999); // Memastikan merangkumi hujung hari
-                    return claimDate >= start && claimDate <= end;
-                } else if (startDateVal) {
-                    const start = new Date(startDateVal);
-                    return claimDate >= start;
-                } else if (endDateVal) {
-                    const end = new Date(endDateVal);
-                    end.setHours(23, 59, 59, 999);
-                    return claimDate <= end;
+                if (startVal && endVal) {
+                    const s = new Date(startVal);
+                    const e = new Date(endVal); 
+                    e.setHours(23, 59, 59); // Pastikan tamat pada penghujung hari
+                    return cDate >= s && cDate <= e;
+                } else if (startVal) { 
+                    return cDate >= new Date(startVal); 
+                } else if (endVal) { 
+                    const e = new Date(endVal); 
+                    e.setHours(23, 59, 59); 
+                    return cDate <= e; 
                 }
-                
-                return true; // Jika tiada filter dipilih, kembalikan semua data
+                return true;
             });
         }
 
         function updateDashboard() {
             const data = getFilteredDashboardData();
             
-            // 1. Kemaskini KPI Cards
+            // 1. Calculate KPI Values
             const totalAmount = data.reduce((sum, c) => sum + c.amount, 0);
-            const pendingAmount = data.filter(c => c.status === 'Menunggu').reduce((sum, c) => sum + c.amount, 0);
-            const paidAmount = data.filter(c => c.status === 'Selesai Dibayar').reduce((sum, c) => sum + c.amount, 0);
+            const paidAmount = data.reduce((sum, c) => sum + c.paid, 0);
+            const pendingAmount = totalAmount - paidAmount;
 
             document.getElementById('kpi-total-amount').innerText = formatRM(totalAmount);
             document.getElementById('kpi-total-count').innerText = data.length;
             document.getElementById('kpi-pending-amount').innerText = formatRM(pendingAmount);
             document.getElementById('kpi-paid-amount').innerText = formatRM(paidAmount);
 
-            // 2. Kemaskini Jadual Terperinci
-            const tbody = document.getElementById('dashTableBody');
-            tbody.innerHTML = '';
-            data.forEach(claim => {
-                const statusColor = claim.status === 'Menunggu' ? 'text-pbi-orange' : 'text-pbi-green';
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-gray-50 dark:hover:bg-[#2e2e2e] transition-colors';
-                tr.innerHTML = `
-                    <td class="px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200">${claim.id}</td>
-                    <td class="px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200">${claim.name}</td>
-                    <td class="px-4 py-2 whitespace-nowrap text-gray-500 dark:text-gray-400">${formatDate(claim.date)}</td>
-                    <td class="px-4 py-2 whitespace-nowrap text-gray-500 dark:text-gray-400">${claim.type}</td>
-                    <td class="px-4 py-2 whitespace-nowrap text-right font-medium text-gray-800 dark:text-gray-200">${formatRM(claim.amount)}</td>
-                    <td class="px-4 py-2 whitespace-nowrap text-center font-semibold ${statusColor}">${claim.status}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            // Theme colors for charts
+            // Chart theming colors
             const isDark = document.documentElement.classList.contains('dark');
             const gridColor = isDark ? '#404040' : '#e5e7eb';
             const textColor = isDark ? '#d1d5db' : '#374151';
 
-            // 3. Kemaskini Bar Chart (Kategori)
+            // 2. Bar Chart (Perbelanjaan Mengikut Kategori)
             const categories = {};
             data.forEach(c => {
                 categories[c.type] = (categories[c.type] || 0) + c.amount;
@@ -812,64 +1017,72 @@
             
             barChartInstance = new Chart(barCtx, {
                 type: 'bar',
-                data: {
-                    labels: Object.keys(categories),
-                    datasets: [{
-                        label: 'Jumlah RM',
-                        data: Object.values(categories),
-                        backgroundColor: pbiColors[0],
-                        borderRadius: 4
-                    }]
+                data: { 
+                    labels: Object.keys(categories), 
+                    datasets: [{ 
+                        label: 'RM',
+                        data: Object.values(categories), 
+                        backgroundColor: pbiColors[0], 
+                        borderRadius: 4 
+                    }] 
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: false } 
+                    }, 
+                    scales: { 
                         y: { 
                             beginAtZero: true, 
-                            grid: { color: gridColor },
-                            ticks: { color: textColor, callback: function(value) { return 'RM ' + value; } }
-                        },
+                            grid: { color: gridColor }, 
+                            ticks: { color: textColor } 
+                        }, 
                         x: { 
-                            grid: { display: false },
-                            ticks: { color: textColor }
-                        }
-                    }
+                            grid: { display: false }, 
+                            ticks: { color: textColor } 
+                        } 
+                    } 
                 }
             });
 
-            // 4. Kemaskini Doughnut Chart (Status)
-            const statusCounts = { 'Menunggu': 0, 'Selesai Dibayar': 0 };
-            data.forEach(c => { statusCounts[c.status]++; });
-
+            // 3. Doughnut Chart (Taburan Status Pembayaran)
+            const stats = { 'Selesai Dibayar': 0, 'Separa Dibayar': 0, 'Menunggu': 0 };
+            data.forEach(c => {
+                // Pastikan status dipetakan dengan betul kepada carta
+                if (c.status === 'Selesai Dibayar') stats['Selesai Dibayar']++;
+                else if (c.status === 'Separa Dibayar') stats['Separa Dibayar']++;
+                else stats['Menunggu']++;
+            });
+            
             const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
             if (doughnutChartInstance) doughnutChartInstance.destroy();
-
+            
             doughnutChartInstance = new Chart(doughnutCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Menunggu', 'Selesai Dibayar'],
+                    labels: Object.keys(stats),
                     datasets: [{
-                        data: [statusCounts['Menunggu'], statusCounts['Selesai Dibayar']],
+                        data: Object.values(stats),
                         backgroundColor: [
-                            tailwind.config.theme.extend.colors.pbi.orange, 
-                            tailwind.config.theme.extend.colors.pbi.green
+                            tailwind.config.theme.extend.colors.pbi.green, 
+                            tailwind.config.theme.extend.colors.pbi.yellow, 
+                            tailwind.config.theme.extend.colors.pbi.orange
                         ],
                         borderWidth: 0,
                         hoverOffset: 4
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '70%',
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { color: textColor, usePointStyle: true, padding: 20 }
-                        }
-                    }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    cutout: '70%', 
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { color: textColor, usePointStyle: true, padding: 20 } 
+                        } 
+                    } 
                 }
             });
         }
