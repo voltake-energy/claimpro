@@ -2,10 +2,10 @@
 <html lang="ms" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistem Pengurusan Tuntutan HR</title>
     
-    <!-- Fonts: Inter untuk rupa korporat dan profesional -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -24,20 +24,12 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        // Power BI inspired palette
                         pbi: {
-                            blue: '#118DFF',
-                            darkblue: '#12239E',
-                            orange: '#E66C37',
-                            purple: '#6B007B',
-                            green: '#00B01A',
-                            teal: '#00A638',
-                            cyan: '#33A1FD',
-                            yellow: '#FFA300'
+                            blue: '#118DFF', darkblue: '#12239E', orange: '#E66C37',
+                            purple: '#6B007B', green: '#00B01A', teal: '#00A638',
+                            cyan: '#33A1FD', yellow: '#FFA300'
                         }
                     }
                 }
@@ -45,1045 +37,1200 @@
         }
     </script>
     <style>
-        /* Custom scrollbar untuk rupa yang lebih kemas */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        .dark ::-webkit-scrollbar-thumb {
-            background: #475569;
-        }
-        
-        /* Transition untuk penukaran tema */
-        body {
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        /* Hilangkan input number arrows */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        body { transition: background-color 0.3s, color 0.3s; }
         input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
-        }
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200 font-sans h-screen flex overflow-hidden selection:bg-pbi-blue selection:text-white">
+<body class="bg-gray-50 text-gray-800 dark:bg-[#1a1a1a] dark:text-gray-200 font-sans h-screen w-screen overflow-hidden selection:bg-pbi-blue selection:text-white flex items-center justify-center">
 
-    <!-- Sidebar / Navigasi (Desktop) -->
-    <aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-colors z-20 hidden md:flex flex-shrink-0">
-        <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
-            <i class="ph-fill ph-wallet text-pbi-blue text-2xl mr-3"></i>
-            <h1 class="text-lg font-bold tracking-tight">Claim<span class="text-pbi-blue">Pro</span></h1>
-        </div>
-        
-        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            <button onclick="navigate('submit')" id="nav-submit" class="nav-btn w-full flex items-center px-4 py-2.5 rounded-md text-sm font-medium transition-colors bg-blue-50 text-pbi-blue dark:bg-blue-900/30 dark:text-pbi-cyan">
-                <i class="ph ph-paper-plane-right text-lg mr-3"></i>
-                Hantar Tuntutan
-            </button>
-            <button onclick="navigate('admin')" id="nav-admin" class="nav-btn w-full flex items-center px-4 py-2.5 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/50 transition-colors">
-                <i class="ph ph-users-three text-lg mr-3"></i>
-                Semakan Pukal HR
-                <span id="pending-badge" class="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full hidden">0</span>
-            </button>
-            <button onclick="navigate('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center px-4 py-2.5 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/50 transition-colors">
-                <i class="ph ph-chart-pie-slice text-lg mr-3"></i>
-                Papan Pemuka
-            </button>
-        </nav>
-
-        <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pbi-blue to-pbi-cyan flex items-center justify-center text-white font-bold text-sm">
-                        AD
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm font-medium">Admin HR</p>
-                    </div>
+    <!-- ============================================== -->
+    <!-- VIEW LOGIN -->
+    <!-- ============================================== -->
+    <div id="login-view" class="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-[#1a1a1a] z-50 transition-opacity duration-300 px-4 absolute inset-0">
+        <div class="bg-white dark:bg-[#252525] rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 w-full max-w-md overflow-hidden flex flex-col">
+            <div class="bg-gradient-to-r from-pbi-blue to-pbi-cyan p-6 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-3 backdrop-blur-sm">
+                    <i class="ph-fill ph-wallet text-white text-3xl"></i>
                 </div>
-                <button onclick="toggleTheme()" class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors" title="Tukar Tema">
-                    <i id="theme-icon" class="ph ph-moon text-lg"></i>
+                <h1 class="text-2xl font-bold text-white tracking-tight">ClaimPro HR</h1>
+                <p class="text-blue-100 text-sm mt-1">Sistem Pengurusan Tuntutan</p>
+            </div>
+            
+            <div class="p-6 md:p-8 flex-1">
+                <div class="mb-6 relative" id="loginSearchContainer">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Sila pilih ID Pekerja anda</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ph ph-magnifying-glass text-gray-400"></i>
+                        </div>
+                        <input type="text" id="loginIdInput" autocomplete="off" class="w-full pl-10 px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow" placeholder="Taip ID atau Nama...">
+                        <i class="ph ph-caret-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+                    </div>
+                    
+                    <input type="hidden" id="loginSelectedId">
+                    <input type="hidden" id="loginSelectedName">
+                    
+                    <!-- Dropdown List -->
+                    <ul id="loginDropdown" class="absolute z-20 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-xl max-h-48 overflow-y-auto hidden">
+                        <li class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center">
+                            <i class="ph ph-spinner animate-spin mr-2"></i> Memuatkan senarai pekerja...
+                        </li>
+                    </ul>
+                </div>
+                <p id="loginError" class="text-red-500 text-xs hidden mb-4">Sila pilih ID yang sah dari senarai.</p>
+
+                <!-- Container Kata Laluan -->
+                <div id="passwordContainer" class="hidden relative mb-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Kata Laluan Superadmin</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ph ph-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" id="loginPasswordInput" autocomplete="off" class="w-full pl-10 px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow" placeholder="••••••••">
+                    </div>
+                    <p id="passwordError" class="text-red-500 text-xs hidden mt-1">Kata laluan tidak sah.</p>
+                </div>
+
+                <button id="btnLogin" disabled onclick="handleLogin()" class="w-full py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-pbi-blue hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pbi-blue transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center">
+                    Masuk ke Sistem <i class="ph ph-sign-in ml-2 text-lg"></i>
                 </button>
             </div>
         </div>
-    </aside>
-
-    <!-- Mobile Header & Nav -->
-    <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 z-30">
-        <div class="flex items-center">
-            <i class="ph-fill ph-wallet text-pbi-blue text-xl mr-2"></i>
-            <h1 class="text-base font-bold">Claim<span class="text-pbi-blue">Pro</span></h1>
-        </div>
-        <div class="flex gap-2">
-            <button onclick="toggleTheme()" class="p-2 text-gray-500">
-                <i id="theme-icon-mobile" class="ph ph-moon text-lg"></i>
-            </button>
-        </div>
-    </div>
-    
-    <!-- Mobile Bottom Nav -->
-    <div class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex justify-around items-center z-30 px-2 pb-safe">
-        <button onclick="navigate('submit')" id="nav-submit-mob" class="nav-btn-mob flex flex-col items-center p-2 text-pbi-blue">
-            <i class="ph ph-paper-plane-right text-xl"></i>
-            <span class="text-[10px] mt-1">Hantar</span>
-        </button>
-        <button onclick="navigate('admin')" id="nav-admin-mob" class="nav-btn-mob flex flex-col items-center p-2 text-gray-500">
-            <div class="relative">
-                <i class="ph ph-users-three text-xl"></i>
-                <span id="pending-badge-mob" class="absolute -top-1 -right-2 bg-red-500 text-white text-[8px] font-bold px-1 rounded-full hidden">0</span>
-            </div>
-            <span class="text-[10px] mt-1">Semakan</span>
-        </button>
-        <button onclick="navigate('dashboard')" id="nav-dashboard-mob" class="nav-btn-mob flex flex-col items-center p-2 text-gray-500">
-            <i class="ph ph-chart-pie-slice text-xl"></i>
-            <span class="text-[10px] mt-1">Laporan</span>
-        </button>
     </div>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden relative pt-16 md:pt-0 pb-16 md:pb-0">
+    <!-- ============================================== -->
+    <!-- APP LAYOUT -->
+    <!-- ============================================== -->
+    <div id="app-layout" class="hidden flex h-screen w-full">
         
-        <!-- Notifikasi Toast -->
-        <div id="toast" class="absolute top-4 right-4 z-50 transform transition-all duration-300 translate-y-[-150%] opacity-0 bg-white dark:bg-gray-800 border-l-4 border-green-500 shadow-lg rounded px-4 py-3 flex items-center">
-            <i class="ph-fill ph-check-circle text-green-500 text-xl mr-3"></i>
-            <div>
-                <p id="toast-title" class="text-sm font-bold text-gray-800 dark:text-white">Berjaya</p>
-                <p id="toast-msg" class="text-xs text-gray-600 dark:text-gray-400">Tindakan selesai.</p>
+        <!-- Sidebar / Navigasi (Desktop) -->
+        <aside class="w-64 bg-white dark:bg-[#252525] border-r border-gray-200 dark:border-gray-800 flex flex-col transition-colors z-20 hidden md:flex flex-shrink-0">
+            <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-800">
+                <i class="ph-fill ph-wallet text-pbi-blue text-2xl mr-3"></i>
+                <h1 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Claim<span class="text-pbi-blue">Pro</span></h1>
             </div>
-        </div>
-
-        <!-- VIEW 1: Borang Tuntutan Pekerja -->
-        <div id="view-submit" class="view-section flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-3xl mx-auto">
-            <div class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Borang Tuntutan Pekerja</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Sila isikan maklumat dan muat naik bukti perbelanjaan pendahuluan anda.</p>
-            </div>
-
-            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
-                <form id="claimForm" onsubmit="submitClaim(event)" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        
-                        <!-- Nama Pekerja (Searchable Dropdown Google Sheets) -->
-                        <div class="space-y-1.5 relative" id="employeeSearchContainer">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Pekerja <span class="text-red-500">*</span></label>
-                            <input type="text" id="cNameInput" autocomplete="off" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue focus:border-transparent transition-shadow" placeholder="Cari ID atau Nama...">
-                            <input type="hidden" id="cName">
-                            
-                            <!-- Dropdown List -->
-                            <ul id="employeeDropdown" class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg max-h-48 overflow-y-auto hidden">
-                                <li class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">Memuatkan data...</li>
-                            </ul>
-                        </div>
-                        
-                        <!-- Tarikh -->
-                        <div class="space-y-1.5">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tarikh Perbelanjaan <span class="text-red-500">*</span></label>
-                            <input type="date" id="cDate" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue focus:border-transparent">
-                        </div>
-
-                        <!-- Jenis Claim -->
-                        <div class="space-y-1.5">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jenis Tuntutan <span class="text-red-500">*</span></label>
-                            <select id="cType" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue focus:border-transparent">
-                                <option value="" disabled selected>Pilih jenis...</option>
-                                <option value="Perjalanan">Perjalanan (Tol, Minyak, Parkir)</option>
-                                <option value="Keraian">Keraian Pelanggan (Makanan/Minuman)</option>
-                                <option value="Penginapan">Penginapan (Hotel)</option>
-                                <option value="Perubatan">Perubatan & Klinik</option>
-                                <option value="Lain-lain">Lain-lain Bekalan/Servis</option>
-                            </select>
-                        </div>
-
-                        <!-- Bilangan Pax -->
-                        <div class="space-y-1.5">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bilangan Pax (Orang) <span class="text-red-500">*</span></label>
-                            <input type="number" id="cPax" min="1" value="1" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue focus:border-transparent">
-                        </div>
-                    </div>
-
-                    <!-- Keterangan -->
-                    <div class="space-y-1.5">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Keterangan Tujuan</label>
-                        <input type="text" id="cDesc" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue focus:border-transparent" placeholder="Cth: Jumpa client ABC SDN BHD">
-                    </div>
-
-                    <!-- Jumlah RM -->
-                    <div class="space-y-1.5">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jumlah Tuntutan (RM) <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <span class="text-gray-500 sm:text-sm">RM</span>
-                            </div>
-                            <input type="number" id="cAmount" step="0.01" min="0.01" required class="w-full pl-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue focus:border-transparent text-lg font-semibold" placeholder="0.00">
-                        </div>
-                    </div>
-
-                    <!-- Upload Resit & Camera -->
-                    <div class="space-y-1.5">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Muat Naik Resit (PDF/Imej) atau Tangkap Gambar <span class="text-red-500">*</span></label>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-                            <!-- Regular Upload (PDF/Image) -->
-                            <label class="flex flex-col items-center justify-center p-4 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md hover:border-pbi-blue transition-colors group cursor-pointer bg-gray-50 dark:bg-gray-800/50">
-                                <i class="ph ph-upload-simple text-3xl text-gray-400 group-hover:text-pbi-blue mb-2"></i>
-                                <span id="file-name-display" class="text-sm font-medium text-pbi-blue text-center">Pilih Fail / Gambar</span>
-                                <input type="file" id="cReceiptFile" accept=".pdf, image/png, image/jpeg, image/jpg" class="hidden" onchange="handleFileSelect('file')">
-                            </label>
-                            
-                            <!-- Camera Capture (Mobile) -->
-                            <label class="flex flex-col items-center justify-center p-4 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md hover:border-pbi-blue transition-colors group cursor-pointer bg-gray-50 dark:bg-gray-800/50">
-                                <i class="ph ph-camera text-3xl text-gray-400 group-hover:text-pbi-blue mb-2"></i>
-                                <span id="camera-name-display" class="text-sm font-medium text-pbi-blue text-center">Buka Kamera</span>
-                                <!-- capture="environment" forces back camera on mobile -->
-                                <input type="file" id="cReceiptCam" accept="image/*" capture="environment" class="hidden" onchange="handleFileSelect('cam')">
-                            </label>
-                        </div>
-                        <p id="receiptError" class="text-red-500 text-xs mt-1 hidden">Sila muat naik satu fail atau tangkap gambar resit.</p>
-                        <input type="hidden" id="selectedFileName"> <!-- To keep track of chosen file name -->
-                    </div>
-
-                    <div class="pt-4 flex justify-end">
-                        <button type="button" onclick="resetForm()" class="mr-3 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                            Set Semula
-                        </button>
-                        <button type="submit" class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pbi-blue hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pbi-blue transition-colors flex items-center">
-                            <i class="ph ph-paper-plane-tilt mr-2"></i> Hantar Tuntutan
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- VIEW 2: Semakan HR / Admin (Bulk Grouping) -->
-        <div id="view-admin" class="view-section hidden flex-1 overflow-y-auto p-4 md:p-8 w-full">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Semakan Tuntutan Pukal (Kumpulan)</h2>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Jadual dikumpulkan mengikut nama pekerja. Uruskan pembayaran penuh atau separa mengikut turutan FIFO.</p>
-                </div>
-                
-                <!-- Filter Status ringkas -->
-                <div class="flex rounded-md shadow-sm" role="group">
-                    <button type="button" onclick="filterAdminTable('Semua')" id="filter-all" class="px-4 py-2 text-sm font-medium rounded-l-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">Semua</button>
-                    <button type="button" onclick="filterAdminTable('Ada Baki')" id="filter-pending" class="px-4 py-2 text-sm font-medium border-t border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Ada Baki</button>
-                    <button type="button" onclick="filterAdminTable('Selesai')" id="filter-paid" class="px-4 py-2 text-sm font-medium rounded-r-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Selesai</button>
-                </div>
-            </div>
-
-            <!-- Jadual Grouping -->
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-900/50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pekerja</th>
-                                <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bil. Tuntutan</th>
-                                <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Kasar (RM)</th>
-                                <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Telah Dibayar (RM)</th>
-                                <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Baki Terkini (RM)</th>
-                                <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                                <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tindakan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminTableBody" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                            <!-- Data akan diisi oleh JS -->
-                        </tbody>
-                    </table>
-                </div>
-                <!-- Empty State -->
-                <div id="adminEmptyState" class="hidden py-12 text-center">
-                    <i class="ph ph-folder-open text-4xl text-gray-400 mb-2"></i>
-                    <p class="text-gray-500 dark:text-gray-400">Tiada rekod tuntutan ditemui.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW 3: Dashboard Pihak Pengurusan -->
-        <div id="view-dashboard" class="view-section hidden flex-1 overflow-y-auto p-4 md:p-8 w-full bg-gray-100 dark:bg-[#1e1e1e]">
             
-            <!-- Header & Filter PBI Style -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-gray-300 dark:border-gray-700 pb-4">
-                <div>
-                    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">Laporan Eksekutif Tuntutan</h2>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wider font-semibold">Tinjauan Syarikat</p>
-                </div>
-                
-                <div class="flex flex-col sm:flex-row items-end sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-                    <div class="flex items-center space-x-2 bg-white dark:bg-[#252525] p-2 rounded shadow-sm border border-gray-200 dark:border-gray-700">
-                        <label class="text-xs text-gray-500 dark:text-gray-400 font-medium">Mula:</label>
-                        <input type="date" id="dashStartDate" onchange="updateDashboard()" class="text-sm border-none bg-transparent focus:ring-0 text-gray-700 dark:text-gray-300 font-medium outline-none">
+            <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                <button onclick="navigate('submit')" id="nav-submit" class="nav-btn w-full flex items-center px-4 py-2.5 rounded-md text-sm font-medium transition-colors bg-blue-50 text-pbi-blue dark:bg-blue-900/30 dark:text-pbi-cyan">
+                    <i class="ph ph-paper-plane-right text-lg mr-3"></i> Hantar Tuntutan
+                </button>
+                <button onclick="navigate('admin')" id="nav-admin" class="nav-btn hidden w-full flex items-center px-4 py-2.5 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/50 transition-colors">
+                    <i class="ph ph-users-three text-lg mr-3"></i> Semakan Pukal HR
+                    <span id="pending-badge" class="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full hidden">0</span>
+                </button>
+                <button onclick="navigate('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center px-4 py-2.5 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/50 transition-colors">
+                    <i class="ph ph-chart-pie-slice text-lg mr-3"></i> Papan Pemuka
+                </button>
+            </nav>
+
+            <div class="p-4 border-t border-gray-200 dark:border-gray-800">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center overflow-hidden">
+                        <div id="user-avatar" class="w-8 h-8 rounded-full bg-gradient-to-tr from-pbi-blue to-pbi-cyan flex items-center justify-center text-white font-bold text-sm flex-shrink-0">--</div>
+                        <div class="ml-3 truncate">
+                            <p id="user-role-label" class="text-sm font-bold text-gray-800 dark:text-white truncate">Pekerja</p>
+                            <p id="user-name-label" class="text-xs text-gray-500 dark:text-gray-400 truncate">Nama</p>
+                        </div>
                     </div>
-                    <div class="flex items-center space-x-2 bg-white dark:bg-[#252525] p-2 rounded shadow-sm border border-gray-200 dark:border-gray-700">
-                        <label class="text-xs text-gray-500 dark:text-gray-400 font-medium">Akhir:</label>
-                        <input type="date" id="dashEndDate" onchange="updateDashboard()" class="text-sm border-none bg-transparent focus:ring-0 text-gray-700 dark:text-gray-300 font-medium outline-none">
-                    </div>
-                    <button onclick="resetDashFilter()" class="p-2 bg-white dark:bg-[#252525] text-gray-600 dark:text-gray-300 rounded shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-sm font-medium" title="Set Semula Filter">
-                        <i class="ph ph-arrows-counter-clockwise"></i>
+                    <button onclick="toggleTheme()" class="p-2 ml-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors flex-shrink-0" title="Tukar Tema">
+                        <i id="theme-icon" class="ph ph-moon text-lg"></i>
                     </button>
                 </div>
+                <button onclick="logout()" class="w-full py-1.5 flex justify-center items-center text-xs font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded border border-red-200 dark:border-red-800 transition-colors">
+                    Log Keluar <i class="ph ph-sign-out ml-2"></i>
+                </button>
             </div>
+        </aside>
 
-            <!-- KPI Cards (Power BI Style Cards) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <!-- Card 1 -->
-                <div class="bg-white dark:bg-[#252525] p-5 rounded shadow-sm border-l-4 border-pbi-blue relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 -mr-4 -mt-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <i class="ph-fill ph-sigma text-8xl text-pbi-blue"></i>
-                    </div>
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Jumlah Tuntutan Kasar</p>
-                    <h3 class="text-3xl font-bold text-gray-800 dark:text-white" id="kpi-total-amount">RM 0.00</h3>
-                    <p class="text-xs text-gray-400 mt-2"><span id="kpi-total-count" class="font-bold">0</span> rekod individu dihantar</p>
-                </div>
-                
-                <!-- Card 2 -->
-                <div class="bg-white dark:bg-[#252525] p-5 rounded shadow-sm border-l-4 border-pbi-orange relative overflow-hidden">
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Baki Perlu Dibayar</p>
-                    <h3 class="text-3xl font-bold text-gray-800 dark:text-white" id="kpi-pending-amount">RM 0.00</h3>
-                    <p class="text-xs text-pbi-orange mt-2 font-medium flex items-center">
-                        <i class="ph ph-warning-circle mr-1"></i> Jumlah belum dilunaskan
-                    </p>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="bg-white dark:bg-[#252525] p-5 rounded shadow-sm border-l-4 border-pbi-green relative overflow-hidden">
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Telah Dibayar (YTD)</p>
-                    <h3 class="text-3xl font-bold text-gray-800 dark:text-white" id="kpi-paid-amount">RM 0.00</h3>
-                    <p class="text-xs text-pbi-green mt-2 font-medium flex items-center">
-                        <i class="ph ph-check-circle mr-1"></i> Wang yang disalurkan
-                    </p>
-                </div>
+        <!-- Mobile Header & Nav -->
+        <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-[#252525] border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4 z-30">
+            <div class="flex items-center">
+                <i class="ph-fill ph-wallet text-pbi-blue text-xl mr-2"></i>
+                <h1 class="text-base font-bold text-gray-900 dark:text-white">Claim<span class="text-pbi-blue">Pro</span></h1>
             </div>
-
-            <!-- Charts Row -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <!-- Bar Chart -->
-                <div class="bg-white dark:bg-[#252525] p-4 rounded shadow-sm border border-gray-200 dark:border-gray-700">
-                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 text-center">Jumlah Perbelanjaan Mengikut Kategori</h3>
-                    <div class="relative h-64 w-full">
-                        <canvas id="barChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Doughnut Chart -->
-                <div class="bg-white dark:bg-[#252525] p-4 rounded shadow-sm border border-gray-200 dark:border-gray-700">
-                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 text-center">Taburan Status Pembayaran</h3>
-                    <div class="relative h-64 w-full flex justify-center">
-                        <canvas id="doughnutChart"></canvas>
-                    </div>
-                </div>
+            <div class="flex gap-2">
+                <button onclick="toggleTheme()" class="p-2 text-gray-500"><i id="theme-icon-mobile" class="ph ph-moon text-lg"></i></button>
+                <button onclick="logout()" class="p-2 text-red-500"><i class="ph ph-sign-out text-lg"></i></button>
             </div>
         </div>
+        
+        <!-- Mobile Bottom Nav -->
+        <div class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-[#252525] border-t border-gray-200 dark:border-gray-800 flex justify-around items-center z-30 px-2 pb-safe">
+            <button onclick="navigate('submit')" id="nav-submit-mob" class="nav-btn-mob flex flex-col items-center p-2 text-pbi-blue transition-colors">
+                <i class="ph ph-paper-plane-right text-xl"></i><span class="text-[10px] mt-1">Hantar</span>
+            </button>
+            <button onclick="navigate('admin')" id="nav-admin-mob" class="hidden nav-btn-mob flex flex-col items-center p-2 text-gray-500 transition-colors">
+                <div class="relative">
+                    <i class="ph ph-users-three text-xl"></i>
+                    <span id="pending-badge-mob" class="absolute -top-1 -right-2 bg-red-500 text-white text-[8px] font-bold px-1 rounded-full hidden">0</span>
+                </div>
+                <span class="text-[10px] mt-1">Semakan</span>
+            </button>
+            <button onclick="navigate('dashboard')" id="nav-dashboard-mob" class="nav-btn-mob flex flex-col items-center p-2 text-gray-500 transition-colors">
+                <i class="ph ph-chart-pie-slice text-xl"></i><span class="text-[10px] mt-1">Laporan</span>
+            </button>
+        </div>
 
-    </main>
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden relative pt-16 md:pt-0 pb-16 md:pb-0 bg-gray-50 dark:bg-[#1a1a1a]">
+            
+            <!-- Toast -->
+            <div id="toast" class="absolute top-4 right-4 z-50 transform transition-all duration-300 translate-y-[-150%] opacity-0 bg-white dark:bg-gray-800 border-l-4 border-pbi-green shadow-xl rounded-md px-4 py-3 flex items-center">
+                <i class="ph-fill ph-check-circle text-pbi-green text-xl mr-3"></i>
+                <div>
+                    <p id="toast-title" class="text-sm font-bold text-gray-900 dark:text-white">Berjaya</p>
+                    <p id="toast-msg" class="text-xs text-gray-600 dark:text-gray-400">Tindakan selesai.</p>
+                </div>
+            </div>
 
-    <!-- Modal Kelulusan Pembayaran (Bulk / Partial) -->
-    <div id="paymentModal" class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 hidden z-50 flex items-center justify-center backdrop-blur-sm transition-opacity">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 transform transition-transform duration-200 m-4">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Sahkan Pembayaran Pukal / Separa</h3>
-                <button onclick="closePaymentModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            <!-- VIEW 1: Borang Tuntutan Pekerja -->
+            <div id="view-submit" class="view-section flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-3xl mx-auto">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Borang Tuntutan</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Isikan maklumat di bawah dan muat naik bukti perbelanjaan pendahuluan anda.</p>
+                </div>
+
+                <div class="bg-white dark:bg-[#252525] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm p-5 md:p-7">
+                    <form id="claimForm" onsubmit="submitClaim(event)" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            
+                            <!-- Nama Pekerja (Auto-locked) -->
+                            <div class="space-y-1.5">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Pekerja <i class="ph-fill ph-lock-key text-gray-400 ml-1 text-xs"></i></label>
+                                <input type="text" id="cNameInputLocked" readonly class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed outline-none font-medium">
+                            </div>
+                            
+                            <!-- Tarikh -->
+                            <div class="space-y-1.5">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tarikh Perbelanjaan <span class="text-red-500">*</span></label>
+                                <input type="date" id="cDate" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow">
+                            </div>
+
+                            <!-- Jenis -->
+                            <div class="space-y-1.5">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jenis Tuntutan <span class="text-red-500">*</span></label>
+                                <select id="cType" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow">
+                                    <option value="" disabled selected>Sila pilih jenis...</option>
+                                    <option value="Perjalanan">Perjalanan (Tol, Minyak, Parkir)</option>
+                                    <option value="Keraian">Keraian Pelanggan</option>
+                                    <option value="Penginapan">Penginapan (Hotel)</option>
+                                    <option value="Perubatan">Perubatan & Klinik</option>
+                                    <option value="Lain-lain">Lain-lain Bekalan/Servis</option>
+                                </select>
+                            </div>
+
+                            <!-- Pax -->
+                            <div class="space-y-1.5">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bilangan Pax <span class="text-red-500">*</span></label>
+                                <input type="number" id="cPax" min="1" value="1" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow">
+                            </div>
+                        </div>
+
+                        <!-- Desc -->
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Keterangan Tujuan</label>
+                            <input type="text" id="cDesc" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow" placeholder="Cth: Jumpa client ABC Sdn Bhd">
+                        </div>
+
+                        <!-- Amount -->
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jumlah Tuntutan (RM) <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 font-semibold">RM</span>
+                                </div>
+                                <input type="number" id="cAmount" step="0.01" min="0.01" required class="w-full pl-12 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue text-xl font-bold transition-shadow" placeholder="0.00">
+                            </div>
+                        </div>
+
+                        <!-- File Upload -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Muat Naik Resit (PDF/Imej) atau Tangkap Gambar <span class="text-red-500">*</span></label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                                <label class="flex flex-col items-center justify-center p-5 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg hover:border-pbi-blue dark:hover:border-pbi-blue hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer bg-gray-50 dark:bg-[#202020]">
+                                    <i class="ph ph-file-arrow-up text-4xl text-gray-400 group-hover:text-pbi-blue mb-3 transition-colors"></i>
+                                    <span id="file-name-display" class="text-sm font-semibold text-pbi-blue text-center line-clamp-2 px-2">Pilih Fail / Gambar</span>
+                                    <input type="file" id="cReceiptFile" accept=".pdf, image/png, image/jpeg, image/jpg" class="hidden" onchange="handleFileSelect('file')">
+                                </label>
+                                <label class="flex flex-col items-center justify-center p-5 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg hover:border-pbi-blue dark:hover:border-pbi-blue hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer bg-gray-50 dark:bg-[#202020]">
+                                    <i class="ph ph-camera text-4xl text-gray-400 group-hover:text-pbi-blue mb-3 transition-colors"></i>
+                                    <span id="camera-name-display" class="text-sm font-semibold text-pbi-blue text-center line-clamp-2 px-2">Buka Kamera Semasa</span>
+                                    <input type="file" id="cReceiptCam" accept="image/*" capture="environment" class="hidden" onchange="handleFileSelect('cam')">
+                                </label>
+                            </div>
+                            <p id="receiptError" class="text-red-500 text-xs mt-1 hidden font-medium flex items-center"><i class="ph-fill ph-warning-circle mr-1"></i> Sila muat naik satu fail atau tangkap gambar resit terlebih dahulu.</p>
+                            <input type="hidden" id="selectedFileName">
+                        </div>
+
+                        <div class="pt-6 flex justify-end border-t border-gray-100 dark:border-gray-800">
+                            <button type="button" onclick="resetForm()" class="mr-3 px-5 py-2.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Set Semula</button>
+                            <button type="submit" id="btnSubmitClaim" class="px-6 py-2.5 rounded-md shadow-sm text-sm font-bold text-white bg-pbi-blue hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pbi-blue transition-colors flex items-center">
+                                <i class="ph ph-paper-plane-tilt text-lg mr-2"></i> Hantar Tuntutan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- VIEW 2: Semakan HR / Admin (Group) -->
+            <div id="view-admin" class="view-section hidden flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Semakan Tuntutan Pekerja (HR)</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Uruskan pembayaran mengikut kumpulan pekerja.</p>
+                    </div>
+                    <div class="flex rounded-md shadow-sm p-1 bg-gray-200 dark:bg-gray-800" role="group">
+                        <button type="button" onclick="filterAdminTable('Semua')" id="filter-all" class="px-4 py-2 text-sm font-semibold rounded border-none bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white transition-all">Semua</button>
+                        <button type="button" onclick="filterAdminTable('Ada Baki')" id="filter-pending" class="px-4 py-2 text-sm font-semibold rounded border-none text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all">Ada Baki</button>
+                        <button type="button" onclick="filterAdminTable('Selesai')" id="filter-paid" class="px-4 py-2 text-sm font-semibold rounded border-none text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all">Selesai</button>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-[#252525] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                            <thead class="bg-gray-50 dark:bg-[#1f1f1f]">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nama Pekerja</th>
+                                    <th class="px-6 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bil. Tuntutan</th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Kasar (RM)</th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Dibayar (RM)</th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Baki (RM)</th>
+                                    <th class="px-6 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tindakan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminTableBody" class="bg-white dark:bg-[#252525] divide-y divide-gray-100 dark:divide-gray-800">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="adminEmptyState" class="hidden py-16 text-center">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 mb-4">
+                            <i class="ph ph-folder-open text-3xl text-gray-400"></i>
+                        </div>
+                        <p class="text-gray-500 dark:text-gray-400 font-medium">Tiada rekod tuntutan ditemui.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: Dashboard -->
+            <div id="view-dashboard" class="view-section hidden flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-gray-200 dark:border-gray-800 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight" id="dashTitle">Laporan Tuntutan</h2>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-widest font-bold" id="dashSubtitle">Tinjauan Syarikat</p>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row items-end sm:items-center gap-2">
+                        <div class="flex items-center space-x-2 bg-white dark:bg-[#252525] px-3 py-2 rounded-md shadow-sm border border-gray-200 dark:border-gray-700">
+                            <label class="text-xs text-gray-500 dark:text-gray-400 font-semibold">Mula:</label>
+                            <input type="date" id="dashStartDate" onchange="updateDashboard()" class="text-sm border-none bg-transparent focus:ring-0 text-gray-700 dark:text-gray-300 font-medium outline-none">
+                        </div>
+                        <div class="flex items-center space-x-2 bg-white dark:bg-[#252525] px-3 py-2 rounded-md shadow-sm border border-gray-200 dark:border-gray-700">
+                            <label class="text-xs text-gray-500 dark:text-gray-400 font-semibold">Akhir:</label>
+                            <input type="date" id="dashEndDate" onchange="updateDashboard()" class="text-sm border-none bg-transparent focus:ring-0 text-gray-700 dark:text-gray-300 font-medium outline-none">
+                        </div>
+                        <button onclick="resetDashFilter()" class="p-2.5 bg-white dark:bg-[#252525] text-gray-600 dark:text-gray-300 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" title="Set Semula">
+                            <i class="ph ph-arrows-counter-clockwise text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white dark:bg-[#252525] p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 border-l-4 border-l-pbi-blue relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 -mr-4 -mt-4 opacity-5 group-hover:opacity-10 transition-opacity"><i class="ph-fill ph-sigma text-9xl text-pbi-blue"></i></div>
+                        <p class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Jumlah Kasar</p>
+                        <h3 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight" id="kpi-total-amount">RM 0.00</h3>
+                        <p class="text-xs text-gray-500 mt-2 font-medium"><span id="kpi-total-count" class="font-bold text-gray-700 dark:text-gray-300">0</span> rekod dihantar</p>
+                    </div>
+                    <div class="bg-white dark:bg-[#252525] p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 border-l-4 border-l-pbi-orange relative overflow-hidden">
+                        <p class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1" id="lbl-pending">Baki Perlu Dibayar</p>
+                        <h3 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight" id="kpi-pending-amount">RM 0.00</h3>
+                        <p class="text-xs text-pbi-orange mt-2 font-semibold flex items-center"><i class="ph-fill ph-warning-circle mr-1"></i> Menunggu tindakan</p>
+                    </div>
+                    <div class="bg-white dark:bg-[#252525] p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 border-l-4 border-l-pbi-green relative overflow-hidden">
+                        <p class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1" id="lbl-paid">Telah Dibayar (YTD)</p>
+                        <h3 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight" id="kpi-paid-amount">RM 0.00</h3>
+                        <p class="text-xs text-pbi-green mt-2 font-semibold flex items-center"><i class="ph-fill ph-check-circle mr-1"></i> Wang disalurkan</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white dark:bg-[#252525] p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
+                        <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200 mb-4 text-center tracking-wide">Perbelanjaan Mengikut Kategori</h3>
+                        <div class="relative h-64 w-full"><canvas id="barChart"></canvas></div>
+                    </div>
+                    <div class="bg-white dark:bg-[#252525] p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
+                        <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200 mb-4 text-center tracking-wide">Taburan Status Pembayaran</h3>
+                        <div class="relative h-64 w-full flex justify-center"><canvas id="doughnutChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Table -->
+                <div class="bg-white dark:bg-[#252525] rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+                    <div class="p-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#1f1f1f]">
+                        <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200">Jadual Transaksi Terperinci</h3>
+                    </div>
+                    <div class="overflow-x-auto max-h-96">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800 text-sm">
+                            <thead class="bg-white dark:bg-[#252525] sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 text-left font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID / Tarikh</th>
+                                    <th scope="col" class="px-4 py-3 text-left font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pekerja</th>
+                                    <th scope="col" class="px-4 py-3 text-left font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Kategori</th>
+                                    <th scope="col" class="px-4 py-3 text-right font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Jumlah (RM)</th>
+                                    <th scope="col" class="px-4 py-3 text-center font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-4 py-3 text-center font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tindakan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashTableBody" class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-[#252525]">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- MODALS -->
+    <!-- ============================================== -->
+
+    <!-- Modal Transaksi Individu -->
+    <div id="transactionModal" class="fixed inset-0 bg-gray-900/60 dark:bg-black/80 hidden z-50 flex items-center justify-center backdrop-blur-sm transition-opacity">
+        <div class="bg-white dark:bg-[#252525] rounded-xl shadow-2xl w-full max-w-lg p-6 m-4 border border-gray-100 dark:border-gray-800 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-start mb-4 border-b border-gray-100 dark:border-gray-800 pb-4 shrink-0">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Perincian Transaksi</h3>
+                    <p class="text-sm font-medium text-pbi-blue mt-1" id="transId">CLM-000</p>
+                </div>
+                <button onclick="closeTransactionModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors bg-gray-100 dark:bg-gray-800 rounded-full p-1.5">
                     <i class="ph ph-x text-xl"></i>
                 </button>
             </div>
             
-            <div class="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-100 dark:border-blue-800/30">
-                <p class="text-sm text-gray-600 dark:text-gray-300">Pekerja: <strong id="modalPayee" class="text-gray-900 dark:text-white"></strong></p>
-                <p class="text-sm text-gray-600 dark:text-gray-300">Baki Perlu Dibayar: <strong id="modalMaxAmount" class="text-pbi-blue text-lg"></strong></p>
-            </div>
-
-            <form id="paymentForm" onsubmit="confirmPayment(event)">
-                <input type="hidden" id="modalPayeeName">
-                <input type="hidden" id="modalMaxBalance">
-                
-                <div class="space-y-4 mb-6">
+            <div class="space-y-5 overflow-y-auto flex-1 pr-1">
+                <div class="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jumlah Ingin Dibayar (RM) <span class="text-red-500">*</span></label>
-                        <input type="number" id="pAmount" step="0.01" min="0.01" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow" placeholder="Masukkan jumlah bayaran">
-                        <p class="text-xs text-gray-500 mt-1">Sistem akan menolak tuntutan mengikut turutan tarikh terlama (FIFO).</p>
+                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nama Pekerja</p>
+                        <p class="font-bold text-gray-900 dark:text-white mt-1" id="transName">-</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tarikh Tuntutan</p>
+                        <p class="font-bold text-gray-900 dark:text-white mt-1" id="transDate">-</p>
+                    </div>
+                    <div class="col-span-2">
+                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Kategori / Tujuan</p>
+                        <p class="font-bold text-gray-900 dark:text-white mt-1" id="transTypeDesc">-</p>
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Muat Naik Bukti Pembayaran <span class="text-red-500">*</span></label>
-                        <input type="file" id="pReceipt" accept=".pdf,image/*" required class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pbi-blue file:text-white hover:file:bg-blue-600 cursor-pointer border border-gray-300 dark:border-gray-600 rounded-md transition-colors">
+                    <div class="col-span-2 bg-gray-50 dark:bg-[#1f1f1f] p-4 rounded-lg border border-gray-100 dark:border-gray-800 flex justify-between items-center mt-2">
+                        <div>
+                            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Jumlah Tuntutan</p>
+                            <p class="font-bold text-gray-900 dark:text-white text-xl mt-0.5" id="transAmount">RM 0.00</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status & Dibayar</p>
+                            <div class="flex items-center justify-end mt-0.5">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold mr-2 uppercase" id="transStatusBadge">STATUS</span>
+                                <p class="font-bold text-xl" id="transPaid">RM 0.00</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-3">
-                    <button type="button" onclick="closePaymentModal()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                        Batal
-                    </button>
-                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pbi-green hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pbi-green transition-colors">
-                        Sahkan Bayaran
+                <div class="border-t border-gray-100 dark:border-gray-800 pt-5">
+                    <h4 class="text-sm font-bold text-gray-800 dark:text-gray-200 mb-3 tracking-wide">Dokumen & Pautan</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3.5 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-900/30 transition-colors">
+                            <div class="flex items-center">
+                                <i class="ph-fill ph-file-pdf text-3xl text-pbi-blue mr-3"></i>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-900 dark:text-white">Bukti Perbelanjaan</p>
+                                    <p class="text-[11px] font-medium text-gray-500">Dimuat naik oleh pekerja</p>
+                                </div>
+                            </div>
+                            <button onclick="openReceiptViewerFromLink('transReceiptLink')" id="transReceiptLink" class="px-3 py-1.5 bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 rounded text-xs font-bold text-pbi-blue hover:text-pbi-darkblue transition-colors whitespace-nowrap">Buka Resit</button>
+                        </div>
+                        
+                        <!-- Senarai Resit Bayaran HR (Diisi oleh JS) -->
+                        <div id="transPayListContainer" class="space-y-3"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 pt-4 flex justify-end border-t border-gray-100 dark:border-gray-800 shrink-0">
+                <button onclick="closeTransactionModal()" class="px-6 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white font-bold rounded-md text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Tutup Paparan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Bayaran (Tandakan item & Masukkan Nilai Bayaran) -->
+    <div id="paymentModal" class="fixed inset-0 bg-gray-900/60 dark:bg-black/80 hidden z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white dark:bg-[#252525] rounded-xl shadow-2xl w-full max-w-2xl p-6 m-4 border border-gray-100 dark:border-gray-800 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center mb-5 border-b border-gray-100 dark:border-gray-800 pb-4">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Proses Pembayaran Tuntutan</h3>
+                <button onclick="closePaymentModal()" class="text-gray-400 hover:text-gray-600 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-full"><i class="ph ph-x text-xl"></i></button>
+            </div>
+            
+            <div class="mb-4">
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Pekerja: <strong id="modalPayee" class="text-gray-900 dark:text-white ml-1 text-lg"></strong></p>
+                <p class="text-xs text-gray-500 mt-1">Tandakan pada petak untuk pilih tuntutan yang ingin dibayar. Anda juga boleh meminda jumlah bayaran untuk bayaran separa (partial).</p>
+            </div>
+
+            <form id="paymentForm" onsubmit="confirmPayment(event)" class="flex-1 flex flex-col overflow-hidden">
+                <input type="hidden" id="modalPayeeName">
+                
+                <!-- Table for Selecting Claims -->
+                <div class="overflow-y-auto mb-4 border border-gray-200 dark:border-gray-700 rounded-lg flex-1">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-gray-50 dark:bg-[#1f1f1f] sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th class="p-3 text-center w-12"><input type="checkbox" id="selectAllClaims" onchange="toggleAllClaims(this)" class="w-4 h-4 rounded text-pbi-blue focus:ring-pbi-blue cursor-pointer"></th>
+                                <th class="p-3 font-bold text-gray-600 dark:text-gray-300">ID / Tarikh</th>
+                                <th class="p-3 font-bold text-gray-600 dark:text-gray-300 text-right">Baki (RM)</th>
+                                <th class="p-3 font-bold text-gray-600 dark:text-gray-300 text-right w-32">Bayar (RM)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentClaimsList" class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-[#252525]">
+                            <!-- Rows injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-between bg-blue-50 dark:bg-blue-900/10 p-4 rounded-lg border border-blue-100 dark:border-blue-900/30 mb-6">
+                    <div class="text-sm font-bold text-gray-600 dark:text-gray-300">Jumlah Keseluruhan Bayaran:</div>
+                    <div class="text-2xl font-bold text-pbi-blue tracking-tight" id="totalPaymentDisplay">RM 0.00</div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Muat Naik Bukti Pembayaran <span class="text-red-500">*</span></label>
+                    <input type="file" id="pReceipt" accept=".pdf,image/*" required class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-bold file:bg-pbi-blue file:text-white hover:file:bg-blue-600 cursor-pointer border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 transition-colors">
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800 mt-auto">
+                    <button type="button" onclick="closePaymentModal()" class="px-5 py-2.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Batal</button>
+                    <button type="submit" id="btnConfirmPayment" class="px-6 py-2.5 bg-pbi-green text-white rounded-md text-sm font-bold shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-pbi-green transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="ph-fill ph-check-circle mr-2"></i> Sahkan Bayaran
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal Perincian Tuntutan Pekerja -->
-    <div id="detailsModal" class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 hidden z-50 flex items-center justify-center backdrop-blur-sm transition-opacity">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl p-6 m-4 max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Perincian Tuntutan: <span id="detailName" class="text-pbi-blue"></span></h3>
-                <button onclick="closeDetailsModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-                    <i class="ph ph-x text-xl"></i>
-                </button>
+    <!-- Modal Admin Details -->
+    <div id="detailsModal" class="fixed inset-0 bg-gray-900/60 dark:bg-black/80 hidden z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white dark:bg-[#252525] rounded-xl shadow-2xl w-full max-w-5xl p-6 m-4 max-h-[90vh] flex flex-col border border-gray-100 dark:border-gray-800">
+            <div class="flex justify-between items-center mb-5 border-b border-gray-100 dark:border-gray-800 pb-4">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Perincian Rekod: <span id="detailName" class="text-pbi-blue"></span></h3>
+                <button onclick="closeDetailsModal()" class="text-gray-400 hover:text-gray-600 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-full"><i class="ph ph-x text-xl"></i></button>
             </div>
-            
-            <div class="overflow-y-auto flex-1 border border-gray-200 dark:border-gray-700 rounded-md">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
-                    <thead class="bg-gray-50 dark:bg-gray-900 sticky top-0 shadow-sm z-10">
+            <div class="overflow-y-auto flex-1 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800 text-sm">
+                    <thead class="bg-gray-50 dark:bg-[#1f1f1f] sticky top-0 z-10 shadow-sm">
                         <tr>
-                            <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">ID / Tarikh</th>
-                            <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">Keterangan</th>
-                            <th class="px-4 py-3 text-right font-semibold text-gray-600 dark:text-gray-400">Kasar (RM)</th>
-                            <th class="px-4 py-3 text-right font-semibold text-gray-600 dark:text-gray-400">Dibayar (RM)</th>
-                            <th class="px-4 py-3 text-right font-semibold text-gray-600 dark:text-gray-400">Baki (RM)</th>
-                            <th class="px-4 py-3 text-center font-semibold text-gray-600 dark:text-gray-400">Status</th>
+                            <th class="px-4 py-3 text-left font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tarikh / ID</th>
+                            <th class="px-4 py-3 text-left font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tujuan</th>
+                            <th class="px-4 py-3 text-right font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Kasar</th>
+                            <th class="px-4 py-3 text-right font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Dibayar</th>
+                            <th class="px-4 py-3 text-right font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Baki</th>
+                            <th class="px-4 py-3 text-center font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                            <th class="px-4 py-3 text-center font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Dokumen</th>
                         </tr>
                     </thead>
-                    <tbody id="detailsTableBody" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        <!-- Data akan diisi oleh JS -->
-                    </tbody>
+                    <tbody id="detailsTableBody" class="bg-white dark:bg-[#252525] divide-y divide-gray-100 dark:divide-gray-800"></tbody>
                 </table>
             </div>
-            <div class="mt-4 flex justify-end">
-                <button onclick="closeDetailsModal()" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                    Tutup
-                </button>
+            <div class="mt-5 pt-4 flex justify-end border-t border-gray-100 dark:border-gray-800">
+                <button onclick="closeDetailsModal()" class="px-6 py-2.5 bg-gray-100 dark:bg-gray-800 font-bold rounded-md text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Tutup Paparan</button>
             </div>
         </div>
     </div>
 
-    <!-- Application Logic (JavaScript) -->
-    <script>
-        // --- DATA STATE (In-Memory Simulation) ---
-        let employeesList = []; // Array untuk simpan data dari Google Sheet
-        
-        // Mock data awal. Perhatikan penambahan attribute 'paid' untuk fungsi separa bayaran
-        let claimsData = [
-            { id: 'CLM-001', name: 'Ahmad Ali', date: '2023-10-25', type: 'Perjalanan', pax: 1, desc: 'Lawat tapak projek 1', amount: 100.00, paid: 100.00, status: 'Selesai Dibayar', receiptName: 'tol1.pdf', payReceiptName: 'txn_001.pdf', timestamp: Date.now() - 10000 },
-            { id: 'CLM-002', name: 'Ahmad Ali', date: '2023-11-05', type: 'Perjalanan', pax: 1, desc: 'Minyak kereta', amount: 50.00, paid: 0, status: 'Menunggu', receiptName: 'minyak.jpg', payReceiptName: null, timestamp: Date.now() - 5000 },
-            { id: 'CLM-003', name: 'Ahmad Ali', date: '2023-11-10', type: 'Keraian', pax: 2, desc: 'Makan client', amount: 75.00, paid: 0, status: 'Menunggu', receiptName: 'resit_makan.png', payReceiptName: null, timestamp: Date.now() - 2000 },
-            { id: 'CLM-004', name: 'Siti Nurhaliza', date: '2023-10-28', type: 'Keraian', pax: 4, desc: 'Makan tengahari VIP', amount: 450.00, paid: 200.00, status: 'Separa Dibayar', receiptName: 'resit_vip.pdf', payReceiptName: 'txn_002.pdf', timestamp: Date.now() - 8000 },
-            { id: 'CLM-005', name: 'Chong Wei', date: '2023-11-02', type: 'Penginapan', pax: 1, desc: 'Hotel mesyuarat', amount: 350.00, paid: 350.00, status: 'Selesai Dibayar', receiptName: 'inv_hotel.pdf', payReceiptName: 'txn_003.pdf', timestamp: Date.now() - 7000 }
-        ];
+    <!-- Modal Document Viewer -->
+    <div id="receiptViewerModal" class="fixed inset-0 bg-gray-900/80 dark:bg-black/90 hidden z-[60] flex items-center justify-center backdrop-blur-md p-4 transition-opacity">
+        <div class="bg-white dark:bg-[#252525] rounded-xl shadow-2xl w-full max-w-4xl h-[85vh] flex flex-col border border-gray-200 dark:border-gray-800 overflow-hidden">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#1f1f1f]">
+                <div>
+                    <h3 id="receiptViewerTitle" class="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Paparan Dokumen</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Menarik fail pratonton secara langsung dari Google Drive.</p>
+                </div>
+                <button onclick="closeReceiptViewer()" class="text-gray-400 hover:text-gray-600 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 p-2 rounded-full transition-colors">
+                    <i class="ph ph-x text-xl"></i>
+                </button>
+            </div>
+            <div class="flex-1 bg-gray-200 dark:bg-black relative">
+                <div class="absolute inset-0 flex flex-col items-center justify-center z-0">
+                    <i class="ph ph-spinner animate-spin text-4xl text-pbi-blue mb-3"></i>
+                    <p class="text-sm text-gray-500 font-medium">Sedang memuatkan dokumen...</p>
+                </div>
+                <iframe id="receiptIframe" class="w-full h-full relative z-10 border-0" allow="autoplay"></iframe>
+            </div>
+        </div>
+    </div>
 
-        let currentFilter = 'Semua';
+    <!-- ============================================== -->
+    <!-- JAVASCRIPT LOGIC -->
+    <!-- ============================================== -->
+    <script>
+        // --- 0. KONFIGURASI APP SCRIPT URL ---
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVjpR--VoTt_1M0fjwHymKu3rYu1qs_QrTiffkWJEtUW8A6G7oPdpfWCS8FC-OPMBbWw/exec"; 
         
-        // Chart Instances
+        // Pautan Google Sheets Data Fetching
+        const sheetCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?output=csv';
+        const claimsCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?gid=1560350142&single=true&output=csv';
+        const SUPERADMIN_IDS = ['VES006', 'VES041'];
+
+        // --- 1. STATE VARIABLES ---
+        let currentUser = null; 
+        let employeesList = []; 
+        let claimsData = [];
+        let currentFilter = 'Semua';
         let barChartInstance = null;
         let doughnutChartInstance = null;
-
-        // Power BI Color Palette
         const pbiColors = ['#118DFF', '#12239E', '#E66C37', '#6B007B', '#00B01A', '#00A638', '#33A1FD', '#FFA300'];
 
-        // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set default date to today
+        // --- 2. INIT ---
+        document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('cDate').valueAsDate = new Date();
-            
-            // Render Initial Views
-            updateAdminTable();
-            updateDashboard();
-            updatePendingBadge();
-            
-            // Initialize Dropdown
-            fetchEmployees();
-            setupEmployeeSearch();
+            await Promise.all([ fetchEmployees(), fetchClaims() ]);
+            setupLoginSearch();
         });
 
-        // --- NAVIGATION ---
-        function navigate(viewId) {
-            // Hide all views
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            
-            // Reset nav styles Desktop
-            document.querySelectorAll('.nav-btn').forEach(el => {
-                el.classList.remove('bg-blue-50', 'text-pbi-blue', 'dark:bg-blue-900/30', 'dark:text-pbi-cyan');
-                el.classList.add('text-gray-600', 'dark:text-gray-400');
-            });
-            // Reset nav styles Mobile
-            document.querySelectorAll('.nav-btn-mob').forEach(el => {
-                el.classList.remove('text-pbi-blue');
-                el.classList.add('text-gray-500');
-            });
-
-            // Show selected view
-            document.getElementById(`view-${viewId}`).classList.remove('hidden');
-            
-            // Active state Desktop
-            const activeNav = document.getElementById(`nav-${viewId}`);
-            if(activeNav) activeNav.classList.add('bg-blue-50', 'text-pbi-blue', 'dark:bg-blue-900/30', 'dark:text-pbi-cyan');
-            
-            // Active state Mobile
-            const activeNavMob = document.getElementById(`nav-${viewId}-mob`);
-            if(activeNavMob) activeNavMob.classList.add('text-pbi-blue');
-
-            // View Specific Callbacks
-            if (viewId === 'admin') updateAdminTable();
-            if (viewId === 'dashboard') {
-                setTimeout(updateDashboard, 50); // slight delay to ensure canvas is visible
-            }
-        }
-
-        // --- THEME TOGGLE ---
-        function toggleTheme() {
-            const html = document.documentElement;
-            html.classList.toggle('dark');
-            html.classList.toggle('light');
-            
-            const isDark = html.classList.contains('dark');
-            const icons = [document.getElementById('theme-icon'), document.getElementById('theme-icon-mobile')];
-            
-            icons.forEach(i => { 
-                if(i) { 
-                    i.className = isDark ? 'ph ph-sun text-lg' : 'ph ph-moon text-lg'; 
-                }
-            });
-            
-            // Rerender charts to update grid/text colors
-            if(!document.getElementById('view-dashboard').classList.contains('hidden')) {
-                updateDashboard();
-            }
-        }
-
-        // --- EMPLOYEE SEARCH (GOOGLE SHEETS) LOGIC ---
-        // Pautan Google Sheets dalam format CSV
-        const sheetCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?output=csv';
-
+        // --- 3. FETCH DATA ---
         async function fetchEmployees() {
             try {
                 const response = await fetch(sheetCSVUrl);
                 const data = await response.text();
-                
                 const rows = data.split('\n');
-                employeesList = [];
                 
-                // Mula index 1 untuk abaikan Header
+                employeesList = [];
                 for(let i = 1; i < rows.length; i++) {
                     if(!rows[i].trim()) continue;
-                    
-                    // Pisahkan berdasarkan koma (mengambil kira quote "" jika ada koma di dalam nama)
                     const cols = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
-                    
                     if(cols.length >= 2) {
                         const id = cols[0].replace(/"/g, '').trim();
                         const name = cols[1].replace(/"/g, '').trim();
-                        employeesList.push({ 
-                            id: id, 
-                            name: name, 
-                            displayText: `${id} - ${name}` 
-                        });
+                        employeesList.push({ id, name, displayText: `${id} - ${name}` });
                     }
                 }
-            } catch (error) {
-                console.error('Gagal memuatkan data pekerja:', error);
-                employeesList = [{ id: 'Ralat', name: 'Gagal muat turun data', displayText: 'Gagal muat turun data Google Sheet. Sila taip nama secara manual.' }];
-            }
+            } catch (error) { console.error("Ralat Employees:", error); }
         }
 
-        function setupEmployeeSearch() {
-            const input = document.getElementById('cNameInput');
-            const hiddenInput = document.getElementById('cName');
-            const dropdown = document.getElementById('employeeDropdown');
-            const container = document.getElementById('employeeSearchContainer');
+        async function fetchClaims() {
+            try {
+                const response = await fetch(claimsCSVUrl);
+                const data = await response.text();
+                const rows = data.split('\n');
+                
+                claimsData = [];
+                for(let i = 1; i < rows.length; i++) {
+                    if(!rows[i].trim()) continue;
+                    const cols = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
+                    
+                    if(cols.length >= 8) {
+                        const id = cols[0] ? cols[0].replace(/"/g, '').trim() : '';
+                        const name = cols[1] ? cols[1].replace(/"/g, '').trim() : '';
+                        const date = cols[2] ? cols[2].replace(/"/g, '').trim() : '';
+                        const type = cols[3] ? cols[3].replace(/"/g, '').trim() : '';
+                        const pax = parseInt(cols[4] ? cols[4].replace(/"/g, '').trim() : 1) || 1;
+                        const desc = cols[5] ? cols[5].replace(/"/g, '').trim() : '';
+                        
+                        const amountStr = cols[6] ? cols[6].replace(/"/g, '').replace(/,/g, '').trim() : '0';
+                        const amount = parseFloat(amountStr) || 0;
+                        
+                        const status = cols[7] ? cols[7].replace(/"/g, '').trim() : 'Menunggu';
+                        const receiptUrl = cols[8] ? cols[8].replace(/"/g, '').trim() : '';
+                        const timestampRaw = cols[9] ? cols[9].replace(/"/g, '').trim() : '';
+                        const timestamp = timestampRaw ? new Date(timestampRaw).getTime() : Date.now();
+                        
+                        // Kolum K dan L mungkin mengandungi gabungan URL dipisahkan oleh koma (Idea 2)
+                        const payReceiptUrl = cols[10] ? cols[10].replace(/"/g, '').trim() : '';
+                        const payDate = cols[11] ? cols[11].replace(/"/g, '').trim() : '';
+                        
+                        const paidColStr = cols[12] ? cols[12].replace(/"/g, '').replace(/,/g, '').trim() : '';
+                        let paid = parseFloat(paidColStr);
 
-            // Tunjuk dropdown bila input di klik
-            input.addEventListener('focus', () => {
-                renderDropdown(input.value);
-                dropdown.classList.remove('hidden');
-            });
+                        if(isNaN(paid)) {
+                            const statusLower = status.toLowerCase();
+                            if(statusLower === 'selesai dibayar' || statusLower === 'selesai' || statusLower === 'telah dibayar') paid = amount;
+                            else paid = 0;
+                        }
 
-            // Tapis data apabila user menaip
-            input.addEventListener('input', (e) => {
-                renderDropdown(e.target.value);
-                hiddenInput.value = ''; // Reset hidden value apabila user ubah secara manual
-            });
-
-            // Tutup dropdown jika klik di luar
-            document.addEventListener('click', (e) => {
-                if (!container.contains(e.target)) {
-                    dropdown.classList.add('hidden');
+                        claimsData.push({ id, name, date, type, pax, desc, amount, status, receiptUrl, timestamp, paid, payReceiptUrl, payDate });
+                    }
                 }
-            });
+            } catch (error) { console.error("Ralat Claims:", error); }
         }
 
-        function renderDropdown(searchTerm) {
-            const dropdown = document.getElementById('employeeDropdown');
+        // --- 4. LOGIN LOGIC ---
+        function setupLoginSearch() {
+            const input = document.getElementById('loginIdInput');
+            const hiddenId = document.getElementById('loginSelectedId');
+            const hiddenName = document.getElementById('loginSelectedName');
+            const dropdown = document.getElementById('loginDropdown');
+            const container = document.getElementById('loginSearchContainer');
+            const btn = document.getElementById('btnLogin');
+
+            input.addEventListener('focus', () => { renderLoginDropdown(input.value); dropdown.classList.remove('hidden'); });
+            input.addEventListener('input', (e) => {
+                renderLoginDropdown(e.target.value);
+                hiddenId.value = ''; hiddenName.value = '';
+                btn.disabled = true;
+                document.getElementById('loginError').classList.add('hidden');
+                document.getElementById('passwordContainer').classList.add('hidden');
+                document.getElementById('loginPasswordInput').value = '';
+                document.getElementById('passwordError').classList.add('hidden');
+            });
+            document.addEventListener('click', (e) => { if (!container.contains(e.target)) dropdown.classList.add('hidden'); });
+        }
+
+        function renderLoginDropdown(searchTerm) {
+            const dropdown = document.getElementById('loginDropdown');
+            const hiddenId = document.getElementById('loginSelectedId');
+            const hiddenName = document.getElementById('loginSelectedName');
+            const btn = document.getElementById('btnLogin');
             dropdown.innerHTML = '';
             
             const term = searchTerm.toLowerCase();
             const filtered = employeesList.filter(emp => emp.displayText.toLowerCase().includes(term));
 
             if(filtered.length === 0) {
-                dropdown.innerHTML = `<li class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">Tiada padanan ditemui. Taip untuk teruskan.</li>`;
-                return;
+                dropdown.innerHTML = `<li class="px-4 py-3 text-sm text-gray-500 font-medium">Tiada padanan pekerja.</li>`; return;
             }
-
             filtered.forEach(emp => {
                 const li = document.createElement('li');
-                li.className = 'px-3 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-pbi-blue hover:text-white cursor-pointer transition-colors';
+                li.className = 'px-4 py-2.5 text-sm font-medium text-gray-800 dark:text-gray-200 hover:bg-pbi-blue hover:text-white cursor-pointer';
                 li.innerText = emp.displayText;
-                
                 li.onclick = () => {
-                    document.getElementById('cNameInput').value = emp.displayText; // Paparan untuk UI
-                    document.getElementById('cName').value = emp.name; // Simpan nilai sebenar ke input hidden
-                    dropdown.classList.add('hidden');
+                    document.getElementById('loginIdInput').value = emp.displayText;
+                    hiddenId.value = emp.id; hiddenName.value = emp.name;
+                    if (SUPERADMIN_IDS.includes(emp.id)) document.getElementById('passwordContainer').classList.remove('hidden');
+                    else document.getElementById('passwordContainer').classList.add('hidden');
+                    btn.disabled = false; dropdown.classList.add('hidden'); document.getElementById('loginError').classList.add('hidden');
                 };
                 dropdown.appendChild(li);
             });
         }
 
-        // --- UPLOAD / CAMERA LOGIC ---
-        function handleFileSelect(source) {
-            const fileInput = document.getElementById(source === 'file' ? 'cReceiptFile' : 'cReceiptCam');
-            const otherInput = document.getElementById(source === 'file' ? 'cReceiptCam' : 'cReceiptFile');
-            const displayId = source === 'file' ? 'file-name-display' : 'camera-name-display';
-            const otherDisplayId = source === 'file' ? 'camera-name-display' : 'file-name-display';
-            
-            if (fileInput.files && fileInput.files.length > 0) {
-                // Kemaskini text dengan nama fail yang dipilih
-                document.getElementById(displayId).innerText = fileInput.files[0].name;
-                document.getElementById('selectedFileName').value = fileInput.files[0].name;
+        function handleLogin() {
+            const hidId = document.getElementById('loginSelectedId').value;
+            const hidName = document.getElementById('loginSelectedName').value;
+            if(!hidId) { document.getElementById('loginError').classList.remove('hidden'); return; }
+
+            const isSuperadminUser = SUPERADMIN_IDS.includes(hidId);
+            if (isSuperadminUser) {
+                const pwd = document.getElementById('loginPasswordInput').value;
+                if (pwd !== 'claim123') { document.getElementById('passwordError').classList.remove('hidden'); return; }
+            }
+
+            currentUser = { id: hidId, name: hidName, isSuperadmin: isSuperadminUser };
+
+            document.getElementById('login-view').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('app-layout').classList.remove('hidden');
                 
-                // Kosongkan input yang satu lagi supaya tidak clash
-                otherInput.value = "";
-                document.getElementById(otherDisplayId).innerText = source === 'file' ? 'Buka Kamera' : 'Pilih Fail / Gambar';
+                document.getElementById('cNameInputLocked').value = currentUser.name;
+                document.getElementById('user-avatar').innerText = currentUser.name.substring(0,2).toUpperCase();
+                document.getElementById('user-name-label').innerText = currentUser.name;
+                
+                if (currentUser.isSuperadmin) {
+                    document.getElementById('nav-admin').classList.remove('hidden');
+                    document.getElementById('nav-admin-mob').classList.remove('hidden');
+                    document.getElementById('user-role-label').innerText = 'Superadmin';
+                    document.getElementById('user-role-label').classList.add('text-pbi-blue');
+                    document.getElementById('dashSubtitle').innerText = 'Tinjauan Penuh Syarikat';
+                } else {
+                    document.getElementById('nav-admin').classList.add('hidden');
+                    document.getElementById('nav-admin-mob').classList.add('hidden');
+                    document.getElementById('user-role-label').innerText = 'Kakitangan';
+                    document.getElementById('user-role-label').classList.remove('text-pbi-blue');
+                    document.getElementById('dashSubtitle').innerText = 'Tinjauan Peribadi';
+                }
+                
+                updatePendingBadge(); navigate('submit');
+            }, 300);
+        }
+
+        function logout() {
+            currentUser = null; document.getElementById('app-layout').classList.add('hidden');
+            const lv = document.getElementById('login-view'); lv.classList.remove('hidden');
+            setTimeout(() => {
+                lv.classList.remove('opacity-0');
+                document.getElementById('loginIdInput').value = ''; document.getElementById('loginSelectedId').value = ''; document.getElementById('loginSelectedName').value = '';
+                document.getElementById('btnLogin').disabled = true; document.getElementById('loginPasswordInput').value = '';
+                document.getElementById('passwordContainer').classList.add('hidden'); document.getElementById('passwordError').classList.add('hidden');
+            }, 50);
+        }
+
+        // --- 5. UI UTILS ---
+        function navigate(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => { el.classList.remove('bg-blue-50', 'text-pbi-blue', 'dark:bg-blue-900/30', 'dark:text-pbi-cyan'); el.classList.add('text-gray-600', 'dark:text-gray-400'); });
+            document.querySelectorAll('.nav-btn-mob').forEach(el => { el.classList.remove('text-pbi-blue'); el.classList.add('text-gray-500'); });
+
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            const nDesk = document.getElementById(`nav-${viewId}`); if(nDesk) nDesk.classList.add('bg-blue-50', 'text-pbi-blue', 'dark:bg-blue-900/30', 'dark:text-pbi-cyan');
+            const nMob = document.getElementById(`nav-${viewId}-mob`); if(nMob) nMob.classList.add('text-pbi-blue');
+
+            if (viewId === 'admin') updateAdminTable();
+            if (viewId === 'dashboard') setTimeout(updateDashboard, 50);
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement; html.classList.toggle('dark'); html.classList.toggle('light');
+            const isDark = html.classList.contains('dark');
+            [document.getElementById('theme-icon'), document.getElementById('theme-icon-mobile')].forEach(i => { if(i) i.className = isDark ? 'ph-fill ph-sun text-lg text-yellow-400' : 'ph ph-moon text-lg'; });
+            if(!document.getElementById('view-dashboard').classList.contains('hidden')) updateDashboard();
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast'); document.getElementById('toast-title').innerText = title; document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-[-150%]', 'opacity-0'); setTimeout(() => toast.classList.add('translate-y-[-150%]', 'opacity-0'), 3500);
+        }
+
+        function formatRM(amt) { return new Intl.NumberFormat('ms-MY', { style: 'currency', currency: 'MYR' }).format(amt); }
+        function formatDate(d) { return new Date(d).toLocaleDateString('ms-MY', { year: 'numeric', month: 'short', day: 'numeric' }); }
+
+        function updatePendingBadge() {
+            const pendingClaims = claimsData.filter(c => (c.amount - c.paid) > 0);
+            const badges = [document.getElementById('pending-badge'), document.getElementById('pending-badge-mob')];
+            badges.forEach(b => { if(b) { b.classList.toggle('hidden', pendingClaims.length === 0); b.innerText = pendingClaims.length > 0 ? pendingClaims.length : ''; } });
+        }
+
+        // --- 6. SUBMIT CLAIM ---
+        function handleFileSelect(src) {
+            const fi = document.getElementById(src === 'file' ? 'cReceiptFile' : 'cReceiptCam');
+            const oi = document.getElementById(src === 'file' ? 'cReceiptCam' : 'cReceiptFile');
+            const did = src === 'file' ? 'file-name-display' : 'camera-name-display';
+            const odid = src === 'file' ? 'camera-name-display' : 'file-name-display';
+            
+            if (fi.files && fi.files.length > 0) {
+                document.getElementById(did).innerText = fi.files[0].name; document.getElementById('selectedFileName').value = fi.files[0].name;
+                oi.value = ""; document.getElementById(odid).innerText = src === 'file' ? 'Buka Kamera Semasa' : 'Pilih Fail / Gambar';
                 document.getElementById('receiptError').classList.add('hidden');
             }
         }
 
         function resetForm() {
             document.getElementById('claimForm').reset();
-            
-            // Reset custom field states
-            document.getElementById('cName').value = "";
-            document.getElementById('cReceiptFile').value = "";
-            document.getElementById('cReceiptCam').value = "";
-            document.getElementById('file-name-display').innerText = 'Pilih Fail / Gambar';
-            document.getElementById('camera-name-display').innerText = 'Buka Kamera';
-            document.getElementById('selectedFileName').value = "";
-            document.getElementById('receiptError').classList.add('hidden');
+            document.getElementById('cReceiptFile').value = ""; document.getElementById('cReceiptCam').value = "";
+            document.getElementById('file-name-display').innerText = 'Pilih Fail / Gambar'; document.getElementById('camera-name-display').innerText = 'Buka Kamera Semasa';
+            document.getElementById('selectedFileName').value = ""; document.getElementById('receiptError').classList.add('hidden');
+            if(currentUser) document.getElementById('cNameInputLocked').value = currentUser.name;
         }
 
-        // --- GENERAL HELPERS ---
-        function showToast(title, msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-title').innerText = title;
-            document.getElementById('toast-msg').innerText = msg;
-            
-            toast.classList.remove('translate-y-[-150%]', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-[-150%]', 'opacity-0');
-            }, 3000);
-        }
-
-        function formatRM(amount) { 
-            return new Intl.NumberFormat('ms-MY', { style: 'currency', currency: 'MYR' }).format(amount); 
-        }
-
-        function formatDate(dStr) { 
-            return new Date(dStr).toLocaleDateString('ms-MY', { year: 'numeric', month: 'short', day: 'numeric' }); 
-        }
-
-        function updatePendingBadge() {
-            // Check ada tak sebarang baki yang perlu dibayar (amount > paid)
-            const hasPending = claimsData.some(c => (c.amount - c.paid) > 0);
-            const badges = [document.getElementById('pending-badge'), document.getElementById('pending-badge-mob')];
-            
-            badges.forEach(b => {
-                if(b) {
-                    if(hasPending) {
-                        b.classList.remove('hidden');
-                        b.innerText = '!'; // Letak simbol seruan untuk tanda alert
-                    } else {
-                        b.classList.add('hidden');
-                    }
-                }
-            });
-        }
-
-        // --- FORM SUBMISSION (NEW CLAIM) ---
         function submitClaim(e) {
             e.preventDefault();
-            
-            const fileName = document.getElementById('selectedFileName').value;
-            if(!fileName) {
-                document.getElementById('receiptError').classList.remove('hidden');
-                return;
-            }
+            const fn = document.getElementById('selectedFileName').value;
+            if(!fn) { document.getElementById('receiptError').classList.remove('hidden'); return; }
 
-            // Dapatkan nama: Utamakan 'hidden' input (jika guna dropdown), jika tidak ambil nilai input raw dan buang ID
-            let finalName = document.getElementById('cName').value.trim();
-            if(!finalName) {
-                let rawInput = document.getElementById('cNameInput').value.trim();
-                // Jika user type manual "EMP001 - Ahmad Ali", cuba extract nama sahaja
-                if(rawInput.includes(' - ')) {
-                    finalName = rawInput.split(' - ').slice(1).join(' - ').trim();
-                } else {
-                    finalName = rawInput;
-                }
-            }
+            const btnSubmit = document.getElementById('btnSubmitClaim'); const oriBtnHtml = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = '<i class="ph ph-spinner animate-spin text-lg mr-2"></i> Dihantar...'; btnSubmit.disabled = true;
 
-            const newId = 'CLM-' + String(claimsData.length + 1).padStart(3, '0');
+            let fileInput = document.getElementById('cReceiptFile').files.length > 0 ? document.getElementById('cReceiptFile') : document.getElementById('cReceiptCam');
+            let file = fileInput.files[0];
+
+            // Penjanaan ID Unik Baharu
+            const now = new Date();
+            const yy = String(now.getFullYear()).slice(-2);
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const hh = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            const firstName = currentUser.name.split(' ')[0].toUpperCase();
             
-            const newClaim = {
-                id: newId,
-                name: finalName,
-                date: document.getElementById('cDate').value,
-                type: document.getElementById('cType').value,
-                pax: parseInt(document.getElementById('cPax').value),
-                desc: document.getElementById('cDesc').value,
-                amount: parseFloat(document.getElementById('cAmount').value),
-                paid: 0, // Nilai default belum dibayar
-                receiptName: fileName,
-                status: 'Menunggu',
-                payReceiptName: null,
-                timestamp: Date.now()
+            const newId = `CLM-${yy}${mm}${dd}-${hh}${min}-${firstName}`;
+            
+            const claimRecord = {
+                id: newId, name: currentUser.name, date: document.getElementById('cDate').value,
+                type: document.getElementById('cType').value, pax: parseInt(document.getElementById('cPax').value),
+                desc: document.getElementById('cDesc').value, amount: parseFloat(document.getElementById('cAmount').value),
+                paid: 0, status: 'Menunggu', fileName: file.name, fileMimeType: file.type
             };
 
-            // Masukkan pada bahagian paling atas data array
-            claimsData.unshift(newClaim);
-            
-            resetForm();
-            updatePendingBadge();
-            showToast('Tuntutan Berjaya Dihantar', `ID Rujukan: ${newId} direkodkan.`);
+            let reader = new FileReader();
+            reader.onload = async function() {
+                claimRecord.fileBase64 = reader.result.split(',')[1];
+                try {
+                    let response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(claimRecord) });
+                    let result = await response.json();
+                    if(result.status === 'success') {
+                        claimRecord.receiptUrl = result.fileUrl; claimRecord.timestamp = Date.now(); claimsData.unshift(claimRecord);
+                        resetForm(); updatePendingBadge(); showToast('Berjaya Disimpan', `Tuntutan (${newId}) dihantar ke pangkalan data.`);
+                    } else throw new Error(result.message);
+                } catch (error) { alert("Ralat Sila pastikan APPS_SCRIPT_URL tepat."); } 
+                finally { btnSubmit.innerHTML = oriBtnHtml; btnSubmit.disabled = false; }
+            };
+            reader.readAsDataURL(file);
         }
 
-        // --- ADMIN VIEW (BULK / GROUPING LOGIC) ---
+        // --- 7. ADMIN HR & PAYMENT LOGIC ---
         function getGroupedData() {
-            const groups = {};
-            
+            const g = {};
             claimsData.forEach(c => {
-                const name = c.name;
-                if(!groups[name]) {
-                    groups[name] = { 
-                        name: name, 
-                        count: 0, 
-                        totalAmount: 0, 
-                        totalPaid: 0, 
-                        balance: 0, 
-                        claims: [] 
-                    };
-                }
-                
-                groups[name].count++;
-                groups[name].totalAmount += c.amount;
-                groups[name].totalPaid += (c.paid || 0);
-                groups[name].balance += (c.amount - (c.paid || 0));
-                groups[name].claims.push(c);
+                if(!g[c.name]) g[c.name] = { name: c.name, count: 0, tAmt: 0, tPaid: 0, bal: 0, claims: [] };
+                g[c.name].count++; g[c.name].tAmt += c.amount; g[c.name].tPaid += c.paid; g[c.name].bal += (c.amount - c.paid);
             });
-            
-            return Object.values(groups);
+            return Object.values(g);
         }
 
-        function filterAdminTable(status) {
-            currentFilter = status;
-            
-            // Update filter buttons styling
-            ['all', 'pending', 'paid'].forEach(id => {
-                const btn = document.getElementById(`filter-${id}`);
-                btn.classList.remove('bg-gray-100', 'dark:bg-gray-700');
-                btn.classList.add('bg-white', 'dark:bg-gray-800');
+        function filterAdminTable(s) {
+            currentFilter = s;
+            ['all','pending','paid'].forEach(i => {
+                const b = document.getElementById(`filter-${i}`);
+                b.classList.remove('bg-white', 'dark:bg-gray-600', 'shadow-sm', 'text-gray-900', 'dark:text-white');
+                b.classList.add('text-gray-600', 'dark:text-gray-400');
             });
-            
-            let activeId = status === 'Ada Baki' ? 'pending' : (status === 'Selesai' ? 'paid' : 'all');
-            let activeBtn = document.getElementById(`filter-${activeId}`);
-            activeBtn.classList.remove('bg-white', 'dark:bg-gray-800');
-            activeBtn.classList.add('bg-gray-100', 'dark:bg-gray-700');
-            
+            let aId = s === 'Ada Baki' ? 'pending' : (s === 'Selesai' ? 'paid' : 'all');
+            let aBtn = document.getElementById(`filter-${aId}`);
+            aBtn.classList.remove('text-gray-600', 'dark:text-gray-400');
+            aBtn.classList.add('bg-white', 'dark:bg-gray-600', 'shadow-sm', 'text-gray-900', 'dark:text-white');
             updateAdminTable();
         }
 
         function updateAdminTable() {
-            const tbody = document.getElementById('adminTableBody');
-            const emptyState = document.getElementById('adminEmptyState');
+            if(!currentUser || !currentUser.isSuperadmin) return;
+            const tbody = document.getElementById('adminTableBody'); const empty = document.getElementById('adminEmptyState');
             tbody.innerHTML = '';
+            let grps = getGroupedData();
+            if (currentFilter === 'Ada Baki') grps = grps.filter(g => g.bal > 0);
+            if (currentFilter === 'Selesai') grps = grps.filter(g => g.bal === 0);
 
-            let groups = getGroupedData();
-            
-            // Proses filter
-            if (currentFilter === 'Ada Baki') {
-                groups = groups.filter(g => g.balance > 0);
-            }
-            if (currentFilter === 'Selesai') {
-                groups = groups.filter(g => g.balance === 0);
-            }
+            if (grps.length === 0) { empty.classList.remove('hidden'); tbody.parentNode.classList.add('hidden'); }
+            else {
+                empty.classList.add('hidden'); tbody.parentNode.classList.remove('hidden');
+                grps.forEach(g => {
+                    const isBal = g.bal > 0;
+                    const st = isBal ? (g.tPaid > 0 ? 'Separa' : 'Ada Baki') : 'Selesai';
+                    const c = isBal ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+                    const btn = isBal 
+                        ? `<button onclick="openPaymentModal('${g.name}')" class="text-xs font-bold bg-pbi-blue text-white px-4 py-2 rounded shadow-sm hover:bg-blue-600 transition-colors">Bayar</button>`
+                        : `<span class="text-xs font-bold text-gray-400 px-4 py-2 bg-gray-50 dark:bg-[#1f1f1f] rounded border border-gray-200 dark:border-gray-800">Selesai</span>`;
 
-            if (groups.length === 0) {
-                emptyState.classList.remove('hidden');
-                tbody.parentNode.classList.add('hidden');
-            } else {
-                emptyState.classList.add('hidden');
-                tbody.parentNode.classList.remove('hidden');
-
-                groups.forEach(g => {
-                    const statusClass = g.balance > 0 
-                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                        : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-                    
-                    const statusText = g.balance > 0 ? (g.totalPaid > 0 ? 'Separa Bayar' : 'Ada Baki') : 'Selesai';
-                    
-                    const actionBtn = g.balance > 0
-                        ? `<button onclick="openPaymentModal('${g.name}', ${g.balance})" class="text-sm bg-pbi-blue hover:bg-blue-600 text-white px-3 py-1.5 rounded shadow-sm mr-2 mb-1 sm:mb-0 transition-colors">Bayar</button>`
-                        : `<span class="text-sm text-gray-400 px-3 py-1.5 mr-2 bg-gray-50 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">Selesai</span>`;
-
-                    const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors';
+                    const tr = document.createElement('tr'); tr.className = 'hover:bg-gray-50 dark:hover:bg-[#2e2e2e] transition-colors';
                     tr.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-white">${g.name}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-600 dark:text-gray-300">${g.count} Tuntutan</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600 dark:text-gray-400">${formatRM(g.totalAmount)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-pbi-green font-medium">${formatRM(g.totalPaid)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-red-500 font-bold">${formatRM(g.balance)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusText}</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right flex justify-end items-center flex-wrap gap-2">
-                            ${actionBtn}
-                            <button onclick="viewDetails('${g.name}')" class="text-sm border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded transition-colors">Perincian</button>
-                        </td>
+                        <td class="px-6 py-4 font-bold text-sm text-gray-900 dark:text-white">${g.name}</td>
+                        <td class="px-6 py-4 text-center text-sm font-medium text-gray-600 dark:text-gray-300">${g.count} Rekod</td>
+                        <td class="px-6 py-4 text-right text-sm font-medium text-gray-600 dark:text-gray-300">${formatRM(g.tAmt)}</td>
+                        <td class="px-6 py-4 text-right text-sm text-pbi-green font-bold">${formatRM(g.tPaid)}</td>
+                        <td class="px-6 py-4 text-right text-sm text-red-500 font-bold">${formatRM(g.bal)}</td>
+                        <td class="px-6 py-4 text-center"><span class="px-3 py-1 text-xs font-bold rounded-full ${c}">${st}</span></td>
+                        <td class="px-6 py-4 text-right space-x-2">${btn} <button onclick="viewAdminDetails('${g.name}')" class="text-xs font-bold border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Details</button></td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
         }
 
-        // --- PAYMENT LOGIC (BULK & PARTIAL) ---
-        function openPaymentModal(name, maxBalance) {
+        // --- PAYMENT MODAL SELECTION LOGIC ---
+        function openPaymentModal(name) {
             document.getElementById('modalPayeeName').value = name;
-            document.getElementById('modalMaxBalance').value = maxBalance;
-            
             document.getElementById('modalPayee').innerText = name;
-            document.getElementById('modalMaxAmount').innerText = formatRM(maxBalance);
             
-            const amountInput = document.getElementById('pAmount');
-            amountInput.value = maxBalance; // By default, suggest full balance payment
-            amountInput.max = maxBalance;   // System prevent overpaying
+            let userPendingClaims = claimsData.filter(c => c.name === name && (c.amount - c.paid) > 0);
+            userPendingClaims.sort((a, b) => new Date(a.date) - new Date(b.date)); // Oldest first
             
+            const listBody = document.getElementById('paymentClaimsList');
+            listBody.innerHTML = '';
+            
+            userPendingClaims.forEach(c => {
+                let bal = c.amount - c.paid;
+                listBody.innerHTML += `
+                    <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        <td class="p-3 text-center align-middle">
+                            <input type="checkbox" class="claim-cb w-4 h-4 rounded text-pbi-blue focus:ring-pbi-blue cursor-pointer" value="${c.id}" onchange="recalcTotal()">
+                        </td>
+                        <td class="p-3 align-middle">
+                            <div class="font-bold text-gray-900 dark:text-white">${c.id}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">${formatDate(c.date)}</div>
+                        </td>
+                        <td class="p-3 text-right align-middle font-medium text-gray-700 dark:text-gray-300">${formatRM(bal)}</td>
+                        <td class="p-3 text-right align-middle">
+                            <input type="number" id="pay_input_${c.id}" class="w-24 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-right text-gray-900 dark:text-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-pbi-blue disabled:opacity-50" max="${bal}" value="${bal}" step="0.01" disabled oninput="recalcTotal(this, ${bal})">
+                            <input type="hidden" id="max_pay_${c.id}" value="${bal}">
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            document.getElementById('selectAllClaims').checked = false;
+            document.getElementById('totalPaymentDisplay').innerText = 'RM 0.00';
             document.getElementById('paymentModal').classList.remove('hidden');
         }
 
-        function closePaymentModal() {
-            document.getElementById('paymentModal').classList.add('hidden');
-            document.getElementById('paymentForm').reset();
+        function toggleAllClaims(source) {
+            const cbs = document.querySelectorAll('.claim-cb');
+            cbs.forEach(cb => {
+                cb.checked = source.checked;
+                const input = document.getElementById('pay_input_' + cb.value);
+                if(source.checked) {
+                    input.disabled = false;
+                    input.classList.remove('bg-gray-100'); input.classList.add('bg-white');
+                    input.value = document.getElementById('max_pay_' + cb.value).value;
+                } else {
+                    input.disabled = true;
+                    input.classList.add('bg-gray-100'); input.classList.remove('bg-white');
+                }
+            });
+            recalcTotal();
         }
 
+        function recalcTotal(inputElement, maxAllowed) {
+            if(inputElement && inputElement.value > maxAllowed) { inputElement.value = maxAllowed; }
+            if(inputElement && inputElement.value < 0) { inputElement.value = 0; }
+
+            const cbs = document.querySelectorAll('.claim-cb');
+            let total = 0;
+            let allChecked = true;
+            let anyChecked = false;
+            
+            cbs.forEach(cb => {
+                const input = document.getElementById('pay_input_' + cb.value);
+                if(cb.checked) {
+                    input.disabled = false;
+                    input.classList.remove('bg-gray-100'); input.classList.add('bg-white');
+                    total += parseFloat(input.value) || 0;
+                    anyChecked = true;
+                } else {
+                    input.disabled = true;
+                    input.classList.add('bg-gray-100'); input.classList.remove('bg-white');
+                    allChecked = false;
+                }
+            });
+            
+            document.getElementById('selectAllClaims').checked = allChecked && cbs.length > 0;
+            document.getElementById('totalPaymentDisplay').innerText = formatRM(total);
+            document.getElementById('btnConfirmPayment').disabled = !anyChecked || total <= 0;
+            return total;
+        }
+
+        function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); document.getElementById('paymentForm').reset(); }
+        
         function confirmPayment(e) {
             e.preventDefault();
-            
-            const payeeName = document.getElementById('modalPayeeName').value;
-            let paymentAmt = parseFloat(document.getElementById('pAmount').value);
+            const total = recalcTotal();
+            if(total <= 0) return;
+
+            const name = document.getElementById('modalPayeeName').value;
             const fileInput = document.getElementById('pReceipt');
-            const receiptName = fileInput.files.length > 0 ? fileInput.files[0].name : 'resit_pukal.pdf';
+            if (fileInput.files.length === 0) return;
+            let file = fileInput.files[0];
 
-            // Dapatkan tuntutan pekerja ini yang masih berbaki, kemudian susun ikut tarikh lama (FIFO)
-            let userPendingClaims = claimsData.filter(c => c.name === payeeName && (c.amount - c.paid) > 0);
-            userPendingClaims.sort((a, b) => new Date(a.date) - new Date(b.date));
+            const btnSubmit = document.getElementById('btnConfirmPayment');
+            const oriBtnHtml = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = '<i class="ph ph-spinner animate-spin text-lg mr-2"></i> Memproses...'; btnSubmit.disabled = true;
 
-            // Sebarkan jumlah bayaran kepada tuntutan-tuntutan tersebut (FIFO Logic)
-            for (let c of userPendingClaims) {
-                if (paymentAmt <= 0) break; // Bayaran dah habis diagihkan
-
-                let claimBalance = c.amount - c.paid;
-                
-                if (paymentAmt >= claimBalance) {
-                    // Bayaran ini cukup untuk selesaikan tuntutan spesifik ini (Full)
-                    c.paid = c.amount;
-                    c.status = 'Selesai Dibayar';
-                    c.payReceiptName = receiptName;
-                    paymentAmt -= claimBalance; // Tolak baki bayaran yang tinggal
-                } else {
-                    // Bayaran ini tidak cukup menampung tuntutan ini sepenuhnya (Partial)
-                    c.paid += paymentAmt;
-                    c.status = 'Separa Dibayar';
-                    c.payReceiptName = receiptName;
-                    paymentAmt = 0; // Bayaran sudah habis diagihkan
+            let updates = [];
+            const cbs = document.querySelectorAll('.claim-cb:checked');
+            cbs.forEach(cb => {
+                const id = cb.value;
+                const payAmt = parseFloat(document.getElementById('pay_input_' + id).value) || 0;
+                const claim = claimsData.find(c => c.id === id);
+                if(claim && payAmt > 0) {
+                    let newPaid = claim.paid + payAmt;
+                    let newStatus = (newPaid >= claim.amount) ? 'Telah Dibayar' : 'Separa Dibayar';
+                    updates.push({ id: id, status: newStatus, paid: newPaid });
                 }
-            }
+            });
 
-            closePaymentModal();
-            updateAdminTable();
-            updatePendingBadge();
-            showToast('Pembayaran Direkodkan', `Bayaran pukal/separa untuk ${payeeName} berjaya dimasukkan ke dalam sistem.`);
+            let reader = new FileReader();
+            reader.onload = async function() {
+                let payload = { action: 'updatePayment', name: name, fileName: file.name, fileMimeType: file.type, fileBase64: reader.result.split(',')[1], updates: updates };
+                try {
+                    let response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                    let result = await response.json();
+                    if(result.status === 'success') {
+                        // KEMASKINI DATA SECARA LOKAL (Gabungan Koma)
+                        updates.forEach(u => {
+                            let claim = claimsData.find(c => c.id === u.id);
+                            if(claim) { 
+                                claim.paid = u.paid; 
+                                claim.status = u.status; 
+                                
+                                // IDEA 2: Concatenate link dan tarikh dengan koma
+                                claim.payReceiptUrl = claim.payReceiptUrl ? claim.payReceiptUrl + ', ' + result.fileUrl : result.fileUrl; 
+                                claim.payDate = claim.payDate ? claim.payDate + ', ' + new Date().toISOString() : new Date().toISOString(); 
+                            }
+                        });
+                        closePaymentModal(); updateAdminTable(); updatePendingBadge(); showToast('Bayaran Direkod', 'Maklumat dan resit HR berjaya disimpan.');
+                    } else throw new Error(result.message);
+                } catch (error) { alert("Ralat Pembayaran! Sila semak pautan Apps Script."); } 
+                finally { btnSubmit.innerHTML = oriBtnHtml; btnSubmit.disabled = false; }
+            };
+            reader.readAsDataURL(file);
         }
 
-        // --- DETAILS MODAL ---
-        function viewDetails(name) {
-            document.getElementById('detailName').innerText = name;
-            const tbody = document.getElementById('detailsTableBody');
-            tbody.innerHTML = '';
+        function viewAdminDetails(n) {
+            document.getElementById('detailName').innerText = n;
+            const tb = document.getElementById('detailsTableBody'); tb.innerHTML = '';
             
-            const userClaims = claimsData.filter(c => c.name === name);
-            // Susun dari terbaru ke lama untuk paparan
-            userClaims.sort((a,b) => b.timestamp - a.timestamp); 
+            claimsData.filter(c => c.name === n).sort((a,b) => b.timestamp - a.timestamp).forEach(c => {
+                const b = c.amount - c.paid;
+                const cCol = b === 0 ? 'text-pbi-green' : (c.paid > 0 ? 'text-yellow-600' : 'text-red-500');
+                
+                let docsHtml = '<div class="flex flex-col items-center justify-center space-y-1.5">';
+                if (c.receiptUrl) docsHtml += `<button onclick="openReceiptViewer('${c.receiptUrl}', 'Resit Tuntutan Pekerja (ID: ${c.id})')" class="px-2 py-1 bg-blue-50 text-pbi-blue border border-blue-200 rounded text-[10px] font-bold w-full mb-1"><i class="ph-fill ph-file-pdf mr-1"></i> Staf</button>`;
+                
+                // IDEA 2: Bina butang HR berasingan jika ada banyak resit dipisahkan dengan koma
+                if (c.payReceiptUrl) {
+                    let payUrls = c.payReceiptUrl.split(',').map(s=>s.trim()).filter(Boolean);
+                    payUrls.forEach((url, idx) => {
+                        docsHtml += `<button onclick="openReceiptViewer('${url}', 'Bukti Bayaran HR ${idx+1} (ID: ${c.id})')" class="px-2 py-1 bg-green-50 text-pbi-green border border-green-200 rounded text-[10px] font-bold w-full mb-1"><i class="ph-fill ph-receipt mr-1"></i> HR ${payUrls.length > 1 ? (idx+1) : ''}</button>`;
+                    });
+                }
+                
+                if (!c.receiptUrl && !c.payReceiptUrl) docsHtml += `<span class="text-[10px] text-gray-400">Tiada Fail</span>`;
+                docsHtml += '</div>';
 
-            userClaims.forEach(c => {
-                const bal = c.amount - c.paid;
-                
-                let statusColor = '';
-                if (bal === 0) statusColor = 'text-pbi-green';
-                else if (c.paid > 0) statusColor = 'text-yellow-600 dark:text-yellow-500';
-                else statusColor = 'text-red-500';
-                
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors';
+                const tr = document.createElement('tr'); tr.className = 'hover:bg-gray-50 dark:hover:bg-[#2e2e2e]';
                 tr.innerHTML = `
-                    <td class="px-4 py-3 whitespace-nowrap text-xs text-gray-800 dark:text-gray-200">
-                        <div class="font-bold">${c.id}</div>
-                        <div class="text-gray-500 dark:text-gray-400 mt-1">${formatDate(c.date)}</div>
-                    </td>
-                    <td class="px-4 py-3 text-xs text-gray-600 dark:text-gray-400 max-w-[150px] truncate" title="${c.desc}">${c.desc || c.type}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-xs text-right font-medium text-gray-800 dark:text-gray-200">${formatRM(c.amount)}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-xs text-right text-gray-600 dark:text-gray-400">${formatRM(c.paid)}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-xs text-right font-bold ${bal > 0 ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}">${formatRM(bal)}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center text-xs font-semibold ${statusColor}">${c.status}</td>
+                    <td class="px-4 py-3 text-xs text-gray-900 dark:text-gray-300"><b>${c.id}</b><br>${formatDate(c.date)}</td>
+                    <td class="px-4 py-3 text-xs text-gray-700 dark:text-gray-400">${c.desc||c.type}</td>
+                    <td class="px-4 py-3 text-xs text-right font-medium">${formatRM(c.amount)}</td>
+                    <td class="px-4 py-3 text-xs text-right font-medium text-pbi-green">${formatRM(c.paid)}</td>
+                    <td class="px-4 py-3 text-xs text-right font-bold ${b>0?'text-red-500':'text-gray-500'}">${formatRM(b)}</td>
+                    <td class="px-4 py-3 text-xs text-center font-bold ${cCol}">${c.status}</td>
+                    <td class="px-4 py-2 align-middle">${docsHtml}</td>
                 `;
-                tbody.appendChild(tr);
+                tb.appendChild(tr);
             });
-            
             document.getElementById('detailsModal').classList.remove('hidden');
         }
+        function closeDetailsModal() { document.getElementById('detailsModal').classList.add('hidden'); }
 
-        function closeDetailsModal() {
-            document.getElementById('detailsModal').classList.add('hidden');
+        // --- IN APP DOC VIEWER ---
+        let currentLinkToOpen = '';
+        function openReceiptViewerFromLink(linkId) {
+            const anchor = document.getElementById(linkId);
+            if(anchor && anchor.getAttribute('data-href')) {
+                openReceiptViewer(anchor.getAttribute('data-href'), 'Paparan Dokumen');
+            }
         }
 
-        // --- DASHBOARD CHARTS & LOGIC ---
-        function resetDashFilter() {
-            document.getElementById('dashStartDate').value = '';
-            document.getElementById('dashEndDate').value = '';
-            updateDashboard();
+        function openReceiptViewer(url, title) {
+            document.getElementById('receiptViewerTitle').innerText = title || "Paparan Dokumen";
+            let previewUrl = url;
+            if (previewUrl.includes('drive.google.com/file/d/')) previewUrl = previewUrl.replace(/\/view.*/, '/preview');
+            document.getElementById('receiptIframe').src = previewUrl;
+            document.getElementById('receiptViewerModal').classList.remove('hidden');
         }
+        function closeReceiptViewer() { document.getElementById('receiptViewerModal').classList.add('hidden'); document.getElementById('receiptIframe').src = ''; }
 
-        function getFilteredDashboardData() {
-            const startVal = document.getElementById('dashStartDate').value;
-            const endVal = document.getElementById('dashEndDate').value;
+        function viewTransaction(id) {
+            const c = claimsData.find(claim => claim.id === id); if(!c) return;
+
+            document.getElementById('transId').innerText = c.id; document.getElementById('transName').innerText = c.name; document.getElementById('transDate').innerText = formatDate(c.date);
+            document.getElementById('transTypeDesc').innerText = `${c.type} - ${c.desc || 'Tiada Keterangan'}`;
+            document.getElementById('transAmount').innerText = formatRM(c.amount); document.getElementById('transPaid').innerText = formatRM(c.paid);
             
-            return claimsData.filter(c => {
-                const cDate = new Date(c.date);
-                
-                if (startVal && endVal) {
-                    const s = new Date(startVal);
-                    const e = new Date(endVal); 
-                    e.setHours(23, 59, 59); // Pastikan tamat pada penghujung hari
-                    return cDate >= s && cDate <= e;
-                } else if (startVal) { 
-                    return cDate >= new Date(startVal); 
-                } else if (endVal) { 
-                    const e = new Date(endVal); 
-                    e.setHours(23, 59, 59); 
-                    return cDate <= e; 
-                }
+            const badge = document.getElementById('transStatusBadge'); badge.innerText = c.status;
+            if (c.status.toLowerCase().includes('selesai') || c.status.toLowerCase().includes('telah')) badge.className = "px-2 py-0.5 rounded text-[10px] font-bold mr-2 uppercase bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
+            else if (c.paid > 0) badge.className = "px-2 py-0.5 rounded text-[10px] font-bold mr-2 uppercase bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
+            else badge.className = "px-2 py-0.5 rounded text-[10px] font-bold mr-2 uppercase bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300";
+
+            const rLink = document.getElementById('transReceiptLink');
+            if (c.receiptUrl) { rLink.setAttribute('data-href', c.receiptUrl); rLink.innerText = "Buka Resit"; rLink.classList.remove('pointer-events-none', 'opacity-50'); } 
+            else { rLink.removeAttribute('data-href'); rLink.innerText = "Tiada Fail"; rLink.classList.add('pointer-events-none', 'opacity-50'); }
+
+            // IDEA 2: Generate dynamic list for HR Receipts
+            const payList = document.getElementById('transPayListContainer');
+            payList.innerHTML = '';
+            
+            if (c.payReceiptUrl) {
+                let payUrls = c.payReceiptUrl.split(',').map(s=>s.trim()).filter(Boolean);
+                let payDates = c.payDate ? c.payDate.split(',').map(s=>s.trim()).filter(Boolean) : [];
+
+                payUrls.forEach((url, idx) => {
+                    let pDate = payDates[idx] ? formatDate(payDates[idx]) : 'Dalam Rekod';
+                    payList.innerHTML += `
+                        <div class="flex items-center justify-between p-3.5 bg-green-50 dark:bg-green-900/10 rounded-lg border border-green-100 dark:border-green-900/30 transition-all">
+                            <div class="flex items-center">
+                                <i class="ph-fill ph-receipt text-3xl text-pbi-green mr-3"></i>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-900 dark:text-white">Bukti Pembayaran HR ${payUrls.length > 1 ? '#' + (idx+1) : ''}</p>
+                                    <p class="text-[11px] font-medium text-gray-500 dark:text-gray-400">Tarikh: ${pDate}</p>
+                                </div>
+                            </div>
+                            <button onclick="openReceiptViewer('${url}', 'Bukti Bayaran HR ${idx+1}')" class="px-3 py-1.5 bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 rounded text-xs font-bold text-pbi-green hover:text-green-700 transition-colors whitespace-nowrap">Buka Bukti</button>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('transactionModal').classList.remove('hidden');
+        }
+        function closeTransactionModal() { document.getElementById('transactionModal').classList.add('hidden'); }
+
+        // --- 8. DASHBOARD LOGIC ---
+        function resetDashFilter() { document.getElementById('dashStartDate').value = ''; document.getElementById('dashEndDate').value = ''; updateDashboard(); }
+        
+        function updateDashboard() {
+            if(!currentUser) return;
+            const sd = document.getElementById('dashStartDate').value; const ed = document.getElementById('dashEndDate').value;
+            let roleFiltered = currentUser.isSuperadmin ? claimsData : claimsData.filter(c => c.name === currentUser.name);
+
+            const d = roleFiltered.filter(c => {
+                const cd = new Date(c.date);
+                if (sd && ed) { const e = new Date(ed); e.setHours(23,59,59); return cd >= new Date(sd) && cd <= e; }
+                else if (sd) return cd >= new Date(sd);
+                else if (ed) { const e = new Date(ed); e.setHours(23,59,59); return cd <= e; }
                 return true;
             });
-        }
 
-        function updateDashboard() {
-            const data = getFilteredDashboardData();
-            
-            // 1. Calculate KPI Values
-            const totalAmount = data.reduce((sum, c) => sum + c.amount, 0);
-            const paidAmount = data.reduce((sum, c) => sum + c.paid, 0);
-            const pendingAmount = totalAmount - paidAmount;
+            const tA = d.reduce((s,c) => s+c.amount,0); const tP = d.reduce((s,c) => s+c.paid,0);
+            document.getElementById('kpi-total-amount').innerText = formatRM(tA); document.getElementById('kpi-total-count').innerText = d.length;
+            document.getElementById('kpi-pending-amount').innerText = formatRM(tA-tP); document.getElementById('kpi-paid-amount').innerText = formatRM(tP);
 
-            document.getElementById('kpi-total-amount').innerText = formatRM(totalAmount);
-            document.getElementById('kpi-total-count').innerText = data.length;
-            document.getElementById('kpi-pending-amount').innerText = formatRM(pendingAmount);
-            document.getElementById('kpi-paid-amount').innerText = formatRM(paidAmount);
+            const tbody = document.getElementById('dashTableBody'); tbody.innerHTML = '';
+            const sortedData = [...d].sort((a,b) => b.timestamp - a.timestamp);
+            if (sortedData.length === 0) tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-gray-500 font-medium">Tiada rekod transaksi.</td></tr>`;
+            else {
+                sortedData.forEach(c => {
+                    let cCol = c.amount === c.paid ? 'text-pbi-green' : (c.paid > 0 ? 'text-yellow-600' : 'text-pbi-orange');
+                    const tr = document.createElement('tr'); tr.className = 'hover:bg-gray-50 dark:hover:bg-[#2e2e2e] transition-colors';
+                    tr.innerHTML = `
+                        <td class="px-4 py-3 whitespace-nowrap"><div class="font-bold text-gray-900 dark:text-white">${c.id}</div><div class="text-[11px] text-gray-500 font-medium">${formatDate(c.date)}</div></td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-semibold text-gray-800 dark:text-gray-200">${c.name}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-600 dark:text-gray-400">${c.type}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-bold text-gray-900 dark:text-white">${formatRM(c.amount)}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-center text-xs font-bold ${cCol}">${c.status}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-center">
+                            <button onclick="viewTransaction('${c.id}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-pbi-blue border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-blue-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded transition-colors">Perincian</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
 
-            // Chart theming colors
             const isDark = document.documentElement.classList.contains('dark');
-            const gridColor = isDark ? '#404040' : '#e5e7eb';
-            const textColor = isDark ? '#d1d5db' : '#374151';
+            const gC = isDark ? '#333' : '#f3f4f6'; const tC = isDark ? '#9ca3af' : '#4b5563';
 
-            // 2. Bar Chart (Perbelanjaan Mengikut Kategori)
-            const categories = {};
-            data.forEach(c => {
-                categories[c.type] = (categories[c.type] || 0) + c.amount;
-            });
-            
-            const barCtx = document.getElementById('barChart').getContext('2d');
-            if (barChartInstance) barChartInstance.destroy();
-            
-            barChartInstance = new Chart(barCtx, {
-                type: 'bar',
-                data: { 
-                    labels: Object.keys(categories), 
-                    datasets: [{ 
-                        label: 'RM',
-                        data: Object.values(categories), 
-                        backgroundColor: pbiColors[0], 
-                        borderRadius: 4 
-                    }] 
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { 
-                        legend: { display: false } 
-                    }, 
-                    scales: { 
-                        y: { 
-                            beginAtZero: true, 
-                            grid: { color: gridColor }, 
-                            ticks: { color: textColor } 
-                        }, 
-                        x: { 
-                            grid: { display: false }, 
-                            ticks: { color: textColor } 
-                        } 
-                    } 
-                }
+            const cat = {}; d.forEach(c => cat[c.type] = (cat[c.type]||0) + c.amount);
+            if(barChartInstance) barChartInstance.destroy();
+            barChartInstance = new Chart(document.getElementById('barChart').getContext('2d'), {
+                type: 'bar', data: { labels: Object.keys(cat), datasets: [{ data: Object.values(cat), backgroundColor: pbiColors[0], borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: gC }, ticks: { color: tC, font:{weight:'bold'} } }, x: { grid: { display: false }, ticks: { color: tC, font:{weight:'600'} } } } }
             });
 
-            // 3. Doughnut Chart (Taburan Status Pembayaran)
-            const stats = { 'Selesai Dibayar': 0, 'Separa Dibayar': 0, 'Menunggu': 0 };
-            data.forEach(c => {
-                // Pastikan status dipetakan dengan betul kepada carta
-                if (c.status === 'Selesai Dibayar') stats['Selesai Dibayar']++;
-                else if (c.status === 'Separa Dibayar') stats['Separa Dibayar']++;
-                else stats['Menunggu']++;
+            const st = { 'Selesai Dibayar':0, 'Separa Dibayar':0, 'Menunggu':0 }; 
+            d.forEach(c => {
+                let sl = c.status.toLowerCase();
+                if(sl.includes('selesai') || sl.includes('telah')) st['Selesai Dibayar']++; else if(c.paid > 0) st['Separa Dibayar']++; else st['Menunggu']++;
             });
-            
-            const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
-            if (doughnutChartInstance) doughnutChartInstance.destroy();
-            
-            doughnutChartInstance = new Chart(doughnutCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(stats),
-                    datasets: [{
-                        data: Object.values(stats),
-                        backgroundColor: [
-                            tailwind.config.theme.extend.colors.pbi.green, 
-                            tailwind.config.theme.extend.colors.pbi.yellow, 
-                            tailwind.config.theme.extend.colors.pbi.orange
-                        ],
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    cutout: '70%', 
-                    plugins: { 
-                        legend: { 
-                            position: 'bottom', 
-                            labels: { color: textColor, usePointStyle: true, padding: 20 } 
-                        } 
-                    } 
-                }
+
+            if(doughnutChartInstance) doughnutChartInstance.destroy();
+            doughnutChartInstance = new Chart(document.getElementById('doughnutChart').getContext('2d'), {
+                type: 'doughnut', data: { labels: Object.keys(st), datasets: [{ data: Object.values(st), backgroundColor: [tailwind.config.theme.extend.colors.pbi.green, tailwind.config.theme.extend.colors.pbi.yellow, tailwind.config.theme.extend.colors.pbi.orange], borderWidth: 0, hoverOffset: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: tC, usePointStyle: true, font:{weight:'bold', size:11}, padding: 20 } } } }
             });
         }
     </script>
