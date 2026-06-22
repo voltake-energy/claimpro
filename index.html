@@ -3,7 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- PWA Meta Tags & Icons (Menggunakan kaedah lh3.googleusercontent.com) -->
     <title>Sistem Pengurusan Tuntutan HR</title>
+    <meta name="theme-color" content="#118DFF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ClaimPro HR">
+    
+    <link rel="icon" href="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" type="image/png">
+    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps">
+    
+    <!-- PWA Manifest Inline -->
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Sistem%20Pengurusan%20Tuntutan%20HR%22%2C%22short_name%22%3A%22ClaimPro%20HR%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23ffffff%22%2C%22theme_color%22%3A%22%23118DFF%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Flh3.googleusercontent.com%2Fd%2F1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Flh3.googleusercontent.com%2Fd%2F1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,6 +31,7 @@
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
+    <!-- Tailwind Config -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -54,9 +67,10 @@
     <!-- ============================================== -->
     <div id="login-view" class="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-[#1a1a1a] z-50 transition-opacity duration-300 px-4 absolute inset-0">
         <div class="bg-white dark:bg-[#252525] rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 w-full max-w-md overflow-hidden flex flex-col">
-            <div class="bg-gradient-to-r from-pbi-blue to-pbi-cyan p-6 text-center">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-3 backdrop-blur-sm">
-                    <i class="ph-fill ph-wallet text-white text-3xl"></i>
+            <div class="bg-gradient-to-r from-pbi-blue to-pbi-cyan p-6 text-center flex flex-col items-center">
+                <!-- Logo Utama Voltake (Login Screen) -->
+                <div class="w-20 h-20 bg-white rounded-full mb-3 shadow-md p-2.5 flex items-center justify-center">
+                    <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" alt="Voltake Logo" class="w-full h-full object-contain">
                 </div>
                 <h1 class="text-2xl font-bold text-white tracking-tight">ClaimPro HR</h1>
                 <p class="text-blue-100 text-sm mt-1">Sistem Pengurusan Tuntutan</p>
@@ -101,6 +115,10 @@
                     Masuk ke Sistem <i class="ph ph-sign-in ml-2 text-lg"></i>
                 </button>
             </div>
+            <!-- Login Footer -->
+            <div class="pb-6 text-center">
+                <p class="text-[10px] text-gray-400 dark:text-gray-500">© 2026 All Right Reserved by Voltake</p>
+            </div>
         </div>
     </div>
 
@@ -112,7 +130,8 @@
         <!-- Sidebar / Navigasi (Desktop) -->
         <aside class="w-64 bg-white dark:bg-[#252525] border-r border-gray-200 dark:border-gray-800 flex flex-col transition-colors z-20 hidden md:flex flex-shrink-0">
             <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-800">
-                <i class="ph-fill ph-wallet text-pbi-blue text-2xl mr-3"></i>
+                <!-- Logo Voltake (Sidebar) -->
+                <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" alt="Voltake Logo" class="w-7 h-7 object-contain mr-3">
                 <h1 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Claim<span class="text-pbi-blue">Pro</span></h1>
             </div>
             
@@ -151,7 +170,8 @@
         <!-- Mobile Header & Nav -->
         <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-[#252525] border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4 z-30">
             <div class="flex items-center">
-                <i class="ph-fill ph-wallet text-pbi-blue text-xl mr-2"></i>
+                <!-- Logo Voltake (Mobile) -->
+                <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" alt="Voltake Logo" class="w-6 h-6 object-contain mr-2">
                 <h1 class="text-base font-bold text-gray-900 dark:text-white">Claim<span class="text-pbi-blue">Pro</span></h1>
             </div>
             <div class="flex gap-2">
@@ -215,7 +235,7 @@
                             <!-- Jenis -->
                             <div class="space-y-1.5">
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jenis Tuntutan <span class="text-red-500">*</span></label>
-                                <select id="cType" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow">
+                                <select id="cType" required onchange="handleTypeChange()" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow">
                                     <option value="" disabled selected>Sila pilih jenis...</option>
                                     <option value="Perjalanan">Perjalanan (Tol, Minyak, Parkir)</option>
                                     <option value="Keraian">Keraian Pelanggan</option>
@@ -223,6 +243,8 @@
                                     <option value="Perubatan">Perubatan & Klinik</option>
                                     <option value="Lain-lain">Lain-lain Bekalan/Servis</option>
                                 </select>
+                                <!-- Nota Medical Limit -->
+                                <p id="medInfoNotice" class="hidden text-[11px] font-semibold text-pbi-orange mt-1"></p>
                             </div>
 
                             <!-- Pax -->
@@ -245,8 +267,10 @@
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                     <span class="text-gray-500 font-semibold">RM</span>
                                 </div>
-                                <input type="number" id="cAmount" step="0.01" min="0.01" required class="w-full pl-12 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue text-xl font-bold transition-shadow" placeholder="0.00">
+                                <input type="number" id="cAmount" oninput="validateAmount()" step="0.01" min="0.01" required class="w-full pl-12 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue text-xl font-bold transition-shadow" placeholder="0.00">
                             </div>
+                            <!-- Error Medical -->
+                            <p id="amountError" class="hidden text-red-500 text-xs font-semibold mt-1"></p>
                         </div>
 
                         <!-- File Upload -->
@@ -285,10 +309,11 @@
                         <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Semakan Tuntutan Pekerja (HR)</h2>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Uruskan pembayaran mengikut kumpulan pekerja.</p>
                     </div>
+                    <!-- REORDERED & DEFAULT IS "ADA BAKI" -->
                     <div class="flex rounded-md shadow-sm p-1 bg-gray-200 dark:bg-gray-800" role="group">
-                        <button type="button" onclick="filterAdminTable('Semua')" id="filter-all" class="px-4 py-2 text-sm font-semibold rounded border-none bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white transition-all">Semua</button>
-                        <button type="button" onclick="filterAdminTable('Ada Baki')" id="filter-pending" class="px-4 py-2 text-sm font-semibold rounded border-none text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all">Ada Baki</button>
+                        <button type="button" onclick="filterAdminTable('Ada Baki')" id="filter-pending" class="px-4 py-2 text-sm font-semibold rounded border-none bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white transition-all">Ada Baki</button>
                         <button type="button" onclick="filterAdminTable('Selesai')" id="filter-paid" class="px-4 py-2 text-sm font-semibold rounded border-none text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all">Selesai</button>
+                        <button type="button" onclick="filterAdminTable('Semua')" id="filter-all" class="px-4 py-2 text-sm font-semibold rounded border-none text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all">Semua</button>
                     </div>
                 </div>
 
@@ -307,7 +332,6 @@
                                 </tr>
                             </thead>
                             <tbody id="adminTableBody" class="bg-white dark:bg-[#252525] divide-y divide-gray-100 dark:divide-gray-800">
-                                <!-- Populated by JS -->
                             </tbody>
                         </table>
                     </div>
@@ -322,6 +346,24 @@
 
             <!-- VIEW 3: Dashboard -->
             <div id="view-dashboard" class="view-section hidden flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-7xl mx-auto">
+                
+                <!-- Baki Medical Dashboard Banner (Pekerja Biasa) -->
+                <div id="medicalDashboardBanner" class="mb-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between hidden shadow-sm">
+                    <div class="flex items-center mb-3 sm:mb-0">
+                        <div class="bg-white dark:bg-blue-800/50 p-2.5 rounded-full mr-4 shadow-sm border border-blue-100 dark:border-blue-700">
+                            <i class="ph-fill ph-first-aid text-2xl text-pbi-blue"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-gray-800 dark:text-gray-200">Baki Kelayakan Perubatan (<span id="medYearDisplay">2026</span>)</p>
+                            <p class="text-[11px] font-medium text-gray-500 dark:text-gray-400 mt-0.5">Had tahunan adalah RM 350.00. Digunakan untuk klinik & ubat.</p>
+                        </div>
+                    </div>
+                    <div class="sm:text-right w-full sm:w-auto bg-white dark:bg-[#252525] px-4 py-2 rounded-lg border border-blue-100 dark:border-blue-800/50 shadow-sm">
+                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Baki Boleh Dituntut</p>
+                        <p class="text-2xl font-bold text-pbi-blue tracking-tight" id="medBalanceDisplay">RM 0.00</p>
+                    </div>
+                </div>
+
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-gray-200 dark:border-gray-800 pb-4">
                     <div>
                         <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight" id="dashTitle">Laporan Tuntutan</h2>
@@ -362,6 +404,12 @@
                     </div>
                 </div>
 
+                <!-- CARTA: TIMELINE (BARU) -->
+                <div class="bg-white dark:bg-[#252525] p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 mb-6">
+                    <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200 mb-4 text-center tracking-wide">Garis Masa Perbelanjaan</h3>
+                    <div class="relative h-64 w-full"><canvas id="timelineChart"></canvas></div>
+                </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <div class="bg-white dark:bg-[#252525] p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
                         <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200 mb-4 text-center tracking-wide">Perbelanjaan Mengikut Kategori</h3>
@@ -373,7 +421,12 @@
                     </div>
                 </div>
 
-                <!-- Dashboard Table -->
+                <!-- CARTA: PERBELANJAAN STAF (SUPERADMIN SAHAJA) -->
+                <div id="staffChartContainer" class="bg-white dark:bg-[#252525] p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 mb-6 hidden">
+                    <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200 mb-4 text-center tracking-wide">Perbelanjaan Mengikut Staf</h3>
+                    <div class="relative h-64 w-full"><canvas id="staffChart"></canvas></div>
+                </div>
+
                 <div class="bg-white dark:bg-[#252525] rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
                     <div class="p-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#1f1f1f]">
                         <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200">Jadual Transaksi Terperinci</h3>
@@ -391,18 +444,18 @@
                                 </tr>
                             </thead>
                             <tbody id="dashTableBody" class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-[#252525]">
-                                <!-- Populated by JS -->
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+            
+            <!-- Global Footer -->
+            <footer class="py-3 text-center text-[11px] font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-[#1a1a1a] border-t border-gray-200 dark:border-gray-800 shrink-0">
+                &copy; 2026 All Right Reserved by Voltake
+            </footer>
         </main>
     </div>
-
-    <!-- ============================================== -->
-    <!-- MODALS -->
-    <!-- ============================================== -->
 
     <!-- Modal Transaksi Individu -->
     <div id="transactionModal" class="fixed inset-0 bg-gray-900/60 dark:bg-black/80 hidden z-50 flex items-center justify-center backdrop-blur-sm transition-opacity">
@@ -412,7 +465,7 @@
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Perincian Transaksi</h3>
                     <p class="text-sm font-medium text-pbi-blue mt-1" id="transId">CLM-000</p>
                 </div>
-                <button onclick="closeTransactionModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors bg-gray-100 dark:bg-gray-800 rounded-full p-1.5">
+                <button onclick="closeTransactionModal()" class="text-gray-400 hover:text-gray-600 transition-colors bg-gray-100 dark:bg-gray-800 rounded-full p-1.5">
                     <i class="ph ph-x text-xl"></i>
                 </button>
             </div>
@@ -420,25 +473,25 @@
             <div class="space-y-5 overflow-y-auto flex-1 pr-1">
                 <div class="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
                     <div>
-                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nama Pekerja</p>
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Nama Pekerja</p>
                         <p class="font-bold text-gray-900 dark:text-white mt-1" id="transName">-</p>
                     </div>
                     <div>
-                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tarikh Tuntutan</p>
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tarikh Tuntutan</p>
                         <p class="font-bold text-gray-900 dark:text-white mt-1" id="transDate">-</p>
                     </div>
                     <div class="col-span-2">
-                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Kategori / Tujuan</p>
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Kategori / Tujuan</p>
                         <p class="font-bold text-gray-900 dark:text-white mt-1" id="transTypeDesc">-</p>
                     </div>
                     
                     <div class="col-span-2 bg-gray-50 dark:bg-[#1f1f1f] p-4 rounded-lg border border-gray-100 dark:border-gray-800 flex justify-between items-center mt-2">
                         <div>
-                            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Jumlah Tuntutan</p>
+                            <p class="text-xs font-semibold text-gray-500 uppercase">Jumlah Tuntutan</p>
                             <p class="font-bold text-gray-900 dark:text-white text-xl mt-0.5" id="transAmount">RM 0.00</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status & Dibayar</p>
+                            <p class="text-xs font-semibold text-gray-500 uppercase">Status & Dibayar</p>
                             <div class="flex items-center justify-end mt-0.5">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold mr-2 uppercase" id="transStatusBadge">STATUS</span>
                                 <p class="font-bold text-xl" id="transPaid">RM 0.00</p>
@@ -458,37 +511,41 @@
                                     <p class="text-[11px] font-medium text-gray-500">Dimuat naik oleh pekerja</p>
                                 </div>
                             </div>
-                            <button onclick="openReceiptViewerFromLink('transReceiptLink')" id="transReceiptLink" class="px-3 py-1.5 bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 rounded text-xs font-bold text-pbi-blue hover:text-pbi-darkblue transition-colors whitespace-nowrap">Buka Resit</button>
+                            <button onclick="openReceiptViewerFromLink('transReceiptLink')" id="transReceiptLink" class="px-3 py-1.5 bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 rounded text-xs font-bold text-pbi-blue transition-colors">Buka Resit</button>
                         </div>
                         
-                        <!-- Senarai Resit Bayaran HR (Diisi oleh JS) -->
                         <div id="transPayListContainer" class="space-y-3"></div>
                     </div>
                 </div>
             </div>
             <div class="mt-6 pt-4 flex justify-end border-t border-gray-100 dark:border-gray-800 shrink-0">
-                <button onclick="closeTransactionModal()" class="px-6 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white font-bold rounded-md text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Tutup Paparan</button>
+                <button onclick="closeTransactionModal()" class="px-6 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white font-bold rounded-md text-sm transition-colors">Tutup Paparan</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Bayaran (Tandakan item & Masukkan Nilai Bayaran) -->
+    <!-- Modal Bayaran -->
     <div id="paymentModal" class="fixed inset-0 bg-gray-900/60 dark:bg-black/80 hidden z-50 flex items-center justify-center backdrop-blur-sm">
         <div class="bg-white dark:bg-[#252525] rounded-xl shadow-2xl w-full max-w-2xl p-6 m-4 border border-gray-100 dark:border-gray-800 max-h-[90vh] flex flex-col">
             <div class="flex justify-between items-center mb-5 border-b border-gray-100 dark:border-gray-800 pb-4">
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Proses Pembayaran Tuntutan</h3>
-                <button onclick="closePaymentModal()" class="text-gray-400 hover:text-gray-600 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-full"><i class="ph ph-x text-xl"></i></button>
+                <button onclick="closePaymentModal()" class="text-gray-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-full"><i class="ph ph-x text-xl"></i></button>
             </div>
             
-            <div class="mb-4">
-                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Pekerja: <strong id="modalPayee" class="text-gray-900 dark:text-white ml-1 text-lg"></strong></p>
-                <p class="text-xs text-gray-500 mt-1">Tandakan pada petak untuk pilih tuntutan yang ingin dibayar. Anda juga boleh meminda jumlah bayaran untuk bayaran separa (partial).</p>
+            <div class="mb-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div>
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Pekerja: <strong id="modalPayee" class="text-gray-900 dark:text-white ml-1 text-lg"></strong></p>
+                    <p class="text-xs text-gray-500 mt-1">Tandakan pada petak untuk pilih tuntutan yang ingin dibayar.</p>
+                </div>
+                <div class="bg-orange-50 dark:bg-orange-900/20 px-3 py-2 rounded-lg border border-orange-200 dark:border-orange-800/30">
+                    <p class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Baki Perubatan (Tahun Ini)</p>
+                    <p class="text-lg font-bold text-pbi-orange" id="modalMedBalance">RM 0.00</p>
+                </div>
             </div>
 
             <form id="paymentForm" onsubmit="confirmPayment(event)" class="flex-1 flex flex-col overflow-hidden">
                 <input type="hidden" id="modalPayeeName">
                 
-                <!-- Table for Selecting Claims -->
                 <div class="overflow-y-auto mb-4 border border-gray-200 dark:border-gray-700 rounded-lg flex-1">
                     <table class="w-full text-sm text-left">
                         <thead class="bg-gray-50 dark:bg-[#1f1f1f] sticky top-0 z-10 shadow-sm">
@@ -500,15 +557,16 @@
                             </tr>
                         </thead>
                         <tbody id="paymentClaimsList" class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-[#252525]">
-                            <!-- Rows injected by JS -->
                         </tbody>
                     </table>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center justify-between bg-blue-50 dark:bg-blue-900/10 p-4 rounded-lg border border-blue-100 dark:border-blue-900/30 mb-6">
+                <div class="flex flex-col sm:flex-row items-center justify-between bg-blue-50 dark:bg-blue-900/10 p-4 rounded-lg border border-blue-100 dark:border-blue-900/30 mb-2">
                     <div class="text-sm font-bold text-gray-600 dark:text-gray-300">Jumlah Keseluruhan Bayaran:</div>
                     <div class="text-2xl font-bold text-pbi-blue tracking-tight" id="totalPaymentDisplay">RM 0.00</div>
                 </div>
+                
+                <p id="medicalLimitError" class="text-red-500 text-xs hidden mb-4 font-semibold"><i class="ph-fill ph-warning-circle mr-1"></i> AMARAN: Jumlah pembayaran untuk kategori Perubatan telah melebihi baki kelayakan tahunan!</p>
 
                 <div class="mb-6">
                     <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Muat Naik Bukti Pembayaran <span class="text-red-500">*</span></label>
@@ -516,8 +574,8 @@
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800 mt-auto">
-                    <button type="button" onclick="closePaymentModal()" class="px-5 py-2.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Batal</button>
-                    <button type="submit" id="btnConfirmPayment" class="px-6 py-2.5 bg-pbi-green text-white rounded-md text-sm font-bold shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-pbi-green transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
+                    <button type="button" onclick="closePaymentModal()" class="px-5 py-2.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-bold text-gray-700 dark:text-gray-300 transition-colors">Batal</button>
+                    <button type="submit" id="btnConfirmPayment" class="px-6 py-2.5 bg-pbi-green text-white rounded-md text-sm font-bold shadow-sm hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                         <i class="ph-fill ph-check-circle mr-2"></i> Sahkan Bayaran
                     </button>
                 </div>
@@ -560,9 +618,8 @@
             <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#1f1f1f]">
                 <div>
                     <h3 id="receiptViewerTitle" class="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Paparan Dokumen</h3>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Menarik fail pratonton secara langsung dari Google Drive.</p>
                 </div>
-                <button onclick="closeReceiptViewer()" class="text-gray-400 hover:text-gray-600 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 p-2 rounded-full transition-colors">
+                <button onclick="closeReceiptViewer()" class="text-gray-400 hover:text-gray-600 bg-gray-200 dark:bg-gray-700 p-2 rounded-full transition-colors">
                     <i class="ph ph-x text-xl"></i>
                 </button>
             </div>
@@ -576,35 +633,102 @@
         </div>
     </div>
 
-    <!-- ============================================== -->
-    <!-- JAVASCRIPT LOGIC -->
-    <!-- ============================================== -->
     <script>
-        // --- 0. KONFIGURASI APP SCRIPT URL ---
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVjpR--VoTt_1M0fjwHymKu3rYu1qs_QrTiffkWJEtUW8A6G7oPdpfWCS8FC-OPMBbWw/exec"; 
-        
-        // Pautan Google Sheets Data Fetching
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxAww-PDRsSDETuptpi9J_NClWCem1o9rVI-icvnNGu9lQ8cgaIrPKCM1Pv4akZSrDbsg/exec"; 
         const sheetCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?output=csv';
         const claimsCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?gid=1560350142&single=true&output=csv';
         const SUPERADMIN_IDS = ['VES006', 'VES041'];
+        
+        // KONFIGURASI PERUBATAN
+        const ANNUAL_MEDICAL_LIMIT = 350;
 
-        // --- 1. STATE VARIABLES ---
         let currentUser = null; 
         let employeesList = []; 
         let claimsData = [];
-        let currentFilter = 'Semua';
+        let currentFilter = 'Ada Baki'; // DEFAULT FILTER PUKAL
         let barChartInstance = null;
         let doughnutChartInstance = null;
+        let timelineChartInstance = null;
+        let staffChartInstance = null;
         const pbiColors = ['#118DFF', '#12239E', '#E66C37', '#6B007B', '#00B01A', '#00A638', '#33A1FD', '#FFA300'];
 
-        // --- 2. INIT ---
+        // Inline Service Worker untuk PWA Installability
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', (e) => self.skipWaiting());
+                self.addEventListener('activate', (e) => self.clients.claim());
+                self.addEventListener('fetch', (e) => {});
+            `;
+            const blob = new Blob([swCode], { type: 'text/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl).catch(()=>{});
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('cDate').valueAsDate = new Date();
             await Promise.all([ fetchEmployees(), fetchClaims() ]);
             setupLoginSearch();
         });
 
-        // --- 3. FETCH DATA ---
+        function getMedicalBalance(empName) {
+            const currentYear = new Date().getFullYear();
+            const medicalClaims = claimsData.filter(c => 
+                c.name === empName && 
+                c.type === 'Perubatan' && 
+                new Date(c.date).getFullYear() === currentYear
+            );
+            const totalPaid = medicalClaims.reduce((sum, c) => sum + c.paid, 0);
+            const totalClaimed = medicalClaims.reduce((sum, c) => sum + c.amount, 0);
+            
+            const claimBalance = Math.max(0, ANNUAL_MEDICAL_LIMIT - totalClaimed);
+            const paymentBalance = Math.max(0, ANNUAL_MEDICAL_LIMIT - totalPaid);
+            
+            return { limit: ANNUAL_MEDICAL_LIMIT, paid: totalPaid, claimed: totalClaimed, balance: paymentBalance, paymentBalance: paymentBalance, claimBalance: claimBalance };
+        }
+
+        function handleTypeChange() {
+            const type = document.getElementById('cType').value;
+            const notice = document.getElementById('medInfoNotice');
+            if (type === 'Perubatan' && currentUser) {
+                const medData = getMedicalBalance(currentUser.name);
+                notice.innerHTML = `<i class="ph-fill ph-info mr-1"></i> Baki kelayakan perubatan tahun ini: <b>${formatRM(medData.claimBalance)}</b>`;
+                notice.classList.remove('hidden');
+                validateAmount(); 
+            } else {
+                notice.classList.add('hidden');
+                document.getElementById('amountError').classList.add('hidden');
+                const btnSubmit = document.getElementById('btnSubmitClaim');
+                const cAmount = document.getElementById('cAmount');
+                if(btnSubmit) { btnSubmit.disabled = false; btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                if(cAmount) { cAmount.classList.remove('border-red-500', 'focus:ring-red-500'); cAmount.classList.add('border-gray-300', 'dark:border-gray-600', 'focus:ring-pbi-blue'); }
+            }
+        }
+
+        function validateAmount() {
+            const type = document.getElementById('cType').value;
+            const amountInput = document.getElementById('cAmount');
+            const errorMsg = document.getElementById('amountError');
+            const btnSubmit = document.getElementById('btnSubmitClaim');
+
+            if (type === 'Perubatan' && currentUser) {
+                const medData = getMedicalBalance(currentUser.name);
+                const val = parseFloat(amountInput.value) || 0;
+
+                if (val > medData.claimBalance) {
+                    errorMsg.innerHTML = `<i class="ph-fill ph-warning-circle mr-1"></i> Ralat: Melebihi baki perubatan. Sila isi maksimum <b>${formatRM(medData.claimBalance)}</b> sahaja.`;
+                    errorMsg.classList.remove('hidden');
+                    if(btnSubmit) { btnSubmit.disabled = true; btnSubmit.classList.add('opacity-50', 'cursor-not-allowed'); }
+                    amountInput.classList.add('border-red-500', 'focus:ring-red-500');
+                    amountInput.classList.remove('border-gray-300', 'dark:border-gray-600', 'focus:ring-pbi-blue');
+                } else {
+                    errorMsg.classList.add('hidden');
+                    if(btnSubmit) { btnSubmit.disabled = false; btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                    amountInput.classList.remove('border-red-500', 'focus:ring-red-500');
+                    amountInput.classList.add('border-gray-300', 'dark:border-gray-600', 'focus:ring-pbi-blue');
+                }
+            }
+        }
+
         async function fetchEmployees() {
             try {
                 const response = await fetch(sheetCSVUrl);
@@ -651,7 +775,6 @@
                         const timestampRaw = cols[9] ? cols[9].replace(/"/g, '').trim() : '';
                         const timestamp = timestampRaw ? new Date(timestampRaw).getTime() : Date.now();
                         
-                        // Kolum K dan L mungkin mengandungi gabungan URL dipisahkan oleh koma (Idea 2)
                         const payReceiptUrl = cols[10] ? cols[10].replace(/"/g, '').trim() : '';
                         const payDate = cols[11] ? cols[11].replace(/"/g, '').trim() : '';
                         
@@ -670,7 +793,6 @@
             } catch (error) { console.error("Ralat Claims:", error); }
         }
 
-        // --- 4. LOGIN LOGIC ---
         function setupLoginSearch() {
             const input = document.getElementById('loginIdInput');
             const hiddenId = document.getElementById('loginSelectedId');
@@ -771,7 +893,6 @@
             }, 50);
         }
 
-        // --- 5. UI UTILS ---
         function navigate(viewId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(el => { el.classList.remove('bg-blue-50', 'text-pbi-blue', 'dark:bg-blue-900/30', 'dark:text-pbi-cyan'); el.classList.add('text-gray-600', 'dark:text-gray-400'); });
@@ -806,7 +927,6 @@
             badges.forEach(b => { if(b) { b.classList.toggle('hidden', pendingClaims.length === 0); b.innerText = pendingClaims.length > 0 ? pendingClaims.length : ''; } });
         }
 
-        // --- 6. SUBMIT CLAIM ---
         function handleFileSelect(src) {
             const fi = document.getElementById(src === 'file' ? 'cReceiptFile' : 'cReceiptCam');
             const oi = document.getElementById(src === 'file' ? 'cReceiptCam' : 'cReceiptFile');
@@ -825,11 +945,27 @@
             document.getElementById('cReceiptFile').value = ""; document.getElementById('cReceiptCam').value = "";
             document.getElementById('file-name-display').innerText = 'Pilih Fail / Gambar'; document.getElementById('camera-name-display').innerText = 'Buka Kamera Semasa';
             document.getElementById('selectedFileName').value = ""; document.getElementById('receiptError').classList.add('hidden');
+            document.getElementById('medInfoNotice').classList.add('hidden');
+            document.getElementById('amountError').classList.add('hidden');
+            const cAmount = document.getElementById('cAmount');
+            if(cAmount) { cAmount.classList.remove('border-red-500', 'focus:ring-red-500'); cAmount.classList.add('border-gray-300', 'dark:border-gray-600', 'focus:ring-pbi-blue'); }
+            
             if(currentUser) document.getElementById('cNameInputLocked').value = currentUser.name;
         }
 
         function submitClaim(e) {
             e.preventDefault();
+            
+            const type = document.getElementById('cType').value;
+            const amountVal = parseFloat(document.getElementById('cAmount').value);
+            if (type === 'Perubatan') {
+                const medData = getMedicalBalance(currentUser.name);
+                if (amountVal > medData.claimBalance) {
+                    alert(`Tuntutan ditolak. Anda hanya mempunyai baki RM ${medData.claimBalance} untuk kategori Perubatan.`);
+                    return;
+                }
+            }
+
             const fn = document.getElementById('selectedFileName').value;
             if(!fn) { document.getElementById('receiptError').classList.remove('hidden'); return; }
 
@@ -839,7 +975,6 @@
             let fileInput = document.getElementById('cReceiptFile').files.length > 0 ? document.getElementById('cReceiptFile') : document.getElementById('cReceiptCam');
             let file = fileInput.files[0];
 
-            // Penjanaan ID Unik Baharu
             const now = new Date();
             const yy = String(now.getFullYear()).slice(-2);
             const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -873,7 +1008,6 @@
             reader.readAsDataURL(file);
         }
 
-        // --- 7. ADMIN HR & PAYMENT LOGIC ---
         function getGroupedData() {
             const g = {};
             claimsData.forEach(c => {
@@ -931,32 +1065,49 @@
             }
         }
 
-        // --- PAYMENT MODAL SELECTION LOGIC ---
         function openPaymentModal(name) {
             document.getElementById('modalPayeeName').value = name;
             document.getElementById('modalPayee').innerText = name;
             
+            const medInfo = getMedicalBalance(name);
+            document.getElementById('modalMedBalance').innerText = formatRM(medInfo.paymentBalance);
+            
             let userPendingClaims = claimsData.filter(c => c.name === name && (c.amount - c.paid) > 0);
-            userPendingClaims.sort((a, b) => new Date(a.date) - new Date(b.date)); // Oldest first
+            userPendingClaims.sort((a, b) => new Date(a.date) - new Date(b.date));
             
             const listBody = document.getElementById('paymentClaimsList');
             listBody.innerHTML = '';
             
             userPendingClaims.forEach(c => {
                 let bal = c.amount - c.paid;
+                let inputMax = bal;
+                let medWarning = '';
+                
+                if (c.type === 'Perubatan') {
+                    inputMax = Math.min(bal, medInfo.paymentBalance);
+                    if (medInfo.paymentBalance <= 0) {
+                        medWarning = `<br><span class="text-[10px] text-red-500 font-bold bg-red-100 dark:bg-red-900/30 px-1 rounded">Baki Tahunan Habis</span>`;
+                    } else if (bal > medInfo.paymentBalance) {
+                        medWarning = `<br><span class="text-[10px] text-orange-500 font-bold bg-orange-100 dark:bg-orange-900/30 px-1 rounded">Terhad kpd baki RM${medInfo.paymentBalance}</span>`;
+                    }
+                }
+
                 listBody.innerHTML += `
                     <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                         <td class="p-3 text-center align-middle">
-                            <input type="checkbox" class="claim-cb w-4 h-4 rounded text-pbi-blue focus:ring-pbi-blue cursor-pointer" value="${c.id}" onchange="recalcTotal()">
+                            <input type="checkbox" ${inputMax <= 0 ? 'disabled' : ''} class="claim-cb w-4 h-4 rounded text-pbi-blue focus:ring-pbi-blue cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" value="${c.id}" onchange="recalcTotal()">
                         </td>
                         <td class="p-3 align-middle">
                             <div class="font-bold text-gray-900 dark:text-white">${c.id}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">${formatDate(c.date)}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">${formatDate(c.date)} <span class="ml-1 text-pbi-blue font-semibold">${c.type === 'Perubatan' ? '(Perubatan)' : ''}</span></div>
                         </td>
-                        <td class="p-3 text-right align-middle font-medium text-gray-700 dark:text-gray-300">${formatRM(bal)}</td>
                         <td class="p-3 text-right align-middle">
-                            <input type="number" id="pay_input_${c.id}" class="w-24 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-right text-gray-900 dark:text-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-pbi-blue disabled:opacity-50" max="${bal}" value="${bal}" step="0.01" disabled oninput="recalcTotal(this, ${bal})">
-                            <input type="hidden" id="max_pay_${c.id}" value="${bal}">
+                            <span class="font-medium text-gray-700 dark:text-gray-300">${formatRM(bal)}</span>
+                            ${medWarning}
+                        </td>
+                        <td class="p-3 text-right align-middle">
+                            <input type="number" id="pay_input_${c.id}" data-type="${c.type}" class="w-24 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-right text-gray-900 dark:text-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-pbi-blue disabled:opacity-50" max="${inputMax}" value="${inputMax}" step="0.01" disabled oninput="recalcTotal(this, ${inputMax})">
+                            <input type="hidden" id="max_pay_${c.id}" value="${inputMax}">
                         </td>
                     </tr>
                 `;
@@ -964,11 +1115,12 @@
             
             document.getElementById('selectAllClaims').checked = false;
             document.getElementById('totalPaymentDisplay').innerText = 'RM 0.00';
+            document.getElementById('medicalLimitError').classList.add('hidden');
             document.getElementById('paymentModal').classList.remove('hidden');
         }
 
         function toggleAllClaims(source) {
-            const cbs = document.querySelectorAll('.claim-cb');
+            const cbs = document.querySelectorAll('.claim-cb:not(:disabled)');
             cbs.forEach(cb => {
                 cb.checked = source.checked;
                 const input = document.getElementById('pay_input_' + cb.value);
@@ -989,36 +1141,55 @@
             if(inputElement && inputElement.value < 0) { inputElement.value = 0; }
 
             const cbs = document.querySelectorAll('.claim-cb');
-            let total = 0;
-            let allChecked = true;
-            let anyChecked = false;
+            let total = 0; let totalMed = 0;
+            let allChecked = true; let anyChecked = false;
             
             cbs.forEach(cb => {
                 const input = document.getElementById('pay_input_' + cb.value);
-                if(cb.checked) {
-                    input.disabled = false;
-                    input.classList.remove('bg-gray-100'); input.classList.add('bg-white');
-                    total += parseFloat(input.value) || 0;
-                    anyChecked = true;
+                if (!cb.disabled) {
+                    if(cb.checked) {
+                        input.disabled = false;
+                        input.classList.remove('bg-gray-100'); input.classList.add('bg-white');
+                        let val = parseFloat(input.value) || 0;
+                        total += val;
+                        if (input.getAttribute('data-type') === 'Perubatan') totalMed += val;
+                        anyChecked = true;
+                    } else {
+                        input.disabled = true;
+                        input.classList.add('bg-gray-100'); input.classList.remove('bg-white');
+                        allChecked = false;
+                    }
                 } else {
-                    input.disabled = true;
-                    input.classList.add('bg-gray-100'); input.classList.remove('bg-white');
                     allChecked = false;
                 }
             });
             
-            document.getElementById('selectAllClaims').checked = allChecked && cbs.length > 0;
+            const activeCbs = document.querySelectorAll('.claim-cb:not(:disabled)');
+            document.getElementById('selectAllClaims').checked = allChecked && activeCbs.length > 0;
             document.getElementById('totalPaymentDisplay').innerText = formatRM(total);
-            document.getElementById('btnConfirmPayment').disabled = !anyChecked || total <= 0;
-            return total;
+
+            const payeeName = document.getElementById('modalPayeeName').value;
+            const medData = getMedicalBalance(payeeName);
+            const btnSubmit = document.getElementById('btnConfirmPayment');
+            const medError = document.getElementById('medicalLimitError');
+
+            if (totalMed > medData.paymentBalance) {
+                medError.classList.remove('hidden');
+                btnSubmit.disabled = true;
+            } else {
+                medError.classList.add('hidden');
+                btnSubmit.disabled = !anyChecked || total <= 0;
+            }
+            return { total, totalMed, medLimit: medData.balance };
         }
 
-        function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); document.getElementById('paymentForm').reset(); }
+        function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); document.getElementById('paymentForm').reset(); document.getElementById('medicalLimitError').classList.add('hidden'); }
         
         function confirmPayment(e) {
             e.preventDefault();
-            const total = recalcTotal();
-            if(total <= 0) return;
+            const totals = recalcTotal();
+            if(totals.total <= 0) return;
+            if(totals.totalMed > totals.medLimit) { alert('Ralat: Jumlah bayaran perubatan melebihi had tahunan.'); return; }
 
             const name = document.getElementById('modalPayeeName').value;
             const fileInput = document.getElementById('pReceipt');
@@ -1049,14 +1220,11 @@
                     let response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
                     let result = await response.json();
                     if(result.status === 'success') {
-                        // KEMASKINI DATA SECARA LOKAL (Gabungan Koma)
                         updates.forEach(u => {
                             let claim = claimsData.find(c => c.id === u.id);
                             if(claim) { 
                                 claim.paid = u.paid; 
                                 claim.status = u.status; 
-                                
-                                // IDEA 2: Concatenate link dan tarikh dengan koma
                                 claim.payReceiptUrl = claim.payReceiptUrl ? claim.payReceiptUrl + ', ' + result.fileUrl : result.fileUrl; 
                                 claim.payDate = claim.payDate ? claim.payDate + ', ' + new Date().toISOString() : new Date().toISOString(); 
                             }
@@ -1080,7 +1248,6 @@
                 let docsHtml = '<div class="flex flex-col items-center justify-center space-y-1.5">';
                 if (c.receiptUrl) docsHtml += `<button onclick="openReceiptViewer('${c.receiptUrl}', 'Resit Tuntutan Pekerja (ID: ${c.id})')" class="px-2 py-1 bg-blue-50 text-pbi-blue border border-blue-200 rounded text-[10px] font-bold w-full mb-1"><i class="ph-fill ph-file-pdf mr-1"></i> Staf</button>`;
                 
-                // IDEA 2: Bina butang HR berasingan jika ada banyak resit dipisahkan dengan koma
                 if (c.payReceiptUrl) {
                     let payUrls = c.payReceiptUrl.split(',').map(s=>s.trim()).filter(Boolean);
                     payUrls.forEach((url, idx) => {
@@ -1107,7 +1274,6 @@
         }
         function closeDetailsModal() { document.getElementById('detailsModal').classList.add('hidden'); }
 
-        // --- IN APP DOC VIEWER ---
         let currentLinkToOpen = '';
         function openReceiptViewerFromLink(linkId) {
             const anchor = document.getElementById(linkId);
@@ -1141,7 +1307,6 @@
             if (c.receiptUrl) { rLink.setAttribute('data-href', c.receiptUrl); rLink.innerText = "Buka Resit"; rLink.classList.remove('pointer-events-none', 'opacity-50'); } 
             else { rLink.removeAttribute('data-href'); rLink.innerText = "Tiada Fail"; rLink.classList.add('pointer-events-none', 'opacity-50'); }
 
-            // IDEA 2: Generate dynamic list for HR Receipts
             const payList = document.getElementById('transPayListContainer');
             payList.innerHTML = '';
             
@@ -1170,11 +1335,20 @@
         }
         function closeTransactionModal() { document.getElementById('transactionModal').classList.add('hidden'); }
 
-        // --- 8. DASHBOARD LOGIC ---
         function resetDashFilter() { document.getElementById('dashStartDate').value = ''; document.getElementById('dashEndDate').value = ''; updateDashboard(); }
         
         function updateDashboard() {
             if(!currentUser) return;
+            
+            if (!currentUser.isSuperadmin) {
+                const medData = getMedicalBalance(currentUser.name);
+                document.getElementById('medYearDisplay').innerText = new Date().getFullYear();
+                document.getElementById('medBalanceDisplay').innerText = formatRM(medData.claimBalance);
+                document.getElementById('medicalDashboardBanner').classList.remove('hidden');
+            } else {
+                document.getElementById('medicalDashboardBanner').classList.add('hidden');
+            }
+
             const sd = document.getElementById('dashStartDate').value; const ed = document.getElementById('dashEndDate').value;
             let roleFiltered = currentUser.isSuperadmin ? claimsData : claimsData.filter(c => c.name === currentUser.name);
 
@@ -1214,6 +1388,39 @@
             const isDark = document.documentElement.classList.contains('dark');
             const gC = isDark ? '#333' : '#f3f4f6'; const tC = isDark ? '#9ca3af' : '#4b5563';
 
+            // --- CARTA GARIS MASA (TIMELINE) ---
+            const timelineData = {};
+            d.forEach(c => {
+                const dateObj = new Date(c.date);
+                const sortKey = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}`;
+                const labelName = dateObj.toLocaleDateString('ms-MY', { year: 'numeric', month: 'short' });
+                if(!timelineData[sortKey]) timelineData[sortKey] = { label: labelName, amount: 0 };
+                timelineData[sortKey].amount += c.amount;
+            });
+            const sortedTimelineKeys = Object.keys(timelineData).sort();
+            const timelineLabels = sortedTimelineKeys.map(k => timelineData[k].label);
+            const timelineValues = sortedTimelineKeys.map(k => timelineData[k].amount);
+
+            if(timelineChartInstance) timelineChartInstance.destroy();
+            timelineChartInstance = new Chart(document.getElementById('timelineChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: timelineLabels,
+                    datasets: [{
+                        label: 'Jumlah Perbelanjaan (RM)',
+                        data: timelineValues,
+                        borderColor: pbiColors[0],
+                        backgroundColor: pbiColors[0] + '33', // 20% opacity
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: pbiColors[0]
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: gC }, ticks: { color: tC, font:{weight:'bold'} } }, x: { grid: { display: false }, ticks: { color: tC, font:{weight:'600'} } } } }
+            });
+
+            // --- CARTA KATEGORI ---
             const cat = {}; d.forEach(c => cat[c.type] = (cat[c.type]||0) + c.amount);
             if(barChartInstance) barChartInstance.destroy();
             barChartInstance = new Chart(document.getElementById('barChart').getContext('2d'), {
@@ -1221,6 +1428,7 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: gC }, ticks: { color: tC, font:{weight:'bold'} } }, x: { grid: { display: false }, ticks: { color: tC, font:{weight:'600'} } } } }
             });
 
+            // --- CARTA STATUS ---
             const st = { 'Selesai Dibayar':0, 'Separa Dibayar':0, 'Menunggu':0 }; 
             d.forEach(c => {
                 let sl = c.status.toLowerCase();
@@ -1232,6 +1440,31 @@
                 type: 'doughnut', data: { labels: Object.keys(st), datasets: [{ data: Object.values(st), backgroundColor: [tailwind.config.theme.extend.colors.pbi.green, tailwind.config.theme.extend.colors.pbi.yellow, tailwind.config.theme.extend.colors.pbi.orange], borderWidth: 0, hoverOffset: 4 }] },
                 options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: tC, usePointStyle: true, font:{weight:'bold', size:11}, padding: 20 } } } }
             });
+
+            // --- CARTA STAF (SUPERADMIN SAHAJA) ---
+            if (currentUser && currentUser.isSuperadmin) {
+                document.getElementById('staffChartContainer').classList.remove('hidden');
+                const staffData = {};
+                d.forEach(c => { staffData[c.name] = (staffData[c.name] || 0) + c.amount; });
+                const sortedStaff = Object.entries(staffData).sort((a,b) => b[1] - a[1]); // Sort highest first
+                
+                if(staffChartInstance) staffChartInstance.destroy();
+                staffChartInstance = new Chart(document.getElementById('staffChart').getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: sortedStaff.map(s => s[0]),
+                        datasets: [{
+                            label: 'Jumlah Perbelanjaan (RM)',
+                            data: sortedStaff.map(s => s[1]),
+                            backgroundColor: pbiColors[2], // Orange color
+                            borderRadius: 4
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, indexAxis: 'x', plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: gC }, ticks: { color: tC, font:{weight:'bold'} } }, x: { grid: { display: false }, ticks: { color: tC, font:{weight:'600'} } } } }
+                });
+            } else {
+                document.getElementById('staffChartContainer').classList.add('hidden');
+            }
         }
     </script>
 </body>
