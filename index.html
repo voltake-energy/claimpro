@@ -400,6 +400,22 @@
                     </div>
                 </div>
 
+                <!-- Banner Kelayakan Perubatan (Khusus untuk Staf di Dashboard) -->
+                <div id="dashMedicalBanner" class="bg-gradient-to-r from-blue-50 to-white dark:from-blue-900/20 dark:to-[#252525] border border-blue-100 dark:border-blue-800/50 rounded-2xl p-5 mb-6 items-center justify-between hidden">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-white dark:bg-blue-800/50 rounded-full flex items-center justify-center mr-4 shadow-sm border border-blue-50 dark:border-blue-700">
+                            <i class="ph-fill ph-first-aid-kit text-pbi-blue text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-500 dark:text-blue-300 uppercase tracking-wider">Baki Kelayakan Perubatan (<span id="dashMedYear">2026</span>)</p>
+                            <p class="text-2xl font-extrabold text-gray-900 dark:text-white" id="dashMedBalDisplay">RM 0.00</p>
+                        </div>
+                    </div>
+                    <div class="text-right hidden sm:block">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 font-bold">Had Tahunan: RM 350.00</p>
+                    </div>
+                </div>
+
                 <!-- KPI Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     <div class="bg-white dark:bg-[#252525] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 border-l-4 border-l-pbi-blue relative overflow-hidden group">
@@ -1581,6 +1597,20 @@
             if(!currentUser) return;
             const sd = document.getElementById('dashStartDate').value; const ed = document.getElementById('dashEndDate').value;
             let roleFiltered = currentUser.isSuperadmin ? claimsData : claimsData.filter(c => c.name === currentUser.name);
+
+            // Paparkan Banner Medical Balance jika user adalah staf biasa
+            const dashMedBanner = document.getElementById('dashMedicalBanner');
+            if (!currentUser.isSuperadmin) {
+                const currentYear = new Date().getFullYear();
+                const medBal = getMedicalBalance(currentUser.name, currentYear);
+                document.getElementById('dashMedYear').innerText = currentYear;
+                document.getElementById('dashMedBalDisplay').innerText = formatRM(medBal);
+                dashMedBanner.classList.remove('hidden');
+                dashMedBanner.classList.add('flex');
+            } else {
+                dashMedBanner.classList.add('hidden');
+                dashMedBanner.classList.remove('flex');
+            }
 
             const d = roleFiltered.filter(c => {
                 const cd = new Date(c.date);
