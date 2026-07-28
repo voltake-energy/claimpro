@@ -261,9 +261,10 @@
                             <!-- Jenis -->
                             <div class="space-y-2">
                                 <label class="block text-sm font-bold text-gray-700 dark:text-gray-300">Jenis Tuntutan <span class="text-red-500">*</span></label>
-                                <select id="cType" required onchange="checkMedicalLimit()" class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow font-medium">
+                                <select id="cType" required onchange="handleTypeChange('new')" class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow font-medium">
                                     <option value="" disabled selected>Sila pilih jenis...</option>
                                     <option value="Perjalanan">Perjalanan (Tol, Minyak, Parkir)</option>
+                                    <option value="Makan & Minum">Makan & Minum</option>
                                     <option value="Keraian">Keraian Pelanggan</option>
                                     <option value="Penginapan">Penginapan (Hotel)</option>
                                     <option value="Perubatan">Perubatan & Klinik</option>
@@ -274,7 +275,22 @@
                             <!-- Pax -->
                             <div class="space-y-2">
                                 <label class="block text-sm font-bold text-gray-700 dark:text-gray-300">Bilangan Pax <span class="text-red-500">*</span></label>
-                                <input type="number" id="cPax" min="1" value="1" required class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow font-medium">
+                                <input type="number" id="cPax" min="1" value="1" required oninput="calculateMealAmount('new')" class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow font-medium">
+                            </div>
+                        </div>
+
+                        <!-- TAMBAHAN: Pilihan Makan & Minum -->
+                        <div id="mealTypeContainer" class="hidden space-y-2 mb-2">
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300">Sesi Makan (Khusus untuk Makan & Minum) <span class="text-red-500">*</span></label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center justify-center gap-2 cursor-pointer p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-[#1f1f1f] flex-1 hover:border-pbi-blue transition-colors">
+                                    <input type="checkbox" id="cMealSiang" value="Siang" onchange="calculateMealAmount('new')" class="w-5 h-5 text-pbi-blue rounded border-gray-300 focus:ring-pbi-blue">
+                                    <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Siang (RM 10)</span>
+                                </label>
+                                <label class="flex items-center justify-center gap-2 cursor-pointer p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-[#1f1f1f] flex-1 hover:border-pbi-blue transition-colors">
+                                    <input type="checkbox" id="cMealMalam" value="Malam" onchange="calculateMealAmount('new')" class="w-5 h-5 text-pbi-blue rounded border-gray-300 focus:ring-pbi-blue">
+                                    <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Malam (RM 15)</span>
+                                </label>
                             </div>
                         </div>
 
@@ -472,7 +488,7 @@
                                     <th scope="col" class="px-5 py-4 text-left font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Kategori</th>
                                     <th scope="col" class="px-5 py-4 text-right font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Jumlah (RM)</th>
                                     <th scope="col" class="px-5 py-4 text-center font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                                    <th scope="col" class="px-5 py-4 text-center font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tindakan</th>
+                                    <th scope="col" class="px-5 py-4 text-right font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tindakan</th>
                                 </tr>
                             </thead>
                             <tbody id="dashTableBody" class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-[#252525]">
@@ -556,8 +572,99 @@
                     </div>
                 </div>
             </div>
-            <div class="mt-6 pt-5 flex justify-end border-t border-gray-100 dark:border-gray-800 shrink-0">
-                <button onclick="closeTransactionModal()" class="px-6 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white font-bold rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Tutup Paparan</button>
+            <div id="transActionContainer" class="mt-6 pt-5 flex justify-end border-t border-gray-100 dark:border-gray-800 shrink-0 gap-2">
+                <!-- Butang Kemaskini / Padam akan dipaparkan di sini oleh JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Kemaskini Tuntutan -->
+    <div id="editModal" class="fixed inset-0 bg-gray-900/60 dark:bg-black/80 hidden z-[80] flex items-center justify-center backdrop-blur-sm transition-opacity p-4">
+        <div class="bg-white dark:bg-[#252525] rounded-2xl shadow-2xl w-full max-w-lg p-6 border border-gray-100 dark:border-gray-800 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-100 dark:border-gray-800 pb-3 shrink-0">
+                <h3 class="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">Kemaskini Tuntutan <span id="editModalIdLabel" class="text-pbi-blue text-sm ml-2"></span></h3>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                    <i class="ph ph-x text-xl"></i>
+                </button>
+            </div>
+            <form id="editForm" onsubmit="submitEditClaim(event)" class="space-y-4 overflow-y-auto custom-scrollbar pr-2 flex-1">
+                <input type="hidden" id="editId">
+                <input type="hidden" id="editName">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Tarikh</label>
+                        <input type="date" id="eDate" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Pax</label>
+                        <input type="number" id="ePax" min="1" required oninput="calculateMealAmount('edit')" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm">
+                    </div>
+                </div>
+                
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Jenis Tuntutan</label>
+                    <select id="eType" required onchange="handleTypeChange('edit')" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm">
+                        <option value="Perjalanan">Perjalanan (Tol, Minyak, Parkir)</option>
+                        <option value="Makan & Minum">Makan & Minum</option>
+                        <option value="Keraian">Keraian Pelanggan</option>
+                        <option value="Penginapan">Penginapan (Hotel)</option>
+                        <option value="Perubatan">Perubatan & Klinik</option>
+                        <option value="Lain-lain">Lain-lain Bekalan/Servis</option>
+                    </select>
+                </div>
+
+                <!-- TAMBAHAN EDIT: Pilihan Makan & Minum -->
+                <div id="eMealTypeContainer" class="hidden space-y-1.5 mt-2">
+                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Sesi Makan</label>
+                    <div class="flex gap-3">
+                        <label class="flex items-center gap-2 cursor-pointer p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700/50 flex-1">
+                            <input type="checkbox" id="eMealSiang" value="Siang" onchange="calculateMealAmount('edit')" class="w-4 h-4 text-pbi-blue rounded">
+                            <span class="text-xs font-bold text-gray-700 dark:text-gray-300">Siang (RM 10)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700/50 flex-1">
+                            <input type="checkbox" id="eMealMalam" value="Malam" onchange="calculateMealAmount('edit')" class="w-4 h-4 text-pbi-blue rounded">
+                            <span class="text-xs font-bold text-gray-700 dark:text-gray-300">Malam (RM 15)</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Keterangan Tujuan</label>
+                    <input type="text" id="eDesc" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm">
+                </div>
+                
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Jumlah (RM)</label>
+                    <input type="number" id="eAmount" step="0.01" min="0.01" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm font-bold">
+                </div>
+                
+                <div class="space-y-1.5 pt-2">
+                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Resit Baru (Biarkan kosong jika tiada perubahan)</label>
+                    <input type="file" id="eReceipt" accept=".pdf, image/*" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-pbi-blue file:text-white hover:file:bg-blue-600 file:cursor-pointer bg-gray-50 dark:bg-[#1f1f1f] border border-gray-300 dark:border-gray-600 rounded-lg">
+                </div>
+                
+                <div class="pt-4 border-t border-gray-100 dark:border-gray-800 mt-4 shrink-0">
+                    <button type="submit" id="btnSubmitEdit" class="w-full py-2.5 bg-pbi-orange text-white rounded-lg text-sm font-extrabold shadow-md hover:bg-orange-600 transition-colors flex items-center justify-center">
+                        Simpan Perubahan <i class="ph-fill ph-check-circle ml-2"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Pengesahan Padam -->
+    <div id="deleteConfirmModal" class="fixed inset-0 bg-gray-900/80 dark:bg-black/90 hidden z-[90] flex items-center justify-center backdrop-blur-sm p-4 transition-opacity">
+        <div class="bg-white dark:bg-[#252525] rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center border border-gray-200 dark:border-gray-800">
+            <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="ph-fill ph-warning-circle text-4xl text-red-500"></i>
+            </div>
+            <h3 class="text-xl font-extrabold text-gray-900 dark:text-white mb-2">Padam Tuntutan?</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Adakah anda pasti mahu memadam tuntutan ini? Tindakan ini tidak boleh dipulihkan.</p>
+            <input type="hidden" id="deleteClaimId">
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeDeleteModal()" class="px-5 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white font-bold rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors w-full">Batal</button>
+                <button onclick="executeDeleteClaim()" id="btnConfirmDelete" class="px-5 py-2.5 bg-red-500 text-white font-bold rounded-lg text-sm hover:bg-red-600 transition-colors w-full">Padam</button>
             </div>
         </div>
     </div>
@@ -720,7 +827,7 @@
     <!-- ============================================== -->
     <script>
         // --- 0. KONFIGURASI APP SCRIPT URL & CONSTANTS ---
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGtZDJ7UZ_0E-0tlHgh17nWKetkraT33kvBK2YpokoB2Awbo3UcISyRcpHPZoJb5DiAw/exec"; 
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxk6mGGCwNGlIIrTp1_4X-hMKSuvfZmL7gCqTkmxEWkxz-i4diYooxCwaHurLJ1vqbeKg/exec"; 
         const sheetCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?output=csv';
         const claimsCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?gid=1560350142&single=true&output=csv';
         const ANNUAL_MEDICAL_LIMIT = 350;
@@ -1086,6 +1193,49 @@
         }
 
         // --- 6. MEDICAL LOGIC & SUBMIT CLAIM ---
+        function handleTypeChange(mode) {
+            const prefix = mode === 'new' ? 'c' : 'e';
+            const type = document.getElementById(prefix + 'Type').value;
+            const mealContainer = document.getElementById(prefix === 'c' ? 'mealTypeContainer' : 'eMealTypeContainer');
+            const amountInput = document.getElementById(prefix + 'Amount');
+
+            if (type === 'Makan & Minum') {
+                mealContainer.classList.remove('hidden');
+                amountInput.readOnly = true;
+                amountInput.classList.add('bg-gray-100', 'dark:bg-gray-800', 'cursor-not-allowed', 'opacity-80');
+                calculateMealAmount(mode);
+            } else {
+                mealContainer.classList.add('hidden');
+                amountInput.readOnly = false;
+                amountInput.classList.remove('bg-gray-100', 'dark:bg-gray-800', 'cursor-not-allowed', 'opacity-80');
+                
+                // Uncheck automatik jika user ubah fikiran ke kategori lain
+                if(mode === 'new') {
+                    document.getElementById('cMealSiang').checked = false;
+                    document.getElementById('cMealMalam').checked = false;
+                }
+            }
+            
+            if(mode === 'new') checkMedicalLimit();
+        }
+
+        function calculateMealAmount(mode) {
+            const prefix = mode === 'new' ? 'c' : 'e';
+            const type = document.getElementById(prefix + 'Type').value;
+            if (type !== 'Makan & Minum') return;
+
+            const pax = parseInt(document.getElementById(prefix + 'Pax').value) || 1;
+            const siangChecked = document.getElementById(prefix + 'MealSiang').checked;
+            const malamChecked = document.getElementById(prefix + 'MealMalam').checked;
+
+            let total = 0;
+            if (siangChecked) total += 10;
+            if (malamChecked) total += 15;
+
+            document.getElementById(prefix + 'Amount').value = (total * pax).toFixed(2);
+            if (mode === 'new') checkMedicalLimit(); 
+        }
+
         function getMedicalBalance(empName, year) {
             let used = 0;
             claimsData.forEach(c => {
@@ -1150,6 +1300,12 @@
             document.getElementById('file-name-display').innerText = 'Pilih Fail / Gambar'; document.getElementById('camera-name-display').innerText = 'Buka Kamera Semasa';
             document.getElementById('selectedFileName').value = ""; document.getElementById('receiptError').classList.add('hidden');
             if(currentUser) document.getElementById('cNameInputLocked').value = currentUser.name;
+            
+            // RESET MAKAN & MINUM
+            document.getElementById('cMealSiang').checked = false;
+            document.getElementById('cMealMalam').checked = false;
+            handleTypeChange('new');
+            
             checkMedicalLimit();
         }
 
@@ -1158,6 +1314,14 @@
             
             // Final validation Medical limit
             if(document.getElementById('btnSubmitClaim').disabled) return;
+            
+            // VALIDASI MAKAN & MINUM KHAS
+            if (document.getElementById('cType').value === 'Makan & Minum') {
+                if (!document.getElementById('cMealSiang').checked && !document.getElementById('cMealMalam').checked) {
+                    alert("Sila tandakan sekurang-kurangnya satu sesi (Siang/Malam) untuk tuntutan Makan & Minum.");
+                    return;
+                }
+            }
 
             const fn = document.getElementById('selectedFileName').value;
             if(!fn) { document.getElementById('receiptError').classList.remove('hidden'); return; }
@@ -1178,10 +1342,21 @@
             
             const newId = `CLM-${yy}${mm}${dd}-${hh}${min}-${firstName}`;
             
+            // UBAHSUAI KETERANGAN MAKAN & MINUM (SELIT KE DALAM DESC)
+            let finalDesc = document.getElementById('cDesc').value;
+            if (document.getElementById('cType').value === 'Makan & Minum') {
+                let mealStr = [];
+                if (document.getElementById('cMealSiang').checked) mealStr.push("Siang");
+                if (document.getElementById('cMealMalam').checked) mealStr.push("Malam");
+                if (mealStr.length > 0) {
+                    finalDesc = finalDesc ? `${finalDesc} [Sesi: ${mealStr.join(', ')}]` : `[Sesi: ${mealStr.join(', ')}]`;
+                }
+            }
+            
             const claimRecord = {
                 id: newId, name: currentUser.name, date: document.getElementById('cDate').value,
                 type: document.getElementById('cType').value, pax: parseInt(document.getElementById('cPax').value),
-                desc: document.getElementById('cDesc').value, amount: parseFloat(document.getElementById('cAmount').value),
+                desc: finalDesc, amount: parseFloat(document.getElementById('cAmount').value),
                 paid: 0, status: 'Menunggu', fileName: file.name, fileMimeType: file.type
             };
 
@@ -1586,9 +1761,173 @@
                     `;
                 });
             }
+            
+            // Logic Paparkan Butang Edit/Delete
+            const actionContainer = document.getElementById('transActionContainer');
+            actionContainer.innerHTML = '';
+            
+            let canEdit = currentUser.isSuperadmin || c.status === 'Menunggu';
+            if (canEdit) {
+                actionContainer.innerHTML = `
+                    <button onclick="openEditModal('${c.id}')" class="px-4 py-2.5 bg-white dark:bg-[#1f1f1f] text-pbi-orange border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-orange-50 dark:hover:bg-gray-800 font-bold rounded-lg text-sm transition-colors"><i class="ph ph-pencil-simple mr-1 text-lg align-text-bottom"></i> Kemaskini</button>
+                    <button onclick="confirmDelete('${c.id}')" class="px-4 py-2.5 bg-white dark:bg-[#1f1f1f] text-red-500 border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-red-50 dark:hover:bg-gray-800 font-bold rounded-lg text-sm transition-colors"><i class="ph ph-trash mr-1 text-lg align-text-bottom"></i> Padam</button>
+                `;
+            }
+            actionContainer.innerHTML += `<button onclick="closeTransactionModal()" class="px-6 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white font-bold rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ml-auto">Tutup</button>`;
+
             document.getElementById('transactionModal').classList.remove('hidden');
         }
         function closeTransactionModal() { document.getElementById('transactionModal').classList.add('hidden'); }
+
+        // --- FUNGSI EDIT / DELETE TUNTUTAN ---
+        function openEditModal(id) {
+            const c = claimsData.find(claim => claim.id === id); if(!c) return;
+            document.getElementById('editId').value = c.id;
+            document.getElementById('editName').value = c.name;
+            document.getElementById('editModalIdLabel').innerText = c.id;
+            
+            // Masukkan Tarikh Format
+            let d = new Date(c.date);
+            let dateString = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+            document.getElementById('eDate').value = dateString;
+            
+            document.getElementById('ePax').value = c.pax;
+            document.getElementById('eType').value = c.type;
+            
+            // URAIKAN KETERANGAN MAKAN & MINUM UNTUK PAPARAN EDIT
+            let rawDesc = c.desc || '';
+            if (c.type === 'Makan & Minum') {
+                document.getElementById('eMealSiang').checked = rawDesc.includes('Siang');
+                document.getElementById('eMealMalam').checked = rawDesc.includes('Malam');
+                rawDesc = rawDesc.replace(/\s*\[Sesi:.*?\]/g, '').trim(); // Sembunyikan tag semasa user tengah edit
+            } else {
+                document.getElementById('eMealSiang').checked = false;
+                document.getElementById('eMealMalam').checked = false;
+            }
+            document.getElementById('eDesc').value = rawDesc;
+            
+            document.getElementById('eAmount').value = c.amount;
+            document.getElementById('eReceipt').value = '';
+            
+            handleTypeChange('edit'); // Kemaskini state input amount samada ReadOnly/Boleh Diubah
+            
+            closeTransactionModal();
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); }
+
+        function submitEditClaim(e) {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const name = document.getElementById('editName').value;
+            const btn = document.getElementById('btnSubmitEdit');
+            
+            // VALIDASI MAKAN & MINUM KHAS
+            if (document.getElementById('eType').value === 'Makan & Minum') {
+                if (!document.getElementById('eMealSiang').checked && !document.getElementById('eMealMalam').checked) {
+                    alert("Sila tandakan sekurang-kurangnya satu sesi (Siang/Malam) untuk tuntutan Makan & Minum.");
+                    return;
+                }
+            }
+            
+            // UBAHSUAI KETERANGAN MAKAN & MINUM (SELIT KE DALAM DESC)
+            let finalDesc = document.getElementById('eDesc').value;
+            if (document.getElementById('eType').value === 'Makan & Minum') {
+                let mealStr = [];
+                if (document.getElementById('eMealSiang').checked) mealStr.push("Siang");
+                if (document.getElementById('eMealMalam').checked) mealStr.push("Malam");
+                if (mealStr.length > 0) {
+                    finalDesc = finalDesc ? `${finalDesc} [Sesi: ${mealStr.join(', ')}]` : `[Sesi: ${mealStr.join(', ')}]`;
+                }
+            }
+            
+            const payload = {
+                action: 'editClaim', id: id, name: name,
+                date: document.getElementById('eDate').value,
+                pax: parseInt(document.getElementById('ePax').value),
+                type: document.getElementById('eType').value,
+                desc: finalDesc,
+                amount: parseFloat(document.getElementById('eAmount').value)
+            };
+
+            const fileInput = document.getElementById('eReceipt');
+            
+            const processSubmit = (finalPayload) => {
+                const oriBtn = btn.innerHTML;
+                btn.innerHTML = '<i class="ph ph-spinner animate-spin mr-2"></i> Menyimpan...'; btn.disabled = true;
+                showLoadingOverlay("Mengemaskini tuntutan...");
+                
+                fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(finalPayload) })
+                .then(res => res.json())
+                .then(res => {
+                    if(res.status === 'success') {
+                        let claim = claimsData.find(c => c.id === id);
+                        if (claim) {
+                            claim.date = finalPayload.date;
+                            claim.pax = finalPayload.pax;
+                            claim.type = finalPayload.type;
+                            claim.desc = finalPayload.desc;
+                            claim.amount = finalPayload.amount;
+                            if (res.fileUrl) claim.receiptUrl = res.fileUrl;
+                        }
+                        closeEditModal(); updateDashboard();
+                        if(!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
+                        updatePendingBadge();
+                        if(document.getElementById('cType').value === 'Perubatan') checkMedicalLimit();
+                        showSuccessPopup("Tuntutan anda berjaya dikemaskini.");
+                    } else throw new Error(res.message);
+                })
+                .catch(err => alert("Ralat Kemaskini: " + err.message))
+                .finally(() => { btn.innerHTML = oriBtn; btn.disabled = false; hideLoadingOverlay(); });
+            };
+
+            if (fileInput.files.length > 0) {
+                let file = fileInput.files[0];
+                payload.fileName = file.name;
+                payload.fileMimeType = file.type;
+                let reader = new FileReader();
+                reader.onload = function() {
+                    payload.fileBase64 = reader.result.split(',')[1];
+                    processSubmit(payload);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                processSubmit(payload);
+            }
+        }
+
+        function confirmDelete(id) {
+            document.getElementById('deleteClaimId').value = id;
+            closeTransactionModal();
+            document.getElementById('deleteConfirmModal').classList.remove('hidden');
+        }
+        
+        function closeDeleteModal() { document.getElementById('deleteConfirmModal').classList.add('hidden'); }
+        
+        function executeDeleteClaim() {
+            const id = document.getElementById('deleteClaimId').value;
+            const btn = document.getElementById('btnConfirmDelete');
+            const oriBtn = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Memadam...'; btn.disabled = true;
+            showLoadingOverlay("Memadam tuntutan...");
+            
+            fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteClaim', id: id }) })
+            .then(res => res.json())
+            .then(res => {
+                if(res.status === 'success') {
+                    claimsData = claimsData.filter(c => c.id !== id);
+                    closeDeleteModal(); updateDashboard();
+                    if(!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
+                    updatePendingBadge();
+                    if(document.getElementById('cType').value === 'Perubatan') checkMedicalLimit();
+                    showSuccessPopup("Tuntutan telah selamat dipadam.");
+                } else throw new Error(res.message);
+            })
+            .catch(err => alert("Ralat Padam: " + err.message))
+            .finally(() => { btn.innerHTML = oriBtn; btn.disabled = false; hideLoadingOverlay(); });
+        }
 
         // --- 8. DASHBOARD LOGIC ---
         function resetDashFilter() { document.getElementById('dashStartDate').value = ''; document.getElementById('dashEndDate').value = ''; updateDashboard(); }
@@ -1630,6 +1969,16 @@
             else {
                 sortedData.forEach(c => {
                     let cCol = c.amount === c.paid ? 'text-pbi-green' : (c.paid > 0 ? 'text-yellow-600' : 'text-pbi-orange');
+                    
+                    let canEdit = currentUser.isSuperadmin || c.status === 'Menunggu';
+                    let actionHtml = `<button onclick="viewTransaction('${c.id}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-pbi-blue border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-blue-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center" title="Perincian"><i class="ph ph-eye text-base"></i></button>`;
+                    if (canEdit) {
+                        actionHtml += `
+                            <button onclick="openEditModal('${c.id}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-pbi-orange border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-orange-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center ml-1" title="Kemaskini"><i class="ph ph-pencil-simple text-base"></i></button>
+                            <button onclick="confirmDelete('${c.id}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-red-500 border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-red-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center ml-1" title="Padam"><i class="ph ph-trash text-base"></i></button>
+                        `;
+                    }
+
                     const tr = document.createElement('tr'); tr.className = 'hover:bg-gray-50 dark:hover:bg-[#2e2e2e] transition-colors';
                     tr.innerHTML = `
                         <td class="px-5 py-4 whitespace-nowrap"><div class="font-extrabold text-gray-900 dark:text-white">${c.id}</div><div class="text-[11px] text-gray-500 font-semibold">${formatDate(c.date)}</div></td>
@@ -1637,8 +1986,8 @@
                         <td class="px-5 py-4 whitespace-nowrap text-sm font-bold text-gray-600 dark:text-gray-400">${c.type}</td>
                         <td class="px-5 py-4 whitespace-nowrap text-right text-sm font-extrabold text-gray-900 dark:text-white">${formatRM(c.amount)}</td>
                         <td class="px-5 py-4 whitespace-nowrap text-center text-[10px] tracking-wider uppercase font-extrabold ${cCol}">${c.status}</td>
-                        <td class="px-5 py-4 whitespace-nowrap text-right">
-                            <button onclick="viewTransaction('${c.id}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-pbi-blue border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-blue-50 dark:hover:bg-gray-800 px-4 py-2 rounded-lg transition-colors">Perincian</button>
+                        <td class="px-5 py-4 whitespace-nowrap text-right h-full">
+                            <div class="flex justify-end items-center">${actionHtml}</div>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -1680,6 +2029,60 @@
                 type: 'doughnut', data: { labels: Object.keys(st), datasets: [{ data: Object.values(st), backgroundColor: ['#00B01A', '#FFA300', '#E66C37'], borderWidth: 0, hoverOffset: 4 }] },
                 options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: tC, usePointStyle: true, font:{weight:'bold', size:11}, padding: 20 } } } }
             });
+
+            // 4. Staff Bar Chart (Superadmin Only)
+            const staffContainer = document.getElementById('staffChartContainer');
+            if (currentUser.isSuperadmin) {
+                staffContainer.classList.remove('hidden');
+                
+                const staffAmt = {};
+                d.forEach(c => {
+                    staffAmt[c.name] = (staffAmt[c.name] || 0) + c.amount;
+                });
+                
+                // Sort by total amount descending, and grab top 10
+                const sortedStaff = Object.entries(staffAmt)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 10);
+                
+                const staffLabels = sortedStaff.map(s => s[0]);
+                const staffData = sortedStaff.map(s => s[1]);
+
+                if (staffBarChartInstance) staffBarChartInstance.destroy();
+                staffBarChartInstance = new Chart(document.getElementById('staffBarChart').getContext('2d'), {
+                    type: 'bar',
+                    data: { 
+                        labels: staffLabels, 
+                        datasets: [{ 
+                            label: 'Jumlah (RM)',
+                            data: staffData, 
+                            backgroundColor: pbiColors[2], 
+                            borderRadius: 4 
+                        }] 
+                    },
+                    options: { 
+                        indexAxis: 'y', // Horizontal bars are easier to read for long names
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { 
+                            legend: { display: false } 
+                        }, 
+                        scales: { 
+                            x: { 
+                                beginAtZero: true, 
+                                grid: { color: gC }, 
+                                ticks: { color: tC, font:{weight:'bold'} } 
+                            }, 
+                            y: { 
+                                grid: { display: false }, 
+                                ticks: { color: tC, font:{weight:'bold'} } 
+                            } 
+                        } 
+                    }
+                });
+            } else {
+                staffContainer.classList.add('hidden');
+            }
         }
     </script>
 </body>
