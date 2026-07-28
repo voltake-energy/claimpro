@@ -113,7 +113,7 @@
                 </div>
                 <p id="loginError" class="text-red-500 text-xs hidden mb-4 font-semibold"><i class="ph-fill ph-warning-circle"></i> Sila pilih pekerja yang sah dari senarai.</p>
 
-                <!-- Container Kata Laluan (Akan dipaparkan bila nama dipilih) -->
+                <!-- Container Kata Laluan -->
                 <div id="passwordContainer" class="hidden relative mb-6">
                     <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Kata Laluan</label>
                     <div class="relative">
@@ -275,7 +275,7 @@
                             <!-- Pax -->
                             <div class="space-y-2">
                                 <label class="block text-sm font-bold text-gray-700 dark:text-gray-300">Bilangan Pax <span class="text-red-500">*</span></label>
-                                <input type="number" id="cPax" min="1" value="1" required oninput="calculateMealAmount('new')" class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow font-medium">
+                                <input type="number" id="cPax" min="1" value="1" required oninput="updateMealLimitInfo('new')" class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow font-medium">
                             </div>
                         </div>
 
@@ -284,12 +284,12 @@
                             <label class="block text-sm font-bold text-gray-700 dark:text-gray-300">Sesi Makan (Khusus untuk Makan & Minum) <span class="text-red-500">*</span></label>
                             <div class="flex gap-4">
                                 <label class="flex items-center justify-center gap-2 cursor-pointer p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-[#1f1f1f] flex-1 hover:border-pbi-blue transition-colors">
-                                    <input type="checkbox" id="cMealSiang" value="Siang" onchange="calculateMealAmount('new')" class="w-5 h-5 text-pbi-blue rounded border-gray-300 focus:ring-pbi-blue">
-                                    <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Siang (RM 10)</span>
+                                    <input type="checkbox" id="cMealSiang" value="Siang" onchange="updateMealLimitInfo('new')" class="w-5 h-5 text-pbi-blue rounded border-gray-300 focus:ring-pbi-blue">
+                                    <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Siang</span>
                                 </label>
                                 <label class="flex items-center justify-center gap-2 cursor-pointer p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-[#1f1f1f] flex-1 hover:border-pbi-blue transition-colors">
-                                    <input type="checkbox" id="cMealMalam" value="Malam" onchange="calculateMealAmount('new')" class="w-5 h-5 text-pbi-blue rounded border-gray-300 focus:ring-pbi-blue">
-                                    <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Malam (RM 15)</span>
+                                    <input type="checkbox" id="cMealMalam" value="Malam" onchange="updateMealLimitInfo('new')" class="w-5 h-5 text-pbi-blue rounded border-gray-300 focus:ring-pbi-blue">
+                                    <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Malam</span>
                                 </label>
                             </div>
                         </div>
@@ -307,8 +307,12 @@
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                     <span class="text-gray-500 font-bold">RM</span>
                                 </div>
-                                <input type="number" id="cAmount" step="0.01" min="0.01" oninput="checkMedicalLimit()" required class="w-full pl-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue text-2xl font-extrabold transition-shadow" placeholder="0.00">
+                                <input type="number" id="cAmount" step="0.01" min="0.01" oninput="validateAmount('new')" required class="w-full pl-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue text-2xl font-extrabold transition-shadow" placeholder="0.00">
                             </div>
+                            <!-- Paparan Limit -->
+                            <p id="cMealLimitText" class="text-pbi-blue text-xs font-bold mt-1.5 hidden"></p>
+                            <!-- Paparan Ralat -->
+                            <p id="cMealWarnText" class="text-red-500 text-xs font-bold mt-2 hidden"></p>
                             <p id="medicalWarnText" class="text-red-500 text-xs font-bold mt-2 hidden"><i class="ph-fill ph-warning-circle"></i> Tuntutan anda melebihi baki perubatan tahunan. Sila kurangkan jumlah.</p>
                         </div>
 
@@ -598,7 +602,7 @@
                     </div>
                     <div class="space-y-1.5">
                         <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Pax</label>
-                        <input type="number" id="ePax" min="1" required oninput="calculateMealAmount('edit')" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm">
+                        <input type="number" id="ePax" min="1" required oninput="updateMealLimitInfo('edit')" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm">
                     </div>
                 </div>
                 
@@ -619,12 +623,12 @@
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Sesi Makan</label>
                     <div class="flex gap-3">
                         <label class="flex items-center gap-2 cursor-pointer p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700/50 flex-1">
-                            <input type="checkbox" id="eMealSiang" value="Siang" onchange="calculateMealAmount('edit')" class="w-4 h-4 text-pbi-blue rounded">
-                            <span class="text-xs font-bold text-gray-700 dark:text-gray-300">Siang (RM 10)</span>
+                            <input type="checkbox" id="eMealSiang" value="Siang" onchange="updateMealLimitInfo('edit')" class="w-4 h-4 text-pbi-blue rounded">
+                            <span class="text-xs font-bold text-gray-700 dark:text-gray-300">Siang</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700/50 flex-1">
-                            <input type="checkbox" id="eMealMalam" value="Malam" onchange="calculateMealAmount('edit')" class="w-4 h-4 text-pbi-blue rounded">
-                            <span class="text-xs font-bold text-gray-700 dark:text-gray-300">Malam (RM 15)</span>
+                            <input type="checkbox" id="eMealMalam" value="Malam" onchange="updateMealLimitInfo('edit')" class="w-4 h-4 text-pbi-blue rounded">
+                            <span class="text-xs font-bold text-gray-700 dark:text-gray-300">Malam</span>
                         </label>
                     </div>
                 </div>
@@ -636,7 +640,9 @@
                 
                 <div class="space-y-1.5">
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Jumlah (RM)</label>
-                    <input type="number" id="eAmount" step="0.01" min="0.01" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm font-bold">
+                    <input type="number" id="eAmount" step="0.01" min="0.01" required oninput="validateAmount('edit')" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm font-bold">
+                    <p id="eMealLimitText" class="text-pbi-blue text-xs font-bold mt-1 hidden"></p>
+                    <p id="eMealWarnText" class="text-red-500 text-xs font-bold mt-1.5 hidden"></p>
                 </div>
                 
                 <div class="space-y-1.5 pt-2">
@@ -645,7 +651,7 @@
                 </div>
                 
                 <div class="pt-4 border-t border-gray-100 dark:border-gray-800 mt-4 shrink-0">
-                    <button type="submit" id="btnSubmitEdit" class="w-full py-2.5 bg-pbi-orange text-white rounded-lg text-sm font-extrabold shadow-md hover:bg-orange-600 transition-colors flex items-center justify-center">
+                    <button type="submit" id="btnSubmitEdit" class="w-full py-2.5 bg-pbi-orange text-white rounded-lg text-sm font-extrabold shadow-md hover:bg-orange-600 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
                         Simpan Perubahan <i class="ph-fill ph-check-circle ml-2"></i>
                     </button>
                 </div>
@@ -826,13 +832,11 @@
     <!-- JAVASCRIPT LOGIC -->
     <!-- ============================================== -->
     <script>
-        // --- 0. KONFIGURASI APP SCRIPT URL & CONSTANTS ---
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxk6mGGCwNGlIIrTp1_4X-hMKSuvfZmL7gCqTkmxEWkxz-i4diYooxCwaHurLJ1vqbeKg/exec"; 
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGtZDJ7UZ_0E-0tlHgh17nWKetkraT33kvBK2YpokoB2Awbo3UcISyRcpHPZoJb5DiAw/exec"; 
         const sheetCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?output=csv';
         const claimsCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?gid=1560350142&single=true&output=csv';
         const ANNUAL_MEDICAL_LIMIT = 350;
 
-        // --- 1. STATE VARIABLES ---
         let currentUser = null; 
         let employeesList = []; 
         let claimsData = [];
@@ -846,7 +850,6 @@
         const ADMIN_ITEMS_PER_PAGE = 20;
         const pbiColors = ['#118DFF', '#12239E', '#E66C37', '#6B007B', '#00B01A', '#00A638', '#33A1FD', '#FFA300', '#A6A6A6', '#D13438'];
 
-        // --- 2. INIT & AUTO-LOGIN ---
         document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('cDate').valueAsDate = new Date();
             
@@ -856,15 +859,12 @@
             
             setupLoginSearch();
 
-            // Check jika user pernah log masuk sblm ni
             const savedUser = localStorage.getItem('claimProUser');
             if(savedUser) {
                 try {
                     currentUser = JSON.parse(savedUser);
-                    // Double check in list if exist
                     const stillValid = employeesList.find(e => e.id === currentUser.id);
                     if(stillValid) {
-                        // Semak jika password dlm cache tak sama dgn dlm Google Sheet (telah diubah)
                         if (currentUser.password !== stillValid.password) {
                             localStorage.removeItem('claimProUser');
                             currentUser = null;
@@ -889,12 +889,11 @@
                     if(!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
                     if(!document.getElementById('view-dashboard').classList.contains('hidden')) updateDashboard();
                     updatePendingBadge();
-                    if(document.getElementById('cType').value === 'Perubatan') checkMedicalLimit();
+                    validateAmount('new');
                 }
             });
         }
 
-        // --- 3. FETCH DATA ---
         async function fetchEmployees() {
             try {
                 const response = await fetch(sheetCSVUrl);
@@ -904,7 +903,6 @@
                 employeesList = [];
                 for(let i = 1; i < rows.length; i++) {
                     if(!rows[i].trim()) continue;
-                    // Format baru: ID, NAME, PASSWORD, DESIGNATION
                     const cols = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
                     if(cols.length >= 4) {
                         const id = cols[0] ? cols[0].replace(/"/g, '').trim() : '';
@@ -965,7 +963,6 @@
             } catch (error) { console.error("Ralat Claims:", error); }
         }
 
-        // --- 4. LOGIN LOGIC ---
         function setupLoginSearch() {
             const input = document.getElementById('loginIdInput');
             const hiddenId = document.getElementById('loginSelectedId');
@@ -1008,7 +1005,6 @@
                     document.getElementById('loginIdInput').value = emp.displayText;
                     hiddenId.value = emp.id; hiddenName.value = emp.name;
                     
-                    // Semua pengguna perlukan kata laluan skrg
                     document.getElementById('passwordContainer').classList.remove('hidden');
                     
                     btn.disabled = false; dropdown.classList.add('hidden'); document.getElementById('loginError').classList.add('hidden');
@@ -1032,9 +1028,8 @@
 
             const isSuperadminUser = (emp.designation.toLowerCase() === 'admin');
 
-            // Tambah parameter password dlm simpanan memori
             currentUser = { id: emp.id, name: emp.name, password: emp.password, isSuperadmin: isSuperadminUser };
-            localStorage.setItem('claimProUser', JSON.stringify(currentUser)); // Auto login save
+            localStorage.setItem('claimProUser', JSON.stringify(currentUser));
             proceedToApp();
         }
 
@@ -1063,7 +1058,7 @@
                     document.getElementById('dashSubtitle').innerText = 'Tinjauan Peribadi';
                 }
                 
-                updatePendingBadge(); navigate('submit'); checkMedicalLimit();
+                updatePendingBadge(); navigate('submit'); validateAmount('new');
             }, 300);
         }
 
@@ -1080,7 +1075,6 @@
             }, 50);
         }
 
-        // --- 5. UI UTILS ---
         function showLoadingOverlay(text) {
             document.getElementById('loadingText').innerText = text || "Sedang Memproses...";
             const ol = document.getElementById('loadingOverlay');
@@ -1133,7 +1127,6 @@
             badges.forEach(b => { if(b) { b.classList.toggle('hidden', pendingClaims.length === 0); b.innerText = pendingClaims.length > 0 ? pendingClaims.length : ''; } });
         }
 
-        // FUNGSI TUKAR KATA LALUAN
         function openPasswordModal() {
             document.getElementById('passwordChangeForm').reset();
             document.getElementById('pwdError').classList.add('hidden');
@@ -1176,11 +1169,9 @@
             .then(res => res.json())
             .then(res => {
                 if (res.status === 'success') {
-                    // Update current session
                     currentUser.password = newPwd;
                     localStorage.setItem('claimProUser', JSON.stringify(currentUser));
                     
-                    // Update array memory locally immediately (avoid cache issues delay)
                     const empIndex = employeesList.findIndex(emp => emp.id === currentUser.id);
                     if (empIndex > -1) employeesList[empIndex].password = newPwd;
                     
@@ -1192,7 +1183,16 @@
             .finally(() => { btn.innerHTML = oriBtn; btn.disabled = false; });
         }
 
-        // --- 6. MEDICAL LOGIC & SUBMIT CLAIM ---
+        function getMedicalBalance(empName, year) {
+            let used = 0;
+            claimsData.forEach(c => {
+                if (c.name === empName && c.type === 'Perubatan' && new Date(c.date).getFullYear() === year) {
+                    used += c.amount; 
+                }
+            });
+            return Math.max(0, ANNUAL_MEDICAL_LIMIT - used);
+        }
+
         function handleTypeChange(mode) {
             const prefix = mode === 'new' ? 'c' : 'e';
             const type = document.getElementById(prefix + 'Type').value;
@@ -1201,25 +1201,26 @@
 
             if (type === 'Makan & Minum') {
                 mealContainer.classList.remove('hidden');
-                amountInput.readOnly = true;
-                amountInput.classList.add('bg-gray-100', 'dark:bg-gray-800', 'cursor-not-allowed', 'opacity-80');
-                calculateMealAmount(mode);
+                amountInput.readOnly = false;
+                amountInput.classList.remove('bg-gray-100', 'dark:bg-gray-800', 'cursor-not-allowed', 'opacity-80');
+                updateMealLimitInfo(mode);
             } else {
                 mealContainer.classList.add('hidden');
                 amountInput.readOnly = false;
                 amountInput.classList.remove('bg-gray-100', 'dark:bg-gray-800', 'cursor-not-allowed', 'opacity-80');
                 
-                // Uncheck automatik jika user ubah fikiran ke kategori lain
-                if(mode === 'new') {
-                    document.getElementById('cMealSiang').checked = false;
-                    document.getElementById('cMealMalam').checked = false;
-                }
+                // Clear checkboxes and limits
+                document.getElementById(prefix + 'MealSiang').checked = false;
+                document.getElementById(prefix + 'MealMalam').checked = false;
+                document.getElementById(prefix + 'Amount').dataset.maxMeal = 0;
+                document.getElementById(prefix + 'MealLimitText').classList.add('hidden');
+                document.getElementById(prefix + 'MealWarnText').classList.add('hidden');
             }
             
-            if(mode === 'new') checkMedicalLimit();
+            validateAmount(mode);
         }
 
-        function calculateMealAmount(mode) {
+        function updateMealLimitInfo(mode) {
             const prefix = mode === 'new' ? 'c' : 'e';
             const type = document.getElementById(prefix + 'Type').value;
             if (type !== 'Makan & Minum') return;
@@ -1232,54 +1233,86 @@
             if (siangChecked) total += 10;
             if (malamChecked) total += 15;
 
-            document.getElementById(prefix + 'Amount').value = (total * pax).toFixed(2);
-            if (mode === 'new') checkMedicalLimit(); 
-        }
-
-        function getMedicalBalance(empName, year) {
-            let used = 0;
-            claimsData.forEach(c => {
-                if (c.name === empName && c.type === 'Perubatan' && new Date(c.date).getFullYear() === year) {
-                    used += c.amount; // Untuk staff limit, kita kira semua claim yang *dihantar*
-                }
-            });
-            return Math.max(0, ANNUAL_MEDICAL_LIMIT - used);
-        }
-
-        function checkMedicalLimit() {
-            const type = document.getElementById('cType').value;
-            const banner = document.getElementById('medicalLimitBanner');
-            const warnText = document.getElementById('medicalWarnText');
-            const btnSubmit = document.getElementById('btnSubmitClaim');
+            const maxLimit = total * pax;
+            document.getElementById(prefix + 'Amount').dataset.maxMeal = maxLimit;
             
-            if (type === 'Perubatan') {
-                const year = new Date(document.getElementById('cDate').value).getFullYear();
-                const bal = getMedicalBalance(currentUser.name, year);
-                
-                document.getElementById('displayMedBal').innerText = formatRM(bal);
-                banner.classList.remove('hidden');
+            const limitText = document.getElementById(prefix + 'MealLimitText');
+            if (maxLimit > 0) {
+                limitText.innerHTML = `<i class="ph-fill ph-info"></i> Maksimum dibenarkan: RM ${maxLimit.toFixed(2)}`;
+                limitText.classList.remove('hidden');
+            } else {
+                limitText.classList.add('hidden');
+            }
 
-                const inputAmt = parseFloat(document.getElementById('cAmount').value) || 0;
-                if (inputAmt > bal) {
-                    warnText.classList.remove('hidden');
-                    document.getElementById('cAmount').classList.add('border-red-500', 'ring-red-500');
-                    document.getElementById('cAmount').classList.remove('border-gray-300', 'dark:border-gray-600', 'focus:ring-pbi-blue');
-                    btnSubmit.disabled = true;
+            validateAmount(mode);
+        }
+
+        function validateAmount(mode) {
+            const prefix = mode === 'new' ? 'c' : 'e';
+            const type = document.getElementById(prefix + 'Type').value;
+            const inputAmtEl = document.getElementById(prefix + 'Amount');
+            const inputAmt = parseFloat(inputAmtEl.value) || 0;
+            let isValid = true;
+
+            // 1. Semak Had Perubatan (Khusus untuk form Submit/New)
+            if (mode === 'new') {
+                const medWarnText = document.getElementById('medicalWarnText');
+                if (type === 'Perubatan') {
+                    const year = new Date(document.getElementById('cDate').value).getFullYear();
+                    const bal = getMedicalBalance(currentUser.name, year);
+                    
+                    document.getElementById('displayMedBal').innerText = formatRM(bal);
+                    document.getElementById('medicalLimitBanner').classList.remove('hidden');
+
+                    if (inputAmt > bal) {
+                        medWarnText.classList.remove('hidden');
+                        isValid = false;
+                    } else {
+                        medWarnText.classList.add('hidden');
+                    }
                 } else {
-                    warnText.classList.add('hidden');
-                    document.getElementById('cAmount').classList.remove('border-red-500', 'ring-red-500');
-                    document.getElementById('cAmount').classList.add('border-gray-300', 'dark:border-gray-600', 'focus:ring-pbi-blue');
-                    btnSubmit.disabled = false;
+                    document.getElementById('medicalLimitBanner').classList.add('hidden');
+                    medWarnText.classList.add('hidden');
+                }
+            }
+
+            // 2. Semak Had Makan & Minum (Limit Capping)
+            const mealWarnText = document.getElementById(prefix + 'MealWarnText');
+            if (type === 'Makan & Minum') {
+                const maxMeal = parseFloat(inputAmtEl.dataset.maxMeal) || 0;
+                if (maxMeal === 0) {
+                    if (inputAmt > 0) {
+                        mealWarnText.innerHTML = `<i class="ph-fill ph-warning-circle"></i> Sila pilih sesi makan (Siang/Malam).`;
+                        mealWarnText.classList.remove('hidden');
+                        isValid = false;
+                    } else {
+                        mealWarnText.classList.add('hidden');
+                    }
+                } else if (inputAmt > maxMeal) {
+                    mealWarnText.innerHTML = `<i class="ph-fill ph-warning-circle"></i> Melebihi had maksimum yang dibenarkan (RM ${maxMeal.toFixed(2)}).`;
+                    mealWarnText.classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    mealWarnText.classList.add('hidden');
                 }
             } else {
-                banner.classList.add('hidden'); warnText.classList.add('hidden');
-                document.getElementById('cAmount').classList.remove('border-red-500', 'ring-red-500');
-                document.getElementById('cAmount').classList.add('border-gray-300', 'dark:border-gray-600', 'focus:ring-pbi-blue');
+                if (mealWarnText) mealWarnText.classList.add('hidden');
+            }
+
+            // Kemaskini Butang Submit & Visual Input
+            const btnSubmit = document.getElementById(mode === 'new' ? 'btnSubmitClaim' : 'btnSubmitEdit');
+            if (!isValid) {
+                inputAmtEl.classList.add('border-red-500', 'ring-red-500');
+                inputAmtEl.classList.remove('border-gray-300', 'dark:border-gray-600', 'focus:ring-pbi-blue');
+                btnSubmit.disabled = true;
+            } else {
+                inputAmtEl.classList.remove('border-red-500', 'ring-red-500');
+                inputAmtEl.classList.add('border-gray-300', 'dark:border-gray-600', 'focus:ring-pbi-blue');
                 btnSubmit.disabled = false;
             }
         }
 
-        document.getElementById('cDate').addEventListener('change', checkMedicalLimit);
+        document.getElementById('cDate').addEventListener('change', () => validateAmount('new'));
 
         function handleFileSelect(src) {
             const fi = document.getElementById(src === 'file' ? 'cReceiptFile' : 'cReceiptCam');
@@ -1301,27 +1334,12 @@
             document.getElementById('selectedFileName').value = ""; document.getElementById('receiptError').classList.add('hidden');
             if(currentUser) document.getElementById('cNameInputLocked').value = currentUser.name;
             
-            // RESET MAKAN & MINUM
-            document.getElementById('cMealSiang').checked = false;
-            document.getElementById('cMealMalam').checked = false;
             handleTypeChange('new');
-            
-            checkMedicalLimit();
         }
 
         function submitClaim(e) {
             e.preventDefault();
-            
-            // Final validation Medical limit
             if(document.getElementById('btnSubmitClaim').disabled) return;
-            
-            // VALIDASI MAKAN & MINUM KHAS
-            if (document.getElementById('cType').value === 'Makan & Minum') {
-                if (!document.getElementById('cMealSiang').checked && !document.getElementById('cMealMalam').checked) {
-                    alert("Sila tandakan sekurang-kurangnya satu sesi (Siang/Malam) untuk tuntutan Makan & Minum.");
-                    return;
-                }
-            }
 
             const fn = document.getElementById('selectedFileName').value;
             if(!fn) { document.getElementById('receiptError').classList.remove('hidden'); return; }
@@ -1331,7 +1349,6 @@
             let fileInput = document.getElementById('cReceiptFile').files.length > 0 ? document.getElementById('cReceiptFile') : document.getElementById('cReceiptCam');
             let file = fileInput.files[0];
 
-            // ID Generation (CLM-YYMMDD-HHMM-NamaPertama)
             const now = new Date();
             const yy = String(now.getFullYear()).slice(-2);
             const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -1342,7 +1359,6 @@
             
             const newId = `CLM-${yy}${mm}${dd}-${hh}${min}-${firstName}`;
             
-            // UBAHSUAI KETERANGAN MAKAN & MINUM (SELIT KE DALAM DESC)
             let finalDesc = document.getElementById('cDesc').value;
             if (document.getElementById('cType').value === 'Makan & Minum') {
                 let mealStr = [];
@@ -1380,15 +1396,14 @@
             reader.readAsDataURL(file);
         }
 
-        // --- 7. ADMIN HR & PAYMENT LOGIC (WITH PAGINATION) ---
         function getGroupedData() {
             const g = {};
             claimsData.forEach(c => {
                 if(!g[c.name]) g[c.name] = { name: c.name, count: 0, tAmt: 0, tPaid: 0, bal: 0, claims: [], lastActivity: 0 };
                 g[c.name].count++; g[c.name].tAmt += c.amount; g[c.name].tPaid += c.paid; g[c.name].bal += (c.amount - c.paid);
-                if(c.timestamp > g[c.name].lastActivity) g[c.name].lastActivity = c.timestamp; // For sorting recent
+                if(c.timestamp > g[c.name].lastActivity) g[c.name].lastActivity = c.timestamp;
             });
-            return Object.values(g).sort((a,b) => b.lastActivity - a.lastActivity); // Always default to Newest activity
+            return Object.values(g).sort((a,b) => b.lastActivity - a.lastActivity);
         }
 
         function filterAdminTable(s) {
@@ -1403,7 +1418,7 @@
             aBtn.classList.remove('text-gray-600', 'dark:text-gray-400');
             aBtn.classList.add('bg-white', 'dark:bg-gray-600', 'shadow-sm', 'text-gray-900', 'dark:text-white');
             
-            adminCurrentPage = 1; // Reset to page 1 on filter
+            adminCurrentPage = 1;
             updateAdminTable();
         }
 
@@ -1430,7 +1445,6 @@
             } else {
                 empty.classList.add('hidden'); tbody.parentNode.classList.remove('hidden');
                 
-                // Pagination Logic
                 adminTotalPages = Math.ceil(grps.length / ADMIN_ITEMS_PER_PAGE);
                 if(adminTotalPages > 1) {
                     pagination.classList.remove('hidden');
@@ -1469,7 +1483,6 @@
             }
         }
 
-        // --- PAYMENT MODAL SELECTION LOGIC ---
         function getMedicalPaid(empName, year) {
             let used = 0;
             claimsData.forEach(c => {
@@ -1482,14 +1495,12 @@
             document.getElementById('modalPayeeName').value = name;
             document.getElementById('modalPayee').innerText = name;
             
-            // Check Medical Limit for HR context
             const cy = new Date().getFullYear();
             const medPaid = getMedicalPaid(name, cy);
             const medAvail = Math.max(0, ANNUAL_MEDICAL_LIMIT - medPaid);
             
             document.getElementById('hrMedicalBalDisplay').innerText = formatRM(medAvail);
             document.getElementById('hrMedicalBalContainer').classList.remove('hidden');
-            // Save info into form dataset for validation
             document.getElementById('paymentForm').dataset.medAvail = medAvail;
             document.getElementById('paymentForm').dataset.medPayTotal = 0;
 
@@ -1572,7 +1583,6 @@
             document.getElementById('selectAllClaims').checked = allChecked && cbs.length > 0;
             document.getElementById('totalPaymentDisplay').innerText = formatRM(total);
             
-            // Guardrail Medical untuk HR
             const medAvail = parseFloat(document.getElementById('paymentForm').dataset.medAvail);
             const errMed = document.getElementById('hrMedicalError');
             const btn = document.getElementById('btnConfirmPayment');
@@ -1677,7 +1687,6 @@
         }
         function closeDetailsModal() { document.getElementById('detailsModal').classList.add('hidden'); }
 
-        // --- IN APP DOC VIEWER & DOWNLOAD ---
         function openReceiptViewerFromLink(linkId) {
             const anchor = document.getElementById(linkId);
             if(anchor && anchor.getAttribute('data-href')) {
@@ -1688,13 +1697,9 @@
         function openReceiptViewer(url, title) {
             document.getElementById('receiptViewerTitle').innerText = title || "Paparan Dokumen";
             let previewUrl = url;
-            // Untuk preview
             if (previewUrl.includes('drive.google.com/file/d/')) previewUrl = previewUrl.replace(/\/view.*/, '/preview');
             document.getElementById('receiptIframe').src = previewUrl;
-            
-            // Simpan pautan ori untuk tujuan download
             document.getElementById('receiptViewerModal').setAttribute('data-current-url', url);
-            
             document.getElementById('receiptViewerModal').classList.remove('hidden');
         }
         
@@ -1706,14 +1711,11 @@
         function downloadCurrentReceipt() {
             const url = document.getElementById('receiptViewerModal').getAttribute('data-current-url');
             if(!url) return;
-            
-            // Tukar url view drive kepada export download
             let downloadUrl = url;
             const match = url.match(/\/d\/(.+?)\//);
             if(match && match[1]) {
                 downloadUrl = `https://drive.google.com/uc?export=download&id=${match[1]}`;
             }
-            // Trigger direct download
             const a = document.createElement('a');
             a.href = downloadUrl;
             a.target = '_blank';
@@ -1762,7 +1764,6 @@
                 });
             }
             
-            // Logic Paparkan Butang Edit/Delete
             const actionContainer = document.getElementById('transActionContainer');
             actionContainer.innerHTML = '';
             
@@ -1779,14 +1780,12 @@
         }
         function closeTransactionModal() { document.getElementById('transactionModal').classList.add('hidden'); }
 
-        // --- FUNGSI EDIT / DELETE TUNTUTAN ---
         function openEditModal(id) {
             const c = claimsData.find(claim => claim.id === id); if(!c) return;
             document.getElementById('editId').value = c.id;
             document.getElementById('editName').value = c.name;
             document.getElementById('editModalIdLabel').innerText = c.id;
             
-            // Masukkan Tarikh Format
             let d = new Date(c.date);
             let dateString = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
             document.getElementById('eDate').value = dateString;
@@ -1794,12 +1793,11 @@
             document.getElementById('ePax').value = c.pax;
             document.getElementById('eType').value = c.type;
             
-            // URAIKAN KETERANGAN MAKAN & MINUM UNTUK PAPARAN EDIT
             let rawDesc = c.desc || '';
             if (c.type === 'Makan & Minum') {
                 document.getElementById('eMealSiang').checked = rawDesc.includes('Siang');
                 document.getElementById('eMealMalam').checked = rawDesc.includes('Malam');
-                rawDesc = rawDesc.replace(/\s*\[Sesi:.*?\]/g, '').trim(); // Sembunyikan tag semasa user tengah edit
+                rawDesc = rawDesc.replace(/\s*\[Sesi:.*?\]/g, '').trim(); 
             } else {
                 document.getElementById('eMealSiang').checked = false;
                 document.getElementById('eMealMalam').checked = false;
@@ -1809,7 +1807,7 @@
             document.getElementById('eAmount').value = c.amount;
             document.getElementById('eReceipt').value = '';
             
-            handleTypeChange('edit'); // Kemaskini state input amount samada ReadOnly/Boleh Diubah
+            handleTypeChange('edit'); 
             
             closeTransactionModal();
             document.getElementById('editModal').classList.remove('hidden');
@@ -1823,15 +1821,8 @@
             const name = document.getElementById('editName').value;
             const btn = document.getElementById('btnSubmitEdit');
             
-            // VALIDASI MAKAN & MINUM KHAS
-            if (document.getElementById('eType').value === 'Makan & Minum') {
-                if (!document.getElementById('eMealSiang').checked && !document.getElementById('eMealMalam').checked) {
-                    alert("Sila tandakan sekurang-kurangnya satu sesi (Siang/Malam) untuk tuntutan Makan & Minum.");
-                    return;
-                }
-            }
+            if (document.getElementById('btnSubmitEdit').disabled) return;
             
-            // UBAHSUAI KETERANGAN MAKAN & MINUM (SELIT KE DALAM DESC)
             let finalDesc = document.getElementById('eDesc').value;
             if (document.getElementById('eType').value === 'Makan & Minum') {
                 let mealStr = [];
@@ -1874,7 +1865,7 @@
                         closeEditModal(); updateDashboard();
                         if(!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
                         updatePendingBadge();
-                        if(document.getElementById('cType').value === 'Perubatan') checkMedicalLimit();
+                        validateAmount('new');
                         showSuccessPopup("Tuntutan anda berjaya dikemaskini.");
                     } else throw new Error(res.message);
                 })
@@ -1921,7 +1912,7 @@
                     closeDeleteModal(); updateDashboard();
                     if(!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
                     updatePendingBadge();
-                    if(document.getElementById('cType').value === 'Perubatan') checkMedicalLimit();
+                    validateAmount('new');
                     showSuccessPopup("Tuntutan telah selamat dipadam.");
                 } else throw new Error(res.message);
             })
@@ -1929,7 +1920,6 @@
             .finally(() => { btn.innerHTML = oriBtn; btn.disabled = false; hideLoadingOverlay(); });
         }
 
-        // --- 8. DASHBOARD LOGIC ---
         function resetDashFilter() { document.getElementById('dashStartDate').value = ''; document.getElementById('dashEndDate').value = ''; updateDashboard(); }
         
         function updateDashboard() {
@@ -1937,7 +1927,6 @@
             const sd = document.getElementById('dashStartDate').value; const ed = document.getElementById('dashEndDate').value;
             let roleFiltered = currentUser.isSuperadmin ? claimsData : claimsData.filter(c => c.name === currentUser.name);
 
-            // Paparkan Banner Medical Balance jika user adalah staf biasa
             const dashMedBanner = document.getElementById('dashMedicalBanner');
             if (!currentUser.isSuperadmin) {
                 const currentYear = new Date().getFullYear();
@@ -1997,7 +1986,6 @@
             const isDark = document.documentElement.classList.contains('dark');
             const gC = isDark ? '#333' : '#f3f4f6'; const tC = isDark ? '#9ca3af' : '#4b5563';
 
-            // 1. Line Chart (Timeline)
             const tl = {};
             d.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(c => {
                 let m = new Date(c.date).toLocaleDateString('ms-MY', {month:'short', year:'2-digit'});
@@ -2009,7 +1997,6 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: gC }, ticks: { color: tC, font:{weight:'bold'} } }, x: { grid: { display: false }, ticks: { color: tC, font:{weight:'bold'} } } } }
             });
 
-            // 2. Bar Chart (Category)
             const cat = {}; d.forEach(c => cat[c.type] = (cat[c.type]||0) + c.amount);
             if(barChartInstance) barChartInstance.destroy();
             barChartInstance = new Chart(document.getElementById('barChart').getContext('2d'), {
@@ -2017,7 +2004,6 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: gC }, ticks: { color: tC, font:{weight:'bold'} } }, x: { grid: { display: false }, ticks: { color: tC, font:{weight:'bold'} } } } }
             });
 
-            // 3. Doughnut (Status)
             const st = { 'Selesai Dibayar':0, 'Separa Dibayar':0, 'Menunggu':0 }; 
             d.forEach(c => {
                 let sl = c.status.toLowerCase();
@@ -2030,7 +2016,6 @@
                 options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: tC, usePointStyle: true, font:{weight:'bold', size:11}, padding: 20 } } } }
             });
 
-            // 4. Staff Bar Chart (Superadmin Only)
             const staffContainer = document.getElementById('staffChartContainer');
             if (currentUser.isSuperadmin) {
                 staffContainer.classList.remove('hidden');
@@ -2040,7 +2025,6 @@
                     staffAmt[c.name] = (staffAmt[c.name] || 0) + c.amount;
                 });
                 
-                // Sort by total amount descending, and grab top 10
                 const sortedStaff = Object.entries(staffAmt)
                     .sort((a, b) => b[1] - a[1])
                     .slice(0, 10);
@@ -2061,7 +2045,7 @@
                         }] 
                     },
                     options: { 
-                        indexAxis: 'y', // Horizontal bars are easier to read for long names
+                        indexAxis: 'y', 
                         responsive: true, 
                         maintainAspectRatio: false, 
                         plugins: { 
