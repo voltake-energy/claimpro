@@ -1461,11 +1461,12 @@
                 }
 
                 grps.forEach(g => {
+                    const safeName = g.name.replace(/'/g, "\\'");
                     const isBal = g.bal > 0;
                     const st = isBal ? (g.tPaid > 0 ? 'Separa' : 'Ada Baki') : 'Selesai';
                     const c = isBal ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
                     const btn = isBal 
-                        ? `<button onclick="openPaymentModal('${g.name}')" class="text-xs font-bold bg-pbi-blue text-white px-4 py-2 rounded-lg shadow-sm hover:bg-blue-600 transition-colors">Bayar</button>`
+                        ? `<button onclick="openPaymentModal('${safeName}')" class="text-xs font-bold bg-pbi-blue text-white px-4 py-2 rounded-lg shadow-sm hover:bg-blue-600 transition-colors">Bayar</button>`
                         : `<span class="text-xs font-bold text-gray-400 px-4 py-2 bg-gray-50 dark:bg-[#1f1f1f] rounded-lg border border-gray-200 dark:border-gray-800">Selesai</span>`;
 
                     const tr = document.createElement('tr'); tr.className = 'hover:bg-gray-50 dark:hover:bg-[#2e2e2e] transition-colors';
@@ -1476,13 +1477,14 @@
                         <td class="px-6 py-4 text-right text-sm text-pbi-green font-extrabold">${formatRM(g.tPaid)}</td>
                         <td class="px-6 py-4 text-right text-sm text-red-500 font-extrabold">${formatRM(g.bal)}</td>
                         <td class="px-6 py-4 text-center"><span class="px-3 py-1 text-[11px] uppercase tracking-wider font-extrabold rounded-full ${c}">${st}</span></td>
-                        <td class="px-6 py-4 text-right space-x-2">${btn} <button onclick="viewAdminDetails('${g.name}')" class="text-xs font-bold border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Details</button></td>
+                        <td class="px-6 py-4 text-right space-x-2">${btn} <button onclick="viewAdminDetails('${safeName}')" class="text-xs font-bold border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Details</button></td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
         }
 
+        // --- PAYMENT MODAL SELECTION LOGIC ---
         function getMedicalPaid(empName, year) {
             let used = 0;
             claimsData.forEach(c => {
