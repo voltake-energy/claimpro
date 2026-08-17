@@ -22,6 +22,10 @@
     
     <!-- Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+    <!-- jsPDF untuk Export Laporan PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -113,7 +117,7 @@
                 </div>
                 <p id="loginError" class="text-red-500 text-xs hidden mb-4 font-semibold"><i class="ph-fill ph-warning-circle"></i> Sila pilih pekerja yang sah dari senarai.</p>
 
-                <!-- Container Kata Laluan -->
+                <!-- Container Kata Laluan (Akan dipaparkan bila nama dipilih) -->
                 <div id="passwordContainer" class="hidden relative mb-6">
                     <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Kata Laluan</label>
                     <div class="relative">
@@ -275,7 +279,7 @@
                             <!-- Pax -->
                             <div class="space-y-2">
                                 <label class="block text-sm font-bold text-gray-700 dark:text-gray-300">Bilangan Pax <span class="text-red-500">*</span></label>
-                                <input type="number" id="cPax" min="1" value="1" required oninput="updateMealLimitInfo('new')" class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow font-medium">
+                                <input type="number" id="cPax" min="1" value="1" required oninput="validateAmount('new')" class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-shadow font-medium">
                             </div>
                         </div>
 
@@ -284,11 +288,11 @@
                             <label class="block text-sm font-bold text-gray-700 dark:text-gray-300">Sesi Makan (Khusus untuk Makan & Minum) <span class="text-red-500">*</span></label>
                             <div class="flex gap-4">
                                 <label class="flex items-center justify-center gap-2 cursor-pointer p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-[#1f1f1f] flex-1 hover:border-pbi-blue transition-colors">
-                                    <input type="checkbox" id="cMealSiang" value="Siang" onchange="updateMealLimitInfo('new')" class="w-5 h-5 text-pbi-blue rounded border-gray-300 focus:ring-pbi-blue">
+                                    <input type="checkbox" id="cMealSiang" value="Siang" onchange="validateAmount('new')" class="w-5 h-5 text-pbi-blue rounded border-gray-300 focus:ring-pbi-blue">
                                     <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Siang</span>
                                 </label>
                                 <label class="flex items-center justify-center gap-2 cursor-pointer p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-[#1f1f1f] flex-1 hover:border-pbi-blue transition-colors">
-                                    <input type="checkbox" id="cMealMalam" value="Malam" onchange="updateMealLimitInfo('new')" class="w-5 h-5 text-pbi-blue rounded border-gray-300 focus:ring-pbi-blue">
+                                    <input type="checkbox" id="cMealMalam" value="Malam" onchange="validateAmount('new')" class="w-5 h-5 text-pbi-blue rounded border-gray-300 focus:ring-pbi-blue">
                                     <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Malam</span>
                                 </label>
                             </div>
@@ -314,23 +318,24 @@
                             <p id="medicalWarnText" class="text-red-500 text-xs font-bold mt-2 hidden"><i class="ph-fill ph-warning-circle"></i> Tuntutan anda melebihi baki perubatan tahunan. Sila kurangkan jumlah.</p>
                         </div>
 
-                        <!-- File Upload -->
+                        <!-- File Upload (Boleh Pilih Pelbagai Resit) -->
                         <div class="space-y-2">
                             <label class="block text-sm font-bold text-gray-700 dark:text-gray-300">Muat Naik Resit (PDF/Imej) atau Tangkap Gambar <span class="text-red-500">*</span></label>
+                            <p class="text-[11px] text-gray-500 font-bold">Boleh pilih lebih dari satu resit untuk satu permohonan yang sama.</p>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                                 <label class="flex flex-col items-center justify-center p-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl hover:border-pbi-blue dark:hover:border-pbi-blue hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer bg-gray-50 dark:bg-[#202020]">
                                     <i class="ph ph-file-arrow-up text-4xl text-gray-400 group-hover:text-pbi-blue mb-3 transition-colors"></i>
-                                    <span id="file-name-display" class="text-sm font-bold text-pbi-blue text-center line-clamp-2 px-2">Pilih Fail / Gambar</span>
-                                    <input type="file" id="cReceiptFile" accept=".pdf, image/png, image/jpeg, image/jpg" class="hidden" onchange="handleFileSelect('file')">
+                                    <span id="file-name-display" class="text-sm font-bold text-pbi-blue text-center line-clamp-2 px-2">Pilih Fail(s) / Gambar</span>
+                                    <!-- MULTIPLE -->
+                                    <input type="file" id="cReceiptFile" accept=".pdf, image/png, image/jpeg, image/jpg" multiple class="hidden" onchange="handleFileSelect('file')">
                                 </label>
                                 <label class="flex flex-col items-center justify-center p-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl hover:border-pbi-blue dark:hover:border-pbi-blue hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer bg-gray-50 dark:bg-[#202020]">
                                     <i class="ph ph-camera text-4xl text-gray-400 group-hover:text-pbi-blue mb-3 transition-colors"></i>
                                     <span id="camera-name-display" class="text-sm font-bold text-pbi-blue text-center line-clamp-2 px-2">Buka Kamera Semasa</span>
-                                    <input type="file" id="cReceiptCam" accept="image/*" capture="environment" class="hidden" onchange="handleFileSelect('cam')">
+                                    <input type="file" id="cReceiptCam" accept="image/*" capture="environment" multiple class="hidden" onchange="handleFileSelect('cam')">
                                 </label>
                             </div>
-                            <p id="receiptError" class="text-red-500 text-xs mt-1.5 hidden font-bold"><i class="ph-fill ph-warning-circle"></i> Sila muat naik satu fail atau tangkap gambar resit terlebih dahulu.</p>
-                            <input type="hidden" id="selectedFileName">
+                            <p id="receiptError" class="text-red-500 text-xs mt-1.5 hidden font-bold"><i class="ph-fill ph-warning-circle"></i> Sila muat naik sekurang-kurangnya satu fail atau tangkap gambar resit terlebih dahulu.</p>
                         </div>
 
                         <div class="pt-6 flex flex-col-reverse sm:flex-row justify-end gap-3 border-t border-gray-100 dark:border-gray-800">
@@ -345,7 +350,7 @@
 
             <!-- VIEW 2: Semakan HR / Admin (Group) -->
             <div id="view-admin" class="view-section hidden flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-7xl mx-auto">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-gray-200 dark:border-gray-800 pb-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4 border-b border-gray-200 dark:border-gray-800 pb-4">
                     <div>
                         <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">Semakan Pukal HR</h2>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 font-medium">Urus dan laksanakan pembayaran secara berkumpulan.</p>
@@ -358,7 +363,7 @@
                             <button type="button" onclick="filterAdminTable('Semua')" id="filter-all" class="px-5 py-2.5 text-sm font-bold rounded-md border-none text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all">Semua</button>
                         </div>
                         
-                        <!-- NEW ADMIN DATE FILTER -->
+                        <!-- FILTER TARIKH DIREKODKAN UNTUK ADMIN + EXPORT BUTTONS -->
                         <div class="flex flex-col sm:flex-row items-end sm:items-center gap-2">
                             <div class="flex items-center space-x-2 bg-white dark:bg-[#252525] px-3 py-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                                 <label class="text-xs text-gray-500 dark:text-gray-400 font-bold">Mula:</label>
@@ -368,10 +373,32 @@
                                 <label class="text-xs text-gray-500 dark:text-gray-400 font-bold">Akhir:</label>
                                 <input type="date" id="adminEndDate" onchange="updateAdminTable()" class="text-sm border-none bg-transparent focus:ring-0 text-gray-900 dark:text-white font-bold outline-none">
                             </div>
-                            <button onclick="resetAdminDateFilter()" class="p-2.5 bg-white dark:bg-[#252525] text-gray-600 dark:text-gray-300 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" title="Set Semula">
+                            <button onclick="resetAdminDateFilter()" class="p-2.5 bg-white dark:bg-[#252525] text-gray-600 dark:text-gray-300 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors mr-2" title="Set Semula">
                                 <i class="ph ph-arrows-counter-clockwise text-lg"></i>
                             </button>
+                            <button onclick="exportAdminCSV()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center">
+                                <i class="ph-fill ph-file-csv mr-1.5 text-base"></i> CSV
+                            </button>
+                            <button onclick="exportAdminPDF()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center">
+                                <i class="ph-fill ph-file-pdf mr-1.5 text-base"></i> PDF
+                            </button>
                         </div>
+                    </div>
+                </div>
+
+                <!-- ADMIN SUMMARY CARD -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
+                    <div class="bg-white dark:bg-[#252525] p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-center">
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Jumlah Kasar Ditapis</p>
+                        <h4 class="text-2xl font-extrabold text-gray-900 dark:text-white" id="adminSumKasar">RM 0.00</h4>
+                    </div>
+                    <div class="bg-white dark:bg-[#252525] p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-center">
+                        <p class="text-xs font-bold text-pbi-green uppercase tracking-widest mb-1">Telah Dibayar (Filter)</p>
+                        <h4 class="text-2xl font-extrabold text-pbi-green" id="adminSumDibayar">RM 0.00</h4>
+                    </div>
+                    <div class="bg-white dark:bg-[#252525] p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-center">
+                        <p class="text-xs font-bold text-pbi-orange uppercase tracking-widest mb-1">Baki Semasa (Filter)</p>
+                        <h4 class="text-2xl font-extrabold text-pbi-orange" id="adminSumBaki">RM 0.00</h4>
                     </div>
                 </div>
 
@@ -508,7 +535,7 @@
                                     <th scope="col" class="px-5 py-4 text-left font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Kategori</th>
                                     <th scope="col" class="px-5 py-4 text-right font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Jumlah (RM)</th>
                                     <th scope="col" class="px-5 py-4 text-center font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                                    <th scope="col" class="px-5 py-4 text-right font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tindakan</th>
+                                    <th scope="col" class="px-5 py-4 text-center font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tindakan</th>
                                 </tr>
                             </thead>
                             <tbody id="dashTableBody" class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-[#252525]">
@@ -580,7 +607,7 @@
                             <div class="flex items-center">
                                 <i class="ph-fill ph-file-pdf text-4xl text-pbi-blue mr-4"></i>
                                 <div>
-                                    <p class="text-sm font-bold text-gray-900 dark:text-white">Bukti Perbelanjaan</p>
+                                    <p class="text-sm font-bold text-gray-900 dark:text-white" id="transReceiptCountTitle">Bukti Perbelanjaan</p>
                                     <p class="text-[11px] font-semibold text-gray-500 mt-0.5">Dimuat naik oleh pekerja</p>
                                 </div>
                             </div>
@@ -615,7 +642,7 @@
                     </div>
                     <div class="space-y-1.5">
                         <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Pax</label>
-                        <input type="number" id="ePax" min="1" required oninput="updateMealLimitInfo('edit')" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm">
+                        <input type="number" id="ePax" min="1" required oninput="validateAmount('edit')" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm">
                     </div>
                 </div>
                 
@@ -635,11 +662,11 @@
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Sesi Makan</label>
                     <div class="flex gap-3">
                         <label class="flex items-center gap-2 cursor-pointer p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700/50 flex-1">
-                            <input type="checkbox" id="eMealSiang" value="Siang" onchange="updateMealLimitInfo('edit')" class="w-4 h-4 text-pbi-blue rounded">
+                            <input type="checkbox" id="eMealSiang" value="Siang" onchange="validateAmount('edit')" class="w-4 h-4 text-pbi-blue rounded">
                             <span class="text-xs font-bold text-gray-700 dark:text-gray-300">Siang</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700/50 flex-1">
-                            <input type="checkbox" id="eMealMalam" value="Malam" onchange="updateMealLimitInfo('edit')" class="w-4 h-4 text-pbi-blue rounded">
+                            <input type="checkbox" id="eMealMalam" value="Malam" onchange="validateAmount('edit')" class="w-4 h-4 text-pbi-blue rounded">
                             <span class="text-xs font-bold text-gray-700 dark:text-gray-300">Malam</span>
                         </label>
                     </div>
@@ -658,8 +685,8 @@
                 </div>
                 
                 <div class="space-y-1.5 pt-2">
-                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Resit Baru (Biarkan kosong jika tiada perubahan)</label>
-                    <input type="file" id="eReceipt" accept=".pdf, image/*" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-pbi-blue file:text-white hover:file:bg-blue-600 file:cursor-pointer bg-gray-50 dark:bg-[#1f1f1f] border border-gray-300 dark:border-gray-600 rounded-lg">
+                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Resit Baru (Biarkan kosong jika tiada perubahan. Boleh pilih lebih dari 1 fail)</label>
+                    <input type="file" id="eReceipt" accept=".pdf, image/*" multiple class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-pbi-blue file:text-white hover:file:bg-blue-600 file:cursor-pointer bg-gray-50 dark:bg-[#1f1f1f] border border-gray-300 dark:border-gray-600 rounded-lg">
                 </div>
                 
                 <div class="pt-4 border-t border-gray-100 dark:border-gray-800 mt-4 shrink-0">
@@ -777,24 +804,30 @@
         </div>
     </div>
 
-    <!-- Modal Document Viewer -->
+    <!-- Modal Document Viewer (Dengan Slider Multiresit) -->
     <div id="receiptViewerModal" class="fixed inset-0 bg-gray-900/80 dark:bg-black/90 hidden z-[60] flex items-center justify-center backdrop-blur-md p-4 md:p-8 transition-opacity">
-        <div class="bg-white dark:bg-[#252525] rounded-2xl shadow-2xl w-full max-w-4xl h-[85vh] flex flex-col border border-gray-200 dark:border-gray-800 overflow-hidden">
-            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#1f1f1f] shrink-0">
+        <div class="bg-white dark:bg-[#252525] rounded-2xl shadow-2xl w-full max-w-4xl h-[85vh] flex flex-col border border-gray-200 dark:border-gray-800 overflow-hidden relative">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#1f1f1f] shrink-0 z-20 relative">
                 <div>
                     <h3 id="receiptViewerTitle" class="text-lg font-extrabold text-gray-900 dark:text-white tracking-tight">Paparan Dokumen</h3>
                     <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 font-semibold uppercase tracking-wider">Pratonton Langsung Google Drive</p>
                 </div>
-                <div class="flex items-center gap-3">
-                    <button onclick="downloadCurrentReceipt()" class="flex items-center px-4 py-2 bg-pbi-blue hover:bg-blue-600 text-white rounded-lg text-xs font-bold transition-colors shadow-sm">
-                        <i class="ph-fill ph-download-simple mr-2 text-lg"></i> Muat Turun
+                <div class="flex items-center gap-2 md:gap-3">
+                    <button onclick="changeReceiptSlide(-1)" id="btnPrevReceipt" class="hidden px-3 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-white rounded-lg text-xs font-bold transition-colors">
+                        <i class="ph-fill ph-caret-left text-lg"></i>
                     </button>
-                    <button onclick="closeReceiptViewer()" class="text-gray-400 hover:text-gray-600 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 p-2 rounded-full transition-colors">
+                    <button onclick="changeReceiptSlide(1)" id="btnNextReceipt" class="hidden px-3 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-white rounded-lg text-xs font-bold transition-colors">
+                        <i class="ph-fill ph-caret-right text-lg"></i>
+                    </button>
+                    <button onclick="downloadCurrentReceipt()" class="flex items-center px-4 py-2 bg-pbi-blue hover:bg-blue-600 text-white rounded-lg text-xs font-bold transition-colors shadow-sm ml-2">
+                        <i class="ph-fill ph-download-simple md:mr-2 text-lg"></i> <span class="hidden md:inline">Muat Turun</span>
+                    </button>
+                    <button onclick="closeReceiptViewer()" class="text-gray-400 hover:text-gray-600 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 p-2 rounded-full transition-colors ml-2">
                         <i class="ph ph-x text-xl"></i>
                     </button>
                 </div>
             </div>
-            <div class="flex-1 bg-gray-200 dark:bg-black relative">
+            <div class="flex-1 bg-gray-200 dark:bg-black relative z-10">
                 <div class="absolute inset-0 flex flex-col items-center justify-center z-0">
                     <i class="ph ph-spinner animate-spin text-5xl text-pbi-blue mb-4"></i>
                     <p class="text-sm font-bold text-gray-600 dark:text-gray-400">Memuatkan dokumen selamat...</p>
@@ -827,7 +860,9 @@
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Sahkan Kata Laluan Baru</label>
                     <input type="password" id="pwdConfirm" required minlength="4" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue text-sm">
                 </div>
+                
                 <p id="pwdError" class="text-red-500 text-xs font-bold hidden mt-2"><i class="ph-fill ph-warning-circle"></i> Ralat kata laluan.</p>
+                
                 <button type="submit" id="btnSubmitPassword" class="w-full mt-4 py-3 bg-pbi-blue text-white rounded-lg text-sm font-extrabold shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-colors flex items-center justify-center disabled:opacity-50">
                     Sahkan Pertukaran
                 </button>
@@ -839,15 +874,18 @@
     <!-- JAVASCRIPT LOGIC -->
     <!-- ============================================== -->
     <script>
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxk6mGGCwNGlIIrTp1_4X-hMKSuvfZmL7gCqTkmxEWkxz-i4diYooxCwaHurLJ1vqbeKg/exec"; 
+        // --- 0. KONFIGURASI APP SCRIPT URL & CONSTANTS ---
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHOnaNpu1w6YSfVYn1qgKeeg0_4LPTvC98BVMMtysSoX_8xW9SE_mKc1WzVRHB9mfMSg/exec"; 
         const sheetCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?output=csv';
         const claimsCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?gid=1560350142&single=true&output=csv';
         const ANNUAL_MEDICAL_LIMIT = 350;
 
+        // --- 1. STATE VARIABLES ---
         let currentUser = null; 
         let employeesList = []; 
         let claimsData = [];
         let currentFilter = 'Ada Baki'; 
+        let currentAdminData = []; // Store current filtered data for Export
         let barChartInstance = null;
         let doughnutChartInstance = null;
         let lineChartInstance = null;
@@ -857,6 +895,12 @@
         const ADMIN_ITEMS_PER_PAGE = 20;
         const pbiColors = ['#118DFF', '#12239E', '#E66C37', '#6B007B', '#00B01A', '#00A638', '#33A1FD', '#FFA300', '#A6A6A6', '#D13438'];
 
+        // Variables for Receipt Slider
+        let currentReceiptUrls = [];
+        let currentReceiptIndex = 0;
+        let currentReceiptTitleBase = "";
+
+        // --- 2. INIT & AUTO-LOGIN ---
         document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('cDate').valueAsDate = new Date();
             
@@ -896,7 +940,7 @@
                     if(!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
                     if(!document.getElementById('view-dashboard').classList.contains('hidden')) updateDashboard();
                     updatePendingBadge();
-                    validateAmount('new');
+                    handleTypeChange('new'); 
                 }
             });
         }
@@ -1062,7 +1106,7 @@
                     document.getElementById('dashSubtitle').innerText = 'Tinjauan Peribadi';
                 }
                 
-                updatePendingBadge(); navigate('submit'); validateAmount('new');
+                updatePendingBadge(); navigate('submit'); handleTypeChange('new');
             }, 300);
         }
 
@@ -1137,9 +1181,7 @@
             document.getElementById('changePasswordModal').classList.remove('hidden');
         }
 
-        function closePasswordModal() {
-            document.getElementById('changePasswordModal').classList.add('hidden');
-        }
+        function closePasswordModal() { document.getElementById('changePasswordModal').classList.add('hidden'); }
 
         function submitChangePassword(e) {
             e.preventDefault();
@@ -1175,10 +1217,8 @@
                 if (res.status === 'success') {
                     currentUser.password = newPwd;
                     localStorage.setItem('claimProUser', JSON.stringify(currentUser));
-                    
                     const empIndex = employeesList.findIndex(emp => emp.id === currentUser.id);
                     if (empIndex > -1) employeesList[empIndex].password = newPwd;
-                    
                     closePasswordModal();
                     showSuccessPopup("Kata laluan anda berjaya dikemaskini.");
                 } else throw new Error(res.message);
@@ -1202,7 +1242,6 @@
             
             if (type === 'Makan & Minum') {
                 mealContainer.classList.remove('hidden');
-                updateMealLimitInfo(mode);
             } else {
                 mealContainer.classList.add('hidden');
                 document.getElementById(prefix + 'MealSiang').checked = false;
@@ -1214,32 +1253,6 @@
             validateAmount(mode);
         }
 
-        function updateMealLimitInfo(mode) {
-            const prefix = mode === 'new' ? 'c' : 'e';
-            const type = document.getElementById(prefix + 'Type').value;
-            if (type !== 'Makan & Minum') return;
-
-            const pax = parseInt(document.getElementById(prefix + 'Pax').value) || 1;
-            const siangChecked = document.getElementById(prefix + 'MealSiang').checked;
-            const malamChecked = document.getElementById(prefix + 'MealMalam').checked;
-
-            let total = 0;
-            if (siangChecked) total += 10;
-            if (malamChecked) total += 15;
-
-            const maxLimit = total * pax;
-            document.getElementById(prefix + 'Amount').dataset.maxMeal = maxLimit;
-            
-            const limitText = document.getElementById(prefix + 'MealLimitText');
-            if (maxLimit > 0) {
-                limitText.innerHTML = `<i class="ph-fill ph-info"></i> Maksimum dibenarkan: RM ${maxLimit.toFixed(2)}`;
-                limitText.classList.remove('hidden');
-            } else {
-                limitText.classList.add('hidden');
-            }
-            validateAmount(mode);
-        }
-
         function validateAmount(mode) {
             const prefix = mode === 'new' ? 'c' : 'e';
             const type = document.getElementById(prefix + 'Type').value;
@@ -1247,6 +1260,7 @@
             const inputAmt = parseFloat(inputAmtEl.value) || 0;
             let isValid = true;
 
+            // Medical check for New Form only
             if (mode === 'new') {
                 const medWarnText = document.getElementById('medicalWarnText');
                 if (type === 'Perubatan') {
@@ -1267,26 +1281,49 @@
                 }
             }
 
+            // Makan & Minum Limit Check
             const mealWarnText = document.getElementById(prefix + 'MealWarnText');
+            const mealLimitText = document.getElementById(prefix + 'MealLimitText');
+
             if (type === 'Makan & Minum') {
-                const maxMeal = parseFloat(inputAmtEl.dataset.maxMeal) || 0;
+                const pax = parseInt(document.getElementById(prefix + 'Pax').value) || 1;
+                const siangChecked = document.getElementById(prefix + 'MealSiang').checked;
+                const malamChecked = document.getElementById(prefix + 'MealMalam').checked;
+
+                let rate = 0;
+                if (siangChecked && !malamChecked) rate = 10;
+                else if (!siangChecked && malamChecked) rate = 15;
+                else if (siangChecked && malamChecked) rate = 25;
+
+                const maxMeal = rate * pax;
+                inputAmtEl.dataset.maxMeal = maxMeal;
+
+                if (maxMeal > 0) {
+                    mealLimitText.innerHTML = `<i class="ph-fill ph-info"></i> Maksimum yang dibenarkan: RM ${maxMeal.toFixed(2)}`;
+                    mealLimitText.classList.remove('hidden');
+                } else {
+                    mealLimitText.classList.add('hidden');
+                }
+                
                 if (maxMeal === 0) {
                     if (inputAmt > 0) {
-                        mealWarnText.innerHTML = `<i class="ph-fill ph-warning-circle"></i> Sila pilih sesi makan (Siang/Malam).`;
+                        mealWarnText.innerHTML = `<i class="ph-fill ph-warning-circle"></i> Sila pilih sekurang-kurangnya 1 sesi makan (Siang/Malam).`;
                         mealWarnText.classList.remove('hidden'); isValid = false;
                     } else {
                         mealWarnText.classList.add('hidden');
                     }
                 } else if (inputAmt > maxMeal) {
-                    mealWarnText.innerHTML = `<i class="ph-fill ph-warning-circle"></i> Melebihi had maksimum yang dibenarkan (RM ${maxMeal.toFixed(2)}).`;
+                    mealWarnText.innerHTML = `<i class="ph-fill ph-warning-circle"></i> Nilai melepasi kelayakan maksimum (RM ${maxMeal.toFixed(2)}). Sila kurangkan jumlah.`;
                     mealWarnText.classList.remove('hidden'); isValid = false;
                 } else {
                     mealWarnText.classList.add('hidden');
                 }
             } else {
                 if (mealWarnText) mealWarnText.classList.add('hidden');
+                if (mealLimitText) mealLimitText.classList.add('hidden');
             }
 
+            // UI Submit Button styling
             const btnSubmit = document.getElementById(mode === 'new' ? 'btnSubmitClaim' : 'btnSubmitEdit');
             if (!isValid) {
                 inputAmtEl.classList.add('border-red-500', 'ring-red-500');
@@ -1308,8 +1345,10 @@
             const odid = src === 'file' ? 'camera-name-display' : 'file-name-display';
             
             if (fi.files && fi.files.length > 0) {
-                document.getElementById(did).innerText = fi.files[0].name; document.getElementById('selectedFileName').value = fi.files[0].name;
-                oi.value = ""; document.getElementById(odid).innerText = src === 'file' ? 'Buka Kamera Semasa' : 'Pilih Fail / Gambar';
+                let displayText = fi.files.length === 1 ? fi.files[0].name : `${fi.files.length} Fail Dipilih`;
+                document.getElementById(did).innerText = displayText; 
+                document.getElementById('selectedFileName').value = displayText;
+                oi.value = ""; document.getElementById(odid).innerText = src === 'file' ? 'Buka Kamera Semasa' : 'Pilih Fail(s) / Gambar';
                 document.getElementById('receiptError').classList.add('hidden');
             }
         }
@@ -1317,22 +1356,20 @@
         function resetForm() {
             document.getElementById('claimForm').reset();
             document.getElementById('cReceiptFile').value = ""; document.getElementById('cReceiptCam').value = "";
-            document.getElementById('file-name-display').innerText = 'Pilih Fail / Gambar'; document.getElementById('camera-name-display').innerText = 'Buka Kamera Semasa';
+            document.getElementById('file-name-display').innerText = 'Pilih Fail(s) / Gambar'; document.getElementById('camera-name-display').innerText = 'Buka Kamera Semasa';
             document.getElementById('selectedFileName').value = ""; document.getElementById('receiptError').classList.add('hidden');
             if(currentUser) document.getElementById('cNameInputLocked').value = currentUser.name;
             handleTypeChange('new');
         }
 
-        function submitClaim(e) {
+        async function submitClaim(e) {
             e.preventDefault();
             if(document.getElementById('btnSubmitClaim').disabled) return;
-            const fn = document.getElementById('selectedFileName').value;
-            if(!fn) { document.getElementById('receiptError').classList.remove('hidden'); return; }
-
-            showLoadingOverlay("Menghantar tuntutan ke pangkalan data...");
-
+            
             let fileInput = document.getElementById('cReceiptFile').files.length > 0 ? document.getElementById('cReceiptFile') : document.getElementById('cReceiptCam');
-            let file = fileInput.files[0];
+            if(fileInput.files.length === 0) { document.getElementById('receiptError').classList.remove('hidden'); return; }
+
+            showLoadingOverlay("Memuat naik dan menghantar tuntutan...");
 
             const now = new Date();
             const yy = String(now.getFullYear()).slice(-2);
@@ -1341,7 +1378,6 @@
             const hh = String(now.getHours()).padStart(2, '0');
             const min = String(now.getMinutes()).padStart(2, '0');
             const firstName = currentUser.name.split(' ')[0].toUpperCase();
-            
             const newId = `CLM-${yy}${mm}${dd}-${hh}${min}-${firstName}`;
             
             let finalDesc = document.getElementById('cDesc').value;
@@ -1358,27 +1394,43 @@
                 id: newId, name: currentUser.name, date: document.getElementById('cDate').value,
                 type: document.getElementById('cType').value, pax: parseInt(document.getElementById('cPax').value),
                 desc: finalDesc, amount: parseFloat(document.getElementById('cAmount').value),
-                paid: 0, status: 'Menunggu', fileName: file.name, fileMimeType: file.type
+                paid: 0, status: 'Menunggu'
             };
 
-            let reader = new FileReader();
-            reader.onload = async function() {
-                claimRecord.fileBase64 = reader.result.split(',')[1];
-                try {
-                    let response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(claimRecord) });
-                    let result = await response.json();
-                    if(result.status === 'success') {
-                        claimRecord.receiptUrl = result.fileUrl; claimRecord.timestamp = Date.now(); claimsData.unshift(claimRecord);
-                        resetForm(); updatePendingBadge(); 
-                        hideLoadingOverlay();
-                        setTimeout(() => showSuccessPopup(`Tuntutan anda (ID: ${newId}) berjaya direkodkan. Sila tunggu semakan HR.`), 350);
-                    } else throw new Error(result.message);
-                } catch (error) { 
+            // Baca Semua Fail yang dipilih
+            let filePromises = Array.from(fileInput.files).map(file => {
+                return new Promise((resolve, reject) => {
+                    let reader = new FileReader();
+                    reader.onload = () => resolve({
+                        fileName: file.name,
+                        fileMimeType: file.type,
+                        fileBase64: reader.result.split(',')[1]
+                    });
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            try {
+                let filesData = await Promise.all(filePromises);
+                claimRecord.files = filesData; 
+
+                let response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(claimRecord) });
+                let result = await response.json();
+                
+                if(result.status === 'success') {
+                    claimRecord.receiptUrl = result.fileUrl; 
+                    claimRecord.timestamp = Date.now(); 
+                    claimsData.unshift(claimRecord);
+                    
+                    resetForm(); updatePendingBadge(); 
                     hideLoadingOverlay();
-                    alert("Ralat Sila pastikan APPS_SCRIPT_URL tepat."); 
-                } 
-            };
-            reader.readAsDataURL(file);
+                    setTimeout(() => showSuccessPopup(`Tuntutan anda (ID: ${newId}) berjaya direkodkan.`), 350);
+                } else throw new Error(result.message);
+            } catch (error) { 
+                hideLoadingOverlay();
+                alert("Ralat Sila pastikan APPS_SCRIPT_URL tepat dan internet stabil."); 
+            } 
         }
 
         function getAdminFilteredClaims() {
@@ -1386,7 +1438,7 @@
             const ed = document.getElementById('adminEndDate') ? document.getElementById('adminEndDate').value : '';
             
             return claimsData.filter(c => {
-                const cd = new Date(c.timestamp); 
+                const cd = new Date(c.timestamp); // Filter ikut tarikh timestamp direkodkan
                 if (sd && ed) { 
                     const e = new Date(ed); e.setHours(23,59,59); 
                     return cd >= new Date(sd) && cd <= e; 
@@ -1450,6 +1502,16 @@
             if (currentFilter === 'Ada Baki') grps = grps.filter(g => g.bal > 0);
             if (currentFilter === 'Selesai') grps = grps.filter(g => g.bal === 0);
 
+            // Simpan currentAdminData untuk fungsi muat turun laporan
+            currentAdminData = grps;
+
+            // Update Summary Cards
+            let sumKasar = 0, sumDibayar = 0, sumBaki = 0;
+            grps.forEach(g => { sumKasar += g.tAmt; sumDibayar += g.tPaid; sumBaki += g.bal; });
+            document.getElementById('adminSumKasar').innerText = formatRM(sumKasar);
+            document.getElementById('adminSumDibayar').innerText = formatRM(sumDibayar);
+            document.getElementById('adminSumBaki').innerText = formatRM(sumBaki);
+
             if (grps.length === 0) { 
                 empty.classList.remove('hidden'); tbody.parentNode.classList.add('hidden'); pagination.classList.add('hidden');
             } else {
@@ -1471,7 +1533,7 @@
                 }
 
                 grps.forEach(g => {
-                    const safeName = g.name.replace(/'/g, "\\'");
+                    const safeName = g.name.replace(/'/g, "\\'"); // Betulkan isu tanda petik
                     const isBal = g.bal > 0;
                     const st = isBal ? (g.tPaid > 0 ? 'Separa' : 'Ada Baki') : 'Selesai';
                     const c = isBal ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
@@ -1492,6 +1554,55 @@
                     tbody.appendChild(tr);
                 });
             }
+        }
+
+        function exportAdminCSV() {
+            if(!currentAdminData || currentAdminData.length === 0) return alert("Tiada data untuk dieksport.");
+            let csvContent = "data:text/csv;charset=utf-8,Nama Pekerja,Bil. Tuntutan,Kasar (RM),Dibayar (RM),Baki (RM)\n";
+            
+            currentAdminData.forEach(g => {
+                let row = `"${g.name}",${g.count},${g.tAmt.toFixed(2)},${g.tPaid.toFixed(2)},${g.bal.toFixed(2)}`;
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Laporan_HR_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function exportAdminPDF() {
+            if(!currentAdminData || currentAdminData.length === 0) return alert("Tiada data untuk dieksport.");
+            if(!window.jspdf) return alert("Sistem PDF sedang dimuatkan, cuba sebentar lagi.");
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(16);
+            doc.text("Laporan Semakan Pukal Tuntutan HR", 14, 15);
+            doc.setFontSize(10);
+            doc.text("Tarikh Janaan: " + formatDate(new Date()), 14, 22);
+
+            let tableData = currentAdminData.map(g => [
+                g.name, 
+                g.count + " Rekod", 
+                "RM " + g.tAmt.toFixed(2), 
+                "RM " + g.tPaid.toFixed(2), 
+                "RM " + g.bal.toFixed(2)
+            ]);
+
+            doc.autoTable({
+                head: [['Nama Pekerja', 'Bil. Tuntutan', 'Kasar', 'Dibayar', 'Baki']],
+                body: tableData,
+                startY: 28,
+                theme: 'striped',
+                headStyles: { fillColor: [17, 141, 255] }
+            });
+
+            doc.save(`Laporan_HR_${new Date().toISOString().slice(0,10)}.pdf`);
         }
 
         function getMedicalPaid(empName, year) {
@@ -1603,7 +1714,6 @@
             } else {
                 errMed.classList.add('hidden'); btn.disabled = !anyChecked || total <= 0;
             }
-
             return total;
         }
 
@@ -1698,43 +1808,6 @@
         }
         function closeDetailsModal() { document.getElementById('detailsModal').classList.add('hidden'); }
 
-        function openReceiptViewerFromLink(linkId) {
-            const anchor = document.getElementById(linkId);
-            if(anchor && anchor.getAttribute('data-href')) {
-                openReceiptViewer(anchor.getAttribute('data-href'), 'Paparan Dokumen');
-            }
-        }
-
-        function openReceiptViewer(url, title) {
-            document.getElementById('receiptViewerTitle').innerText = title || "Paparan Dokumen";
-            let previewUrl = url;
-            if (previewUrl.includes('drive.google.com/file/d/')) previewUrl = previewUrl.replace(/\/view.*/, '/preview');
-            document.getElementById('receiptIframe').src = previewUrl;
-            document.getElementById('receiptViewerModal').setAttribute('data-current-url', url);
-            document.getElementById('receiptViewerModal').classList.remove('hidden');
-        }
-        
-        function closeReceiptViewer() { 
-            document.getElementById('receiptViewerModal').classList.add('hidden'); 
-            document.getElementById('receiptIframe').src = ''; 
-        }
-
-        function downloadCurrentReceipt() {
-            const url = document.getElementById('receiptViewerModal').getAttribute('data-current-url');
-            if(!url) return;
-            let downloadUrl = url;
-            const match = url.match(/\/d\/(.+?)\//);
-            if(match && match[1]) {
-                downloadUrl = `https://drive.google.com/uc?export=download&id=${match[1]}`;
-            }
-            const a = document.createElement('a');
-            a.href = downloadUrl;
-            a.target = '_blank';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
         function viewTransaction(id) {
             const c = claimsData.find(claim => claim.id === id); if(!c) return;
 
@@ -1748,8 +1821,16 @@
             else badge.className = "px-2 py-0.5 rounded text-[10px] font-extrabold mr-2 uppercase bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300";
 
             const rLink = document.getElementById('transReceiptLink');
-            if (c.receiptUrl) { rLink.setAttribute('data-href', c.receiptUrl); rLink.innerText = "Buka Resit"; rLink.classList.remove('pointer-events-none', 'opacity-50'); } 
-            else { rLink.removeAttribute('data-href'); rLink.innerText = "Tiada Fail"; rLink.classList.add('pointer-events-none', 'opacity-50'); }
+            const rcTitle = document.getElementById('transReceiptCountTitle');
+            if (c.receiptUrl) { 
+                let cArr = c.receiptUrl.split(',').map(s=>s.trim()).filter(Boolean);
+                rLink.setAttribute('data-href', c.receiptUrl); 
+                rLink.innerText = cArr.length > 1 ? `Buka Resit (${cArr.length})` : "Buka Resit"; 
+                rLink.classList.remove('pointer-events-none', 'opacity-50'); 
+                rcTitle.innerText = "Bukti Perbelanjaan";
+            } else { 
+                rLink.removeAttribute('data-href'); rLink.innerText = "Tiada Fail"; rLink.classList.add('pointer-events-none', 'opacity-50'); 
+            }
 
             const payList = document.getElementById('transPayListContainer');
             payList.innerHTML = '';
@@ -1791,6 +1872,68 @@
         }
         function closeTransactionModal() { document.getElementById('transactionModal').classList.add('hidden'); }
 
+        function openReceiptViewerFromLink(linkId) {
+            const anchor = document.getElementById(linkId);
+            if(anchor && anchor.getAttribute('data-href')) {
+                openReceiptViewer(anchor.getAttribute('data-href'), 'Paparan Dokumen');
+            }
+        }
+
+        function openReceiptViewer(urlData, title) {
+            // Ia kini menyokong comma-separated string
+            currentReceiptUrls = urlData.split(',').map(s=>s.trim()).filter(Boolean);
+            currentReceiptIndex = 0;
+            currentReceiptTitleBase = title || "Paparan Dokumen";
+            
+            updateReceiptSlideView();
+            document.getElementById('receiptViewerModal').classList.remove('hidden');
+        }
+
+        function updateReceiptSlideView() {
+            let total = currentReceiptUrls.length;
+            let currentUrl = currentReceiptUrls[currentReceiptIndex];
+            
+            // Adjust title with numbering
+            if(total > 1) {
+                document.getElementById('receiptViewerTitle').innerText = `${currentReceiptTitleBase} (${currentReceiptIndex + 1}/${total})`;
+                document.getElementById('btnPrevReceipt').classList.remove('hidden');
+                document.getElementById('btnNextReceipt').classList.remove('hidden');
+            } else {
+                document.getElementById('receiptViewerTitle').innerText = currentReceiptTitleBase;
+                document.getElementById('btnPrevReceipt').classList.add('hidden');
+                document.getElementById('btnNextReceipt').classList.add('hidden');
+            }
+
+            // Replace view with preview
+            let previewUrl = currentUrl;
+            if (previewUrl.includes('drive.google.com/file/d/')) previewUrl = previewUrl.replace(/\/view.*/, '/preview');
+            document.getElementById('receiptIframe').src = previewUrl;
+            document.getElementById('receiptViewerModal').setAttribute('data-current-url', currentUrl);
+        }
+
+        function changeReceiptSlide(delta) {
+            currentReceiptIndex += delta;
+            let total = currentReceiptUrls.length;
+            if(currentReceiptIndex < 0) currentReceiptIndex = total - 1; // loop back
+            if(currentReceiptIndex >= total) currentReceiptIndex = 0; // loop start
+            updateReceiptSlideView();
+        }
+        
+        function closeReceiptViewer() { 
+            document.getElementById('receiptViewerModal').classList.add('hidden'); 
+            document.getElementById('receiptIframe').src = ''; 
+        }
+
+        function downloadCurrentReceipt() {
+            const url = document.getElementById('receiptViewerModal').getAttribute('data-current-url');
+            if(!url) return;
+            let downloadUrl = url;
+            const match = url.match(/\/d\/(.+?)\//);
+            if(match && match[1]) downloadUrl = `https://drive.google.com/uc?export=download&id=${match[1]}`;
+            const a = document.createElement('a'); a.href = downloadUrl; a.target = '_blank';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+
         function openEditModal(id) {
             const c = claimsData.find(claim => claim.id === id); if(!c) return;
             document.getElementById('editId').value = c.id;
@@ -1814,7 +1957,6 @@
                 document.getElementById('eMealMalam').checked = false;
             }
             document.getElementById('eDesc').value = rawDesc;
-            
             document.getElementById('eAmount').value = c.amount;
             document.getElementById('eReceipt').value = '';
             
@@ -1826,7 +1968,7 @@
 
         function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); }
 
-        function submitEditClaim(e) {
+        async function submitEditClaim(e) {
             e.preventDefault();
             const id = document.getElementById('editId').value;
             const name = document.getElementById('editName').value;
@@ -1839,9 +1981,7 @@
                 let mealStr = [];
                 if (document.getElementById('eMealSiang').checked) mealStr.push("Siang");
                 if (document.getElementById('eMealMalam').checked) mealStr.push("Malam");
-                if (mealStr.length > 0) {
-                    finalDesc = finalDesc ? `${finalDesc} [Sesi: ${mealStr.join(', ')}]` : `[Sesi: ${mealStr.join(', ')}]`;
-                }
+                if (mealStr.length > 0) finalDesc = finalDesc ? `${finalDesc} [Sesi: ${mealStr.join(', ')}]` : `[Sesi: ${mealStr.join(', ')}]`;
             }
             
             const payload = {
@@ -1854,48 +1994,51 @@
             };
 
             const fileInput = document.getElementById('eReceipt');
-            
-            const processSubmit = (finalPayload) => {
-                const oriBtn = btn.innerHTML;
-                btn.innerHTML = '<i class="ph ph-spinner animate-spin mr-2"></i> Menyimpan...'; btn.disabled = true;
-                showLoadingOverlay("Mengemaskini tuntutan...");
-                
-                fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(finalPayload) })
-                .then(res => res.json())
-                .then(res => {
-                    if(res.status === 'success') {
-                        let claim = claimsData.find(c => c.id === id);
-                        if (claim) {
-                            claim.date = finalPayload.date;
-                            claim.pax = finalPayload.pax;
-                            claim.type = finalPayload.type;
-                            claim.desc = finalPayload.desc;
-                            claim.amount = finalPayload.amount;
-                            if (res.fileUrl) claim.receiptUrl = res.fileUrl;
-                        }
-                        closeEditModal(); updateDashboard();
-                        if(!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
-                        updatePendingBadge();
-                        validateAmount('new');
-                        showSuccessPopup("Tuntutan anda berjaya dikemaskini.");
-                    } else throw new Error(res.message);
-                })
-                .catch(err => alert("Ralat Kemaskini: " + err.message))
-                .finally(() => { btn.innerHTML = oriBtn; btn.disabled = false; hideLoadingOverlay(); });
-            };
+            const oriBtn = btn.innerHTML;
+            btn.innerHTML = '<i class="ph ph-spinner animate-spin mr-2"></i> Menyimpan...'; btn.disabled = true;
+            showLoadingOverlay("Mengemaskini tuntutan...");
 
             if (fileInput.files.length > 0) {
-                let file = fileInput.files[0];
-                payload.fileName = file.name;
-                payload.fileMimeType = file.type;
-                let reader = new FileReader();
-                reader.onload = function() {
-                    payload.fileBase64 = reader.result.split(',')[1];
-                    processSubmit(payload);
-                };
-                reader.readAsDataURL(file);
-            } else {
-                processSubmit(payload);
+                let filePromises = Array.from(fileInput.files).map(file => {
+                    return new Promise((resolve, reject) => {
+                        let reader = new FileReader();
+                        reader.onload = () => resolve({
+                            fileName: file.name,
+                            fileMimeType: file.type,
+                            fileBase64: reader.result.split(',')[1]
+                        });
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                });
+                let filesData = await Promise.all(filePromises);
+                payload.files = filesData;
+            }
+
+            try {
+                let response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                let res = await response.json();
+                
+                if(res.status === 'success') {
+                    let claim = claimsData.find(c => c.id === id);
+                    if (claim) {
+                        claim.date = payload.date;
+                        claim.pax = payload.pax;
+                        claim.type = payload.type;
+                        claim.desc = payload.desc;
+                        claim.amount = payload.amount;
+                        if (res.fileUrl) claim.receiptUrl = res.fileUrl; // new comma string
+                    }
+                    closeEditModal(); updateDashboard();
+                    if(!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
+                    updatePendingBadge();
+                    handleTypeChange('new'); 
+                    showSuccessPopup("Tuntutan anda berjaya dikemaskini.");
+                } else throw new Error(res.message);
+            } catch (err) {
+                alert("Ralat Kemaskini: " + err.message);
+            } finally {
+                btn.innerHTML = oriBtn; btn.disabled = false; hideLoadingOverlay();
             }
         }
 
@@ -1904,7 +2047,6 @@
             closeTransactionModal();
             document.getElementById('deleteConfirmModal').classList.remove('hidden');
         }
-        
         function closeDeleteModal() { document.getElementById('deleteConfirmModal').classList.add('hidden'); }
         
         function executeDeleteClaim() {
@@ -1923,7 +2065,7 @@
                     closeDeleteModal(); updateDashboard();
                     if(!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
                     updatePendingBadge();
-                    validateAmount('new');
+                    handleTypeChange('new'); 
                     showSuccessPopup("Tuntutan telah selamat dipadam.");
                 } else throw new Error(res.message);
             })
@@ -1944,11 +2086,9 @@
                 const medBal = getMedicalBalance(currentUser.name, currentYear);
                 document.getElementById('dashMedYear').innerText = currentYear;
                 document.getElementById('dashMedBalDisplay').innerText = formatRM(medBal);
-                dashMedBanner.classList.remove('hidden');
-                dashMedBanner.classList.add('flex');
+                dashMedBanner.classList.remove('hidden'); dashMedBanner.classList.add('flex');
             } else {
-                dashMedBanner.classList.add('hidden');
-                dashMedBanner.classList.remove('flex');
+                dashMedBanner.classList.add('hidden'); dashMedBanner.classList.remove('flex');
             }
 
             const d = roleFiltered.filter(c => {
@@ -1969,7 +2109,6 @@
             else {
                 sortedData.forEach(c => {
                     let cCol = c.amount === c.paid ? 'text-pbi-green' : (c.paid > 0 ? 'text-yellow-600' : 'text-pbi-orange');
-                    
                     let canEdit = currentUser.isSuperadmin || c.status === 'Menunggu';
                     let actionHtml = `<button onclick="viewTransaction('${c.id}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-pbi-blue border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-blue-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center" title="Perincian"><i class="ph ph-eye text-base"></i></button>`;
                     if (canEdit) {
@@ -1999,8 +2138,7 @@
 
             const tl = {};
             d.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(c => {
-                let m = new Date(c.date).toLocaleDateString('ms-MY', {month:'short', year:'2-digit'});
-                tl[m] = (tl[m]||0) + c.amount;
+                let m = new Date(c.date).toLocaleDateString('ms-MY', {month:'short', year:'2-digit'}); tl[m] = (tl[m]||0) + c.amount;
             });
             if(lineChartInstance) lineChartInstance.destroy();
             lineChartInstance = new Chart(document.getElementById('lineChart').getContext('2d'), {
@@ -2020,7 +2158,6 @@
                 let sl = c.status.toLowerCase();
                 if(sl.includes('selesai') || sl.includes('telah')) st['Selesai Dibayar']++; else if(c.paid > 0) st['Separa Dibayar']++; else st['Menunggu']++;
             });
-
             if(doughnutChartInstance) doughnutChartInstance.destroy();
             doughnutChartInstance = new Chart(document.getElementById('doughnutChart').getContext('2d'), {
                 type: 'doughnut', data: { labels: Object.keys(st), datasets: [{ data: Object.values(st), backgroundColor: ['#00B01A', '#FFA300', '#E66C37'], borderWidth: 0, hoverOffset: 4 }] },
@@ -2030,54 +2167,16 @@
             const staffContainer = document.getElementById('staffChartContainer');
             if (currentUser.isSuperadmin) {
                 staffContainer.classList.remove('hidden');
-                
                 const staffAmt = {};
-                d.forEach(c => {
-                    staffAmt[c.name] = (staffAmt[c.name] || 0) + c.amount;
-                });
+                d.forEach(c => { staffAmt[c.name] = (staffAmt[c.name] || 0) + c.amount; });
+                const sortedStaff = Object.entries(staffAmt).sort((a, b) => b[1] - a[1]).slice(0, 10);
                 
-                const sortedStaff = Object.entries(staffAmt)
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, 10);
-                
-                const staffLabels = sortedStaff.map(s => s[0]);
-                const staffData = sortedStaff.map(s => s[1]);
-
                 if (staffBarChartInstance) staffBarChartInstance.destroy();
                 staffBarChartInstance = new Chart(document.getElementById('staffBarChart').getContext('2d'), {
-                    type: 'bar',
-                    data: { 
-                        labels: staffLabels, 
-                        datasets: [{ 
-                            label: 'Jumlah (RM)',
-                            data: staffData, 
-                            backgroundColor: pbiColors[2], 
-                            borderRadius: 4 
-                        }] 
-                    },
-                    options: { 
-                        indexAxis: 'y', 
-                        responsive: true, 
-                        maintainAspectRatio: false, 
-                        plugins: { 
-                            legend: { display: false } 
-                        }, 
-                        scales: { 
-                            x: { 
-                                beginAtZero: true, 
-                                grid: { color: gC }, 
-                                ticks: { color: tC, font:{weight:'bold'} } 
-                            }, 
-                            y: { 
-                                grid: { display: false }, 
-                                ticks: { color: tC, font:{weight:'bold'} } 
-                            } 
-                        } 
-                    }
+                    type: 'bar', data: { labels: sortedStaff.map(s => s[0]), datasets: [{ label: 'Jumlah (RM)', data: sortedStaff.map(s => s[1]), backgroundColor: pbiColors[2], borderRadius: 4 }] },
+                    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: gC }, ticks: { color: tC, font:{weight:'bold'} } }, y: { grid: { display: false }, ticks: { color: tC, font:{weight:'bold'} } } } }
                 });
-            } else {
-                staffContainer.classList.add('hidden');
-            }
+            } else { staffContainer.classList.add('hidden'); }
         }
     </script>
 </body>
