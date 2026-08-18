@@ -4,13 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistem Pengurusan Tuntutan HR</title>
+
+    <!-- ============================================================
+         PERF FIX #6 — HEAD-START FETCH (paling penting)
+
+         Diukur di production (voltakeclaim.netlify.app):
+           t=0      HTML mula parse
+           t=734ms  Tailwind CDN turun, lepas tu compile CSS dalam browser
+           t=1539ms DOMContentLoaded baru fire -> fetch CSV BARU BERMULA
+           t=2664ms employees siap
+           t=3629ms claims siap
+
+         1.5 SAAT PERTAMA langsung tak buat apa-apa network untuk data.
+         Fetch tersekat belakang Tailwind sebab dia dalam DOMContentLoaded.
+
+         Script ni kick off kedua-dua fetch SERTA-MERTA, sebelum Tailwind,
+         sebelum font, sebelum apa-apa. Promise disimpan dalam window.__boot
+         dan diambil kemudian oleh fetchEmployees() / fetchClaims().
+         Fetch jalan serentak dengan Tailwind compile, bukan tunggu dia.
+         ============================================================ -->
+    <script>
+    (function () {
+        window.SHEET_CSV_EMPLOYEES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?output=csv';
+        window.SHEET_CSV_CLAIMS    = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?gid=1560350142&single=true&output=csv';
+
+        var grab = function (url) {
+            return fetch(url)
+                .then(function (r) { return r.ok ? r.text() : Promise.reject(new Error('HTTP ' + r.status)); })
+                .catch(function (e) { console.error('Boot fetch gagal:', url, e); return null; });
+        };
+
+        window.__boot = {
+            t0: Date.now(),
+            emp: grab(window.SHEET_CSV_EMPLOYEES),
+            claims: grab(window.SHEET_CSV_CLAIMS)
+        };
+    })();
+    </script>
     
     <!-- PWA Meta Tags & Icons (Voltake Logo) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#118DFF">
-    <link rel="icon" href="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" type="image/png">
-    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps">
+    <link rel="icon" href="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps=w192" type="image/png">
+    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps=w192">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -93,7 +130,7 @@
     <div id="login-view" class="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-[#1a1a1a] z-50 transition-opacity duration-300 px-4 absolute inset-0">
         <div class="bg-white dark:bg-[#252525] rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 w-full max-w-md overflow-hidden flex flex-col">
             <div class="bg-white dark:bg-[#252525] p-6 text-center border-b border-gray-100 dark:border-gray-800">
-                <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" alt="Voltake Logo" class="h-16 w-auto mx-auto object-contain mb-3">
+                <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps=w192" alt="Voltake Logo" class="h-16 w-auto mx-auto object-contain mb-3">
                 <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">ClaimPro HR</h1>
                 <p class="text-gray-500 dark:text-gray-400 text-sm font-medium mt-1">Sistem Pengurusan Tuntutan</p>
             </div>
@@ -152,7 +189,7 @@
         <!-- Sidebar / Navigasi (Desktop) -->
         <aside class="w-64 bg-white dark:bg-[#252525] border-r border-gray-200 dark:border-gray-800 flex flex-col transition-colors z-20 hidden md:flex flex-shrink-0">
             <div class="h-16 flex items-center justify-center px-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#252525]">
-                <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" alt="Voltake" class="h-8 w-auto object-contain">
+                <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps=w192" alt="Voltake" class="h-8 w-auto object-contain">
             </div>
             
             <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
@@ -199,7 +236,7 @@
 
         <!-- Mobile Header & Nav -->
         <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-[#252525] border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4 z-30">
-            <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" alt="Voltake" class="h-7 w-auto object-contain">
+            <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps=w192" alt="Voltake" class="h-7 w-auto object-contain">
             <div class="flex gap-1">
                 <button onclick="refreshData()" class="p-2 text-gray-500 dark:text-gray-400"><i class="ph ph-arrows-clockwise text-xl"></i></button>
                 <button onclick="toggleTheme()" class="p-2 text-gray-500 dark:text-gray-400"><i id="theme-icon-mobile" class="ph ph-moon text-xl"></i></button>
@@ -880,8 +917,9 @@
     <script>
         // --- 0. KONFIGURASI APP SCRIPT URL & CONSTANTS ---
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHOnaNpu1w6YSfVYn1qgKeeg0_4LPTvC98BVMMtysSoX_8xW9SE_mKc1WzVRHB9mfMSg/exec"; 
-        const sheetCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?output=csv';
-        const claimsCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?gid=1560350142&single=true&output=csv';
+        // URL didefinisikan dalam <head> supaya boot script boleh guna. Satu sumber sahaja.
+        const sheetCSVUrl  = window.SHEET_CSV_EMPLOYEES;
+        const claimsCSVUrl = window.SHEET_CSV_CLAIMS;
         const ANNUAL_MEDICAL_LIMIT = 350;
 
         // --- 0b. CDN LAZY-LOAD TARGETS ---
@@ -1103,7 +1141,7 @@
 
         function refreshData() {
             showLoadingOverlay("Menyegerakkan data...");
-            Promise.all([fetchEmployees(), fetchClaims()]).then((results) => {
+            Promise.all([fetchEmployees(true), fetchClaims(true)]).then((results) => {
                 hideLoadingOverlay();
                 saveCache();
                 if (results.every(Boolean)) {
@@ -1115,11 +1153,24 @@
             });
         }
 
-        async function fetchEmployees() {
+        // Ambil hasil dari boot fetch kalau ada, kalau tak fetch baru.
+        // forceNetwork=true untuk butang Refresh (mesti data segar).
+        async function consumeBoot(key, url, forceNetwork) {
+            if (!forceNetwork && window.__boot && window.__boot[key]) {
+                const pending = window.__boot[key];
+                window.__boot[key] = null;          // guna sekali sahaja
+                const text = await pending;
+                if (text !== null) return text;      // boot fetch berjaya
+                // boot fetch gagal -> jatuh ke fetch biasa di bawah
+            }
+            const response = await fetch(url, forceNetwork ? { cache: 'no-store' } : undefined);
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return await response.text();
+        }
+
+        async function fetchEmployees(forceNetwork) {
             try {
-                const response = await fetch(sheetCSVUrl);
-                if (!response.ok) throw new Error('HTTP ' + response.status);
-                const data = await response.text();
+                const data = await consumeBoot('emp', sheetCSVUrl, forceNetwork);
                 const rows = data.split('\n');
                 
                 employeesList = [];
@@ -1144,11 +1195,9 @@
             }
         }
 
-        async function fetchClaims() {
+        async function fetchClaims(forceNetwork) {
             try {
-                const response = await fetch(claimsCSVUrl);
-                if (!response.ok) throw new Error('HTTP ' + response.status);
-                const data = await response.text();
+                const data = await consumeBoot('claims', claimsCSVUrl, forceNetwork);
                 const rows = data.split('\n');
                 
                 claimsData = [];
