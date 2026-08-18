@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistem Pengurusan Tuntutan HR</title>
+
+    <!-- ============================================================= -->
+    <!-- TEKNIK #6 - Content-Security-Policy                            -->
+    <!-- Hadkan dari mana browser boleh muat script/style/imej.         -->
+    <!-- Versi header penuh (termasuk frame-ancestors) ada di           -->
+    <!-- netlify.toml. Meta ini baseline untuk GitHub Pages.            -->
+    <!-- ============================================================= -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://unpkg.com;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com;
+        font-src 'self' data: https://fonts.gstatic.com https://unpkg.com;
+        img-src 'self' data: blob: https://lh3.googleusercontent.com https://drive.google.com https://*.googleusercontent.com;
+        connect-src 'self' https://script.google.com https://script.googleusercontent.com;
+        frame-src https://drive.google.com https://docs.google.com;
+        object-src 'none'; base-uri 'self'; form-action 'self';">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="robots" content="noindex, nofollow">
     
     <!-- PWA Meta Tags & Icons (Voltake Logo) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,7 +36,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     
     <!-- Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
@@ -28,7 +46,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     
     <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
     <script>
         tailwind.config = {
@@ -84,6 +102,47 @@
     </div>
 
     <!-- ============================================== -->
+    <!-- TEKNIK #7 - MODAL NOTIS PRIVASI (PDPA 2010) -->
+    <!-- ============================================== -->
+    <div id="privacyModal" class="fixed inset-0 bg-gray-900/60 dark:bg-black/80 z-[110] items-center justify-center backdrop-blur-sm hidden p-4">
+        <div class="bg-white dark:bg-[#252525] rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto border border-gray-100 dark:border-gray-800">
+            <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between sticky top-0 bg-white dark:bg-[#252525]">
+                <h3 class="text-lg font-extrabold text-gray-900 dark:text-white">Notis Privasi Data</h3>
+                <button onclick="closePrivacyModal()" class="text-gray-400 hover:text-gray-700 dark:hover:text-white"><i class="ph ph-x text-2xl"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                <div>
+                    <p class="font-extrabold text-gray-900 dark:text-white mb-1">Data yang dikumpul</p>
+                    <p>Nama penuh, ID pekerja, jawatan, e-mel, butiran tuntutan perbelanjaan (tarikh, jenis, jumlah, keterangan) dan salinan resit yang anda muat naik.</p>
+                </div>
+                <div>
+                    <p class="font-extrabold text-gray-900 dark:text-white mb-1">Tujuan pemprosesan</p>
+                    <p>Semata-mata untuk memproses, meluluskan dan merekod pembayaran tuntutan perbelanjaan pekerja. Data tidak digunakan untuk pemasaran dan tidak dikongsi dengan pihak ketiga selain juruaudit atau pihak berkuasa apabila dikehendaki undang-undang.</p>
+                </div>
+                <div>
+                    <p class="font-extrabold text-gray-900 dark:text-white mb-1">Siapa boleh akses</p>
+                    <p>Anda hanya boleh melihat rekod tuntutan sendiri. Hanya pengguna berperanan HR/Admin boleh melihat rekod semua pekerja. Penapisan ini dikuatkuasakan di pelayan, bukan di paparan sahaja.</p>
+                </div>
+                <div>
+                    <p class="font-extrabold text-gray-900 dark:text-white mb-1">Tempoh simpanan</p>
+                    <p>Rekod tuntutan disimpan selama 7 tahun selaras keperluan penyimpanan rekod perakaunan, kemudian diarkib. Log aktiviti sistem disimpan 12 bulan. Sesi log masuk tamat automatik selepas 12 jam.</p>
+                </div>
+                <div>
+                    <p class="font-extrabold text-gray-900 dark:text-white mb-1">Lokasi penyimpanan</p>
+                    <p>Data disimpan dalam Google Workspace (Google Sheets &amp; Google Drive). Google boleh memproses data di pelayan luar Malaysia — ini merupakan pemindahan rentas sempadan di bawah PDPA 2010.</p>
+                </div>
+                <div>
+                    <p class="font-extrabold text-gray-900 dark:text-white mb-1">Hak anda</p>
+                    <p>Anda berhak memohon akses, pembetulan atau pemadaman data peribadi anda. Hubungi Jabatan HR untuk sebarang permohonan atau aduan berkaitan data peribadi.</p>
+                </div>
+            </div>
+            <div class="p-4 border-t border-gray-100 dark:border-gray-800">
+                <button onclick="closePrivacyModal()" class="w-full py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-bold rounded-lg transition-colors">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
     <!-- VIEW LOGIN -->
     <!-- ============================================== -->
     <div id="login-view" class="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-[#1a1a1a] z-50 transition-opacity duration-300 px-4 absolute inset-0">
@@ -129,9 +188,21 @@
                     <p id="passwordError" class="text-red-500 text-xs hidden mt-1.5 font-semibold"><i class="ph-fill ph-warning-circle"></i> Kata laluan tidak sah.</p>
                 </div>
 
+                <label class="flex items-center gap-2.5 mb-5 cursor-pointer select-none">
+                    <input type="checkbox" id="loginRemember" checked class="w-4 h-4 rounded border-gray-300 text-pbi-blue focus:ring-pbi-blue">
+                    <span class="text-xs font-bold text-gray-600 dark:text-gray-400">Kekal log masuk pada peranti ini (30 hari)</span>
+                </label>
+
                 <button id="btnLogin" disabled onclick="handleLogin()" class="w-full py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-pbi-blue hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pbi-blue transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center">
                     Log Masuk <i class="ph ph-sign-in ml-2 text-xl"></i>
                 </button>
+
+                <!-- TEKNIK #7 - Notis PDPA (Notice & Choice Principle) -->
+                <p class="text-[11px] leading-relaxed text-gray-500 dark:text-gray-500 mt-5 text-center">
+                    Dengan log masuk, anda bersetuju sistem ini memproses nama, ID pekerja dan
+                    rekod tuntutan anda untuk tujuan pentadbiran pembayaran.
+                    <button type="button" onclick="openPrivacyModal()" class="text-pbi-blue font-bold hover:underline">Notis Privasi</button>
+                </p>
             </div>
             
             <div class="p-4 bg-gray-50 dark:bg-[#1f1f1f] text-center border-t border-gray-200 dark:border-gray-800">
@@ -226,6 +297,24 @@
             
             <!-- VIEW 1: Borang Tuntutan Pekerja -->
             <div id="view-submit" class="view-section flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-3xl mx-auto">
+
+                <!-- TEKNIK #2 - peringatan lembut selagi masih guna kata laluan default -->
+                <div id="defaultPwdNag" class="hidden mb-6 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-xl p-4 flex items-start gap-3">
+                    <i class="ph-fill ph-shield-warning text-2xl text-amber-500 flex-shrink-0 mt-0.5"></i>
+                    <div class="flex-1">
+                        <p class="text-sm font-extrabold text-gray-900 dark:text-white">Anda masih menggunakan kata laluan default</p>
+                        <p class="text-xs font-semibold text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
+                            Kata laluan yang diberikan HR mudah diteka. Tukar kepada kata laluan sendiri untuk melindungi rekod tuntutan anda.
+                        </p>
+                        <button onclick="openPasswordModal()" class="mt-3 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition-colors">
+                            Tukar Sekarang
+                        </button>
+                    </div>
+                    <button onclick="togglePasswordNag(false)" class="text-amber-400 hover:text-amber-600 flex-shrink-0" title="Tutup sementara">
+                        <i class="ph ph-x text-lg"></i>
+                    </button>
+                </div>
+
                 <div class="mb-6 flex justify-between items-end">
                     <div>
                         <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">Borang Tuntutan</h2>
@@ -337,6 +426,12 @@
                             </div>
                             <p id="receiptError" class="text-red-500 text-xs mt-1.5 hidden font-bold"><i class="ph-fill ph-warning-circle"></i> Sila muat naik sekurang-kurangnya satu fail atau tangkap gambar resit terlebih dahulu.</p>
                         </div>
+
+                        <p class="text-[11px] text-gray-500 dark:text-gray-500 leading-relaxed">
+                            Resit dan butiran tuntutan yang anda hantar disimpan dalam Google Drive syarikat
+                            selama 7 tahun untuk tujuan audit, dan hanya boleh dilihat oleh anda serta HR.
+                            <button type="button" onclick="openPrivacyModal()" class="text-pbi-blue font-bold hover:underline">Notis Privasi</button>
+                        </p>
 
                         <div class="pt-6 flex flex-col-reverse sm:flex-row justify-end gap-3 border-t border-gray-100 dark:border-gray-800">
                             <button type="button" onclick="resetForm()" class="px-5 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-center">Set Semula</button>
@@ -850,18 +945,22 @@
             <form id="passwordChangeForm" onsubmit="submitChangePassword(event)" class="space-y-4">
                 <div class="space-y-1.5">
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Kata Laluan Semasa</label>
-                    <input type="password" id="pwdOld" required class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue text-sm">
+                    <input type="password" id="pwdOld" required autocomplete="current-password" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue text-sm">
                 </div>
                 <div class="space-y-1.5">
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Kata Laluan Baru</label>
-                    <input type="password" id="pwdNew" required minlength="4" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue text-sm">
+                    <input type="password" id="pwdNew" required minlength="8" autocomplete="new-password" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue text-sm">
                 </div>
                 <div class="space-y-1.5">
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">Sahkan Kata Laluan Baru</label>
-                    <input type="password" id="pwdConfirm" required minlength="4" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue text-sm">
+                    <input type="password" id="pwdConfirm" required minlength="8" autocomplete="new-password" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pbi-blue text-sm">
                 </div>
                 
-                <p id="pwdError" class="text-red-500 text-xs font-bold hidden mt-2"><i class="ph-fill ph-warning-circle"></i> Ralat kata laluan.</p>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400 font-semibold leading-relaxed bg-gray-50 dark:bg-[#1f1f1f] rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                    Syarat: minimum 8 aksara, mesti ada huruf dan nombor. Selepas tukar, semua peranti
+                    lain yang log masuk akan dilog keluar secara automatik.
+                </p>
+                <p id="pwdError" class="text-red-500 text-xs font-bold hidden mt-2"></p>
                 
                 <button type="submit" id="btnSubmitPassword" class="w-full mt-4 py-3 bg-pbi-blue text-white rounded-lg text-sm font-extrabold shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-pbi-blue transition-colors flex items-center justify-center disabled:opacity-50">
                     Sahkan Pertukaran
@@ -874,18 +973,28 @@
     <!-- JAVASCRIPT LOGIC -->
     <!-- ============================================== -->
     <script>
-        // --- 0. KONFIGURASI APP SCRIPT URL & CONSTANTS ---
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHOnaNpu1w6YSfVYn1qgKeeg0_4LPTvC98BVMMtysSoX_8xW9SE_mKc1WzVRHB9mfMSg/exec"; 
-        const sheetCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?output=csv';
-        const claimsCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?gid=1560350142&single=true&output=csv';
+        // ==========================================================
+        // 0. KONFIGURASI
+        // ==========================================================
+        // TEKNIK #1 - Tiada URL "Publish to Web" di sini.
+        // Semua data masuk/keluar melalui satu endpoint Apps Script yang
+        // di-gate session token. URL ini bukan rahsia - ia endpoint awam,
+        // tetapi setiap action di sebaliknya perlukan token yang sah.
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw30smKd-_KwJgLSqalOGRvLZbrAOwFwMN9TMZL9BpO26IQZFti9iTX8o8ooFpecSgf3w/exec";
+
         const ANNUAL_MEDICAL_LIMIT = 350;
+        const LS_TOKEN    = 'claimpro.token';
+        const LS_REMEMBER = 'claimpro.remember';
+        const LS_LASTID   = 'claimpro.lastId';
 
         // --- 1. STATE VARIABLES ---
-        let currentUser = null; 
-        let employeesList = []; 
+        let sessionToken = null;
+        let currentUser = null;
+        let employeesList = [];   // senarai dalam app (selepas login)
+        let loginStaffList = [];  // senarai untuk dropdown login sahaja (ID + nama)
         let claimsData = [];
-        let currentFilter = 'Ada Baki'; 
-        let currentAdminData = []; // Store current filtered data for Export
+        let currentFilter = 'Ada Baki';
+        let currentAdminData = [];
         let barChartInstance = null;
         let doughnutChartInstance = null;
         let lineChartInstance = null;
@@ -895,123 +1004,159 @@
         const ADMIN_ITEMS_PER_PAGE = 20;
         const pbiColors = ['#118DFF', '#12239E', '#E66C37', '#6B007B', '#00B01A', '#00A638', '#33A1FD', '#FFA300', '#A6A6A6', '#D13438'];
 
-        // Variables for Receipt Slider
         let currentReceiptUrls = [];
         let currentReceiptIndex = 0;
         let currentReceiptTitleBase = "";
 
-        // --- 2. INIT & AUTO-LOGIN ---
+        // ==========================================================
+        // TEKNIK #6 - HELPER ESCAPE (anti-XSS)
+        // ==========================================================
+        // Data dari Sheet/input pengguna TIDAK BOLEH masuk innerHTML
+        // mentah-mentah. esc() untuk kandungan HTML, jsStr() untuk nilai
+        // yang dimasukkan ke dalam atribut onclick.
+        function esc(v) {
+            return String(v === null || v === undefined ? '' : v)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        function jsStr(v) {
+            return String(v === null || v === undefined ? '' : v)
+                .replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"')
+                .replace(/</g, '\\u003C').replace(/\r?\n/g, ' ');
+        }
+
+        // ==========================================================
+        // TEKNIK #3 - LAPISAN API (token dilampirkan setiap request)
+        // ==========================================================
+        async function api(action, payload, opts) {
+            opts = opts || {};
+            const body = Object.assign({ action: action }, payload || {});
+            if (!opts.noToken) {
+                if (!sessionToken) { forceLogout('Sesi tamat. Sila log masuk semula.'); throw new Error('Tiada sesi'); }
+                body.token = sessionToken;
+            }
+
+            let res;
+            try {
+                // Sengaja tanpa header Content-Type supaya kekal "simple request"
+                // (tiada CORS preflight ke Apps Script).
+                res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body) });
+            } catch (err) {
+                throw new Error('Tiada sambungan ke pelayan. Semak internet anda.');
+            }
+
+            let data;
+            try { data = await res.json(); }
+            catch (err) { throw new Error('Respons pelayan tidak sah. Semak URL Apps Script.'); }
+
+            if (data.status !== 'success') {
+                const msg = String(data.message || 'Ralat tidak diketahui');
+                if (/^Unauthorized/i.test(msg)) { forceLogout(msg); throw new Error(msg); }
+                throw new Error(msg);
+            }
+            return data;
+        }
+
+        // ==========================================================
+        // 2. INIT & AUTO-LOGIN (guna remember-token, bukan password)
+        // ==========================================================
         document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('cDate').valueAsDate = new Date();
-            
-            showLoadingOverlay("Memuatkan sistem...");
-            await Promise.all([ fetchEmployees(), fetchClaims() ]);
-            hideLoadingOverlay();
-            
             setupLoginSearch();
 
-            const savedUser = localStorage.getItem('claimProUser');
-            if(savedUser) {
+            showLoadingOverlay("Memuatkan sistem...");
+            await loadStaffList();
+            preselectLastUser();
+
+            // Cuba sambung semula sesi tanpa taip password
+            const remember = localStorage.getItem(LS_REMEMBER);
+            if (remember) {
                 try {
-                    currentUser = JSON.parse(savedUser);
-                    const stillValid = employeesList.find(e => e.id === currentUser.id);
-                    if(stillValid) {
-                        if (currentUser.password !== stillValid.password) {
-                            localStorage.removeItem('claimProUser');
-                            currentUser = null;
-                        } else {
-                            currentUser.name = stillValid.name;
-                            currentUser.isSuperadmin = (stillValid.designation.toLowerCase() === 'admin');
-                            proceedToApp();
-                        }
-                    } else {
-                        localStorage.removeItem('claimProUser');
-                    }
-                } catch(e) { console.error("LS Error", e); }
+                    const r = await api('resume', { rememberToken: remember }, { noToken: true });
+                    sessionToken = r.token;
+                    localStorage.setItem(LS_TOKEN, r.token);
+                    applyUser(r.user, r.usingDefaultPassword);
+                    await loadData();
+                    hideLoadingOverlay();
+                    proceedToApp();
+                    return;
+                } catch (err) {
+                    localStorage.removeItem(LS_REMEMBER);
+                    localStorage.removeItem(LS_TOKEN);
+                }
             }
+            hideLoadingOverlay();
         });
 
-        function refreshData() {
+        /** Senarai staf untuk dropdown login - ID & nama sahaja, tiada password. */
+        async function loadStaffList() {
+            try {
+                const r = await api('getStaffList', {}, { noToken: true });
+                loginStaffList = (r.staff || []).map(e => ({
+                    id: e.id, name: e.name, displayText: e.id + ' - ' + e.name
+                }));
+            } catch (err) {
+                console.error('Gagal muat senarai staf:', err.message);
+                loginStaffList = [];
+            }
+        }
+
+        /** Isi semula ID terakhir supaya staff tak perlu cari nama tiap kali login. */
+        function preselectLastUser() {
+            const lastId = localStorage.getItem(LS_LASTID);
+            if (!lastId) return;
+            const emp = loginStaffList.filter(e => e.id === lastId)[0];
+            if (!emp) return;
+            document.getElementById('loginIdInput').value = emp.displayText;
+            document.getElementById('loginSelectedId').value = emp.id;
+            document.getElementById('loginSelectedName').value = emp.name;
+            document.getElementById('passwordContainer').classList.remove('hidden');
+            document.getElementById('btnLogin').disabled = false;
+        }
+
+        /** Muat data selepas login. Penapisan ikut role dibuat di pelayan. */
+        async function loadData() {
+            const r = await api('getData', {});
+            claimsData = r.claims || [];
+            if (r.staff && r.staff.length) {
+                employeesList = r.staff.map(e => ({
+                    id: e.id, name: e.name, displayText: e.id + ' - ' + e.name
+                }));
+            }
+        }
+
+        function applyUser(user, usingDefaultPassword) {
+            currentUser = {
+                id: user.id,
+                name: user.name,
+                role: user.role,
+                isSuperadmin: user.role === 'admin'
+            };
+            localStorage.setItem(LS_LASTID, user.id);
+            togglePasswordNag(!!usingDefaultPassword);
+        }
+
+        function togglePasswordNag(show) {
+            const el = document.getElementById('defaultPwdNag');
+            if (el) el.classList.toggle('hidden', !show);
+        }
+
+        async function refreshData() {
             showLoadingOverlay("Menyegerakkan data...");
-            Promise.all([fetchEmployees(), fetchClaims()]).then(() => {
+            try {
+                await loadData();
                 hideLoadingOverlay();
                 showSuccessPopup("Data berjaya dikemaskini dari pelayan.");
-                if(currentUser) {
-                    if(!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
-                    if(!document.getElementById('view-dashboard').classList.contains('hidden')) updateDashboard();
+                if (currentUser) {
+                    if (!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
+                    if (!document.getElementById('view-dashboard').classList.contains('hidden')) updateDashboard();
                     updatePendingBadge();
-                    handleTypeChange('new'); 
+                    handleTypeChange('new');
                 }
-            });
-        }
-
-        async function fetchEmployees() {
-            try {
-                const response = await fetch(sheetCSVUrl);
-                const data = await response.text();
-                const rows = data.split('\n');
-                
-                employeesList = [];
-                for(let i = 1; i < rows.length; i++) {
-                    if(!rows[i].trim()) continue;
-                    const cols = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
-                    if(cols.length >= 4) {
-                        const id = cols[0] ? cols[0].replace(/"/g, '').trim() : '';
-                        const name = cols[1] ? cols[1].replace(/"/g, '').trim() : '';
-                        const password = cols[2] ? cols[2].replace(/"/g, '').trim() : '';
-                        const designation = cols[3] ? cols[3].replace(/"/g, '').trim() : '';
-                        
-                        if(id && name) {
-                            employeesList.push({ id, name, password, designation, displayText: `${id} - ${name}` });
-                        }
-                    }
-                }
-            } catch (error) { console.error("Ralat Employees:", error); }
-        }
-
-        async function fetchClaims() {
-            try {
-                const response = await fetch(claimsCSVUrl);
-                const data = await response.text();
-                const rows = data.split('\n');
-                
-                claimsData = [];
-                for(let i = 1; i < rows.length; i++) {
-                    if(!rows[i].trim()) continue;
-                    const cols = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
-                    
-                    if(cols.length >= 8) {
-                        const id = cols[0] ? cols[0].replace(/"/g, '').trim() : '';
-                        const name = cols[1] ? cols[1].replace(/"/g, '').trim() : '';
-                        const date = cols[2] ? cols[2].replace(/"/g, '').trim() : '';
-                        const type = cols[3] ? cols[3].replace(/"/g, '').trim() : '';
-                        const pax = parseInt(cols[4] ? cols[4].replace(/"/g, '').trim() : 1) || 1;
-                        const desc = cols[5] ? cols[5].replace(/"/g, '').trim() : '';
-                        
-                        const amountStr = cols[6] ? cols[6].replace(/"/g, '').replace(/,/g, '').trim() : '0';
-                        const amount = parseFloat(amountStr) || 0;
-                        
-                        const status = cols[7] ? cols[7].replace(/"/g, '').trim() : 'Menunggu';
-                        const receiptUrl = cols[8] ? cols[8].replace(/"/g, '').trim() : '';
-                        const timestampRaw = cols[9] ? cols[9].replace(/"/g, '').trim() : '';
-                        const timestamp = timestampRaw ? new Date(timestampRaw).getTime() : Date.now();
-                        
-                        const payReceiptUrl = cols[10] ? cols[10].replace(/"/g, '').trim() : '';
-                        const payDate = cols[11] ? cols[11].replace(/"/g, '').trim() : '';
-                        
-                        const paidColStr = cols[12] ? cols[12].replace(/"/g, '').replace(/,/g, '').trim() : '';
-                        let paid = parseFloat(paidColStr);
-
-                        if(isNaN(paid)) {
-                            const statusLower = status.toLowerCase();
-                            if(statusLower === 'selesai dibayar' || statusLower === 'selesai' || statusLower === 'telah dibayar') paid = amount;
-                            else paid = 0;
-                        }
-
-                        claimsData.push({ id, name, date, type, pax, desc, amount, status, receiptUrl, timestamp, paid, payReceiptUrl, payDate });
-                    }
-                }
-            } catch (error) { console.error("Ralat Claims:", error); }
+            } catch (err) {
+                hideLoadingOverlay();
+                if (!/^Unauthorized/i.test(err.message)) alert("Ralat memuat data: " + err.message);
+            }
         }
 
         function setupLoginSearch() {
@@ -1043,7 +1188,7 @@
             dropdown.innerHTML = '';
             
             const term = searchTerm.toLowerCase();
-            const filtered = employeesList.filter(emp => emp.displayText.toLowerCase().includes(term));
+            const filtered = loginStaffList.filter(emp => emp.displayText.toLowerCase().includes(term));
 
             if(filtered.length === 0) {
                 dropdown.innerHTML = `<li class="px-4 py-3 text-sm text-gray-500 font-bold">Tiada padanan pekerja.</li>`; return;
@@ -1062,23 +1207,51 @@
             });
         }
 
-        function handleLogin() {
+        // ==========================================================
+        // TEKNIK #3 + #4 - LOGIN DISAHKAN DI PELAYAN
+        // ==========================================================
+        // Versi lama membandingkan password dalam browser selepas download
+        // seluruh Sheet. Sekarang browser tak pernah nampak password sesiapa;
+        // ia hanya hantar ID + password dan terima token kalau betul.
+        async function handleLogin() {
             const hidId = document.getElementById('loginSelectedId').value;
-            if(!hidId) { document.getElementById('loginError').classList.remove('hidden'); return; }
+            const errId = document.getElementById('loginError');
+            const errPwd = document.getElementById('passwordError');
+            const btn = document.getElementById('btnLogin');
 
-            const emp = employeesList.find(e => e.id === hidId);
-            if (!emp) { document.getElementById('loginError').classList.remove('hidden'); return; }
-
+            if (!hidId) { errId.classList.remove('hidden'); return; }
             const pwd = document.getElementById('loginPasswordInput').value;
-            if (pwd !== emp.password) { 
-                document.getElementById('passwordError').classList.remove('hidden'); 
-                return; 
-            }
+            if (!pwd) { errPwd.textContent = 'Sila masukkan kata laluan.'; errPwd.classList.remove('hidden'); return; }
 
-            const isSuperadminUser = (emp.designation.toLowerCase() === 'admin');
-            currentUser = { id: emp.id, name: emp.name, password: emp.password, isSuperadmin: isSuperadminUser };
-            localStorage.setItem('claimProUser', JSON.stringify(currentUser));
-            proceedToApp();
+            errId.classList.add('hidden');
+            errPwd.classList.add('hidden');
+            const oriBtn = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ph ph-spinner animate-spin mr-2"></i> Mengesahkan...';
+
+            try {
+                const remember = document.getElementById('loginRemember').checked;
+                const r = await api('login', { userId: hidId, password: pwd, remember: remember }, { noToken: true });
+
+                sessionToken = r.token;
+                localStorage.setItem(LS_TOKEN, r.token);
+                if (r.rememberToken) localStorage.setItem(LS_REMEMBER, r.rememberToken);
+                else localStorage.removeItem(LS_REMEMBER);
+
+                applyUser(r.user, r.usingDefaultPassword);
+                document.getElementById('loginPasswordInput').value = '';
+
+                showLoadingOverlay("Memuatkan data anda...");
+                await loadData();
+                hideLoadingOverlay();
+                proceedToApp();
+            } catch (err) {
+                errPwd.textContent = err.message || 'ID atau kata laluan tidak sah.';
+                errPwd.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = oriBtn;
+            }
         }
 
         function proceedToApp() {
@@ -1087,40 +1260,84 @@
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('app-layout').classList.remove('hidden');
                 document.getElementById('app-layout').classList.add('opacity-100');
-                
+
                 document.getElementById('cNameInputLocked').value = currentUser.name;
-                document.getElementById('user-avatar').innerText = currentUser.name.substring(0,2).toUpperCase();
-                document.getElementById('user-name-label').innerText = currentUser.name;
-                
+                document.getElementById('user-avatar').textContent = currentUser.name.substring(0,2).toUpperCase();
+                document.getElementById('user-name-label').textContent = currentUser.name;
+
                 if (currentUser.isSuperadmin) {
                     document.getElementById('nav-admin').classList.remove('hidden');
                     document.getElementById('nav-admin-mob').classList.remove('hidden');
-                    document.getElementById('user-role-label').innerText = 'Superadmin';
+                    document.getElementById('user-role-label').textContent = 'Superadmin';
                     document.getElementById('user-role-label').classList.add('text-pbi-blue');
-                    document.getElementById('dashSubtitle').innerText = 'Tinjauan Penuh Syarikat';
+                    document.getElementById('dashSubtitle').textContent = 'Tinjauan Penuh Syarikat';
                 } else {
                     document.getElementById('nav-admin').classList.add('hidden');
                     document.getElementById('nav-admin-mob').classList.add('hidden');
-                    document.getElementById('user-role-label').innerText = 'Kakitangan';
+                    document.getElementById('user-role-label').textContent = 'Kakitangan';
                     document.getElementById('user-role-label').classList.remove('text-pbi-blue');
-                    document.getElementById('dashSubtitle').innerText = 'Tinjauan Peribadi';
+                    document.getElementById('dashSubtitle').textContent = 'Tinjauan Peribadi';
                 }
-                
+
                 updatePendingBadge(); navigate('submit'); handleTypeChange('new');
             }, 300);
         }
 
-        function logout() {
-            localStorage.removeItem('claimProUser');
-            currentUser = null; 
+        /** Logout: revoke token di PELAYAN, bukan sekadar padam dari browser. */
+        async function logout() {
+            const token = sessionToken;
+            const remember = localStorage.getItem(LS_REMEMBER);
+            clearLocalSession();
+            try {
+                if (token || remember) {
+                    await fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'logout', token: token, rememberToken: remember })
+                    });
+                }
+            } catch (err) { /* tetap logout di client walaupun rangkaian gagal */ }
+            showLoginScreen();
+        }
+
+        /** Dipanggil bila pelayan tolak token (tamat tempoh / dibatalkan). */
+        function forceLogout(message) {
+            clearLocalSession();
+            showLoginScreen();
+            const errPwd = document.getElementById('passwordError');
+            if (errPwd && message) { errPwd.textContent = message; errPwd.classList.remove('hidden'); }
+        }
+
+        function clearLocalSession() {
+            sessionToken = null;
+            currentUser = null;
+            claimsData = [];
+            localStorage.removeItem(LS_TOKEN);
+            localStorage.removeItem(LS_REMEMBER);
+        }
+
+        function showLoginScreen() {
+            hideLoadingOverlay();
             document.getElementById('app-layout').classList.add('hidden');
-            const lv = document.getElementById('login-view'); lv.classList.remove('hidden');
+            const lv = document.getElementById('login-view');
+            lv.classList.remove('hidden');
             setTimeout(() => {
                 lv.classList.remove('opacity-0');
-                document.getElementById('loginIdInput').value = ''; document.getElementById('loginSelectedId').value = ''; document.getElementById('loginSelectedName').value = '';
-                document.getElementById('btnLogin').disabled = true; document.getElementById('loginPasswordInput').value = '';
-                document.getElementById('passwordContainer').classList.add('hidden'); document.getElementById('passwordError').classList.add('hidden');
+                document.getElementById('loginSelectedId').value = '';
+                document.getElementById('loginSelectedName').value = '';
+                document.getElementById('btnLogin').disabled = true;
+                document.getElementById('loginPasswordInput').value = '';
+                document.getElementById('passwordContainer').classList.add('hidden');
+                preselectLastUser();
             }, 50);
+        }
+
+        function openPrivacyModal() {
+            const m = document.getElementById('privacyModal');
+            m.classList.remove('hidden'); m.classList.add('flex');
+        }
+        function closePrivacyModal() {
+            const m = document.getElementById('privacyModal');
+            m.classList.add('hidden'); m.classList.remove('flex');
         }
 
         function showLoadingOverlay(text) {
@@ -1183,48 +1400,44 @@
 
         function closePasswordModal() { document.getElementById('changePasswordModal').classList.add('hidden'); }
 
-        function submitChangePassword(e) {
+        // TEKNIK #2 + #4 - kata laluan lama disahkan di PELAYAN
+        async function submitChangePassword(e) {
             e.preventDefault();
             const oldPwd = document.getElementById('pwdOld').value;
             const newPwd = document.getElementById('pwdNew').value;
             const confirmPwd = document.getElementById('pwdConfirm').value;
             const errEl = document.getElementById('pwdError');
-            
-            if (oldPwd !== currentUser.password) {
-                errEl.innerHTML = '<i class="ph-fill ph-warning-circle"></i> Kata laluan semasa tidak tepat.';
-                errEl.classList.remove('hidden'); return;
-            }
-            if (newPwd !== confirmPwd) {
-                errEl.innerHTML = '<i class="ph-fill ph-warning-circle"></i> Kata laluan baru dan pengesahan tidak sepadan.';
-                errEl.classList.remove('hidden'); return;
-            }
-            if (newPwd.length < 4) {
-                errEl.innerHTML = '<i class="ph-fill ph-warning-circle"></i> Kata laluan mestilah sekurang-kurangnya 4 aksara.';
-                errEl.classList.remove('hidden'); return;
-            }
-            
+
+            const fail = (msg) => {
+                errEl.textContent = msg;
+                errEl.classList.remove('hidden');
+            };
+
+            if (newPwd !== confirmPwd) return fail('Kata laluan baharu dan pengesahan tidak sepadan.');
+            if (newPwd.length < 8) return fail('Kata laluan mesti sekurang-kurangnya 8 aksara.');
+            if (!/[A-Za-z]/.test(newPwd) || !/[0-9]/.test(newPwd)) return fail('Kata laluan mesti mengandungi huruf dan nombor.');
+            if (newPwd === oldPwd) return fail('Kata laluan baharu tidak boleh sama dengan yang lama.');
+
             errEl.classList.add('hidden');
             const btn = document.getElementById('btnSubmitPassword');
             const oriBtn = btn.innerHTML;
             btn.innerHTML = '<i class="ph ph-spinner animate-spin mr-2"></i> Mengemaskini...';
             btn.disabled = true;
-            
-            const payload = { action: 'changePassword', userId: currentUser.id, newPassword: newPwd };
-            
-            fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
-            .then(res => res.json())
-            .then(res => {
-                if (res.status === 'success') {
-                    currentUser.password = newPwd;
-                    localStorage.setItem('claimProUser', JSON.stringify(currentUser));
-                    const empIndex = employeesList.findIndex(emp => emp.id === currentUser.id);
-                    if (empIndex > -1) employeesList[empIndex].password = newPwd;
-                    closePasswordModal();
-                    showSuccessPopup("Kata laluan anda berjaya dikemaskini.");
-                } else throw new Error(res.message);
-            })
-            .catch(err => alert("Ralat semasa menukar kata laluan. " + err.message))
-            .finally(() => { btn.innerHTML = oriBtn; btn.disabled = false; });
+
+            try {
+                const r = await api('changePassword', { oldPassword: oldPwd, newPassword: newPwd });
+                // Pelayan batalkan semua sesi lama dan beri token baharu
+                sessionToken = r.token;
+                localStorage.setItem(LS_TOKEN, r.token);
+                localStorage.removeItem(LS_REMEMBER);
+                togglePasswordNag(false);
+                closePasswordModal();
+                showSuccessPopup("Kata laluan berjaya ditukar. Sesi pada peranti lain telah dilog keluar.");
+            } catch (err) {
+                fail(err.message);
+            } finally {
+                btn.innerHTML = oriBtn; btn.disabled = false;
+            }
         }
 
         function getMedicalBalance(empName, year) {
@@ -1364,73 +1577,66 @@
 
         async function submitClaim(e) {
             e.preventDefault();
-            if(document.getElementById('btnSubmitClaim').disabled) return;
-            
-            let fileInput = document.getElementById('cReceiptFile').files.length > 0 ? document.getElementById('cReceiptFile') : document.getElementById('cReceiptCam');
-            if(fileInput.files.length === 0) { document.getElementById('receiptError').classList.remove('hidden'); return; }
+            if (document.getElementById('btnSubmitClaim').disabled) return;
+
+            const fileInput = document.getElementById('cReceiptFile').files.length > 0
+                ? document.getElementById('cReceiptFile')
+                : document.getElementById('cReceiptCam');
+            if (fileInput.files.length === 0) {
+                document.getElementById('receiptError').classList.remove('hidden'); return;
+            }
 
             showLoadingOverlay("Memuat naik dan menghantar tuntutan...");
 
-            const now = new Date();
-            const yy = String(now.getFullYear()).slice(-2);
-            const mm = String(now.getMonth() + 1).padStart(2, '0');
-            const dd = String(now.getDate()).padStart(2, '0');
-            const hh = String(now.getHours()).padStart(2, '0');
-            const min = String(now.getMinutes()).padStart(2, '0');
-            const firstName = currentUser.name.split(' ')[0].toUpperCase();
-            const newId = `CLM-${yy}${mm}${dd}-${hh}${min}-${firstName}`;
-            
+            const type = document.getElementById('cType').value;
+            const mealSiang = document.getElementById('cMealSiang').checked;
+            const mealMalam = document.getElementById('cMealMalam').checked;
+
             let finalDesc = document.getElementById('cDesc').value;
-            if (document.getElementById('cType').value === 'Makan & Minum') {
-                let mealStr = [];
-                if (document.getElementById('cMealSiang').checked) mealStr.push("Siang");
-                if (document.getElementById('cMealMalam').checked) mealStr.push("Malam");
+            if (type === 'Makan & Minum') {
+                const mealStr = [];
+                if (mealSiang) mealStr.push("Siang");
+                if (mealMalam) mealStr.push("Malam");
                 if (mealStr.length > 0) {
-                    finalDesc = finalDesc ? `${finalDesc} [Sesi: ${mealStr.join(', ')}]` : `[Sesi: ${mealStr.join(', ')}]`;
+                    finalDesc = finalDesc ? finalDesc + ' [Sesi: ' + mealStr.join(', ') + ']'
+                                          : '[Sesi: ' + mealStr.join(', ') + ']';
                 }
             }
-            
-            const claimRecord = {
-                id: newId, name: currentUser.name, date: document.getElementById('cDate').value,
-                type: document.getElementById('cType').value, pax: parseInt(document.getElementById('cPax').value),
-                desc: finalDesc, amount: parseFloat(document.getElementById('cAmount').value),
-                paid: 0, status: 'Menunggu'
+
+            // Nota: ID tuntutan dan nama pemilik dijana di PELAYAN dari session,
+            // bukan dihantar dari browser (Teknik #4).
+            const payload = {
+                date: document.getElementById('cDate').value,
+                type: type,
+                pax: parseInt(document.getElementById('cPax').value, 10),
+                desc: finalDesc,
+                amount: parseFloat(document.getElementById('cAmount').value),
+                mealSiang: mealSiang,
+                mealMalam: mealMalam
             };
 
-            // Baca Semua Fail yang dipilih
-            let filePromises = Array.from(fileInput.files).map(file => {
-                return new Promise((resolve, reject) => {
-                    let reader = new FileReader();
-                    reader.onload = () => resolve({
-                        fileName: file.name,
-                        fileMimeType: file.type,
-                        fileBase64: reader.result.split(',')[1]
-                    });
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
+            const filePromises = Array.from(fileInput.files).map(file => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve({
+                    fileName: file.name, fileMimeType: file.type,
+                    fileBase64: reader.result.split(',')[1]
                 });
-            });
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            }));
 
             try {
-                let filesData = await Promise.all(filePromises);
-                claimRecord.files = filesData; 
+                payload.files = await Promise.all(filePromises);
+                const r = await api('submitClaim', payload);
+                claimsData.unshift(r.claim);
 
-                let response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(claimRecord) });
-                let result = await response.json();
-                
-                if(result.status === 'success') {
-                    claimRecord.receiptUrl = result.fileUrl; 
-                    claimRecord.timestamp = Date.now(); 
-                    claimsData.unshift(claimRecord);
-                    
-                    resetForm(); updatePendingBadge(); 
-                    hideLoadingOverlay();
-                    setTimeout(() => showSuccessPopup(`Tuntutan anda (ID: ${newId}) berjaya direkodkan.`), 350);
-                } else throw new Error(result.message);
-            } catch (error) { 
+                resetForm(); updatePendingBadge();
                 hideLoadingOverlay();
-                alert("Ralat Sila pastikan APPS_SCRIPT_URL tepat dan internet stabil."); 
-            } 
+                setTimeout(() => showSuccessPopup('Tuntutan anda (ID: ' + r.claim.id + ') berjaya direkodkan.'), 350);
+            } catch (error) {
+                hideLoadingOverlay();
+                if (!/^Unauthorized/i.test(error.message)) alert("Ralat: " + error.message);
+            }
         }
 
         function getAdminFilteredClaims() {
@@ -1533,7 +1739,7 @@
                 }
 
                 grps.forEach(g => {
-                    const safeName = g.name.replace(/'/g, "\\'"); // Betulkan isu tanda petik
+                    const safeName = jsStr(g.name); // TEKNIK #6 - escape untuk atribut onclick
                     const isBal = g.bal > 0;
                     const st = isBal ? (g.tPaid > 0 ? 'Separa' : 'Ada Baki') : 'Selesai';
                     const c = isBal ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
@@ -1543,7 +1749,7 @@
 
                     const tr = document.createElement('tr'); tr.className = 'hover:bg-gray-50 dark:hover:bg-[#2e2e2e] transition-colors';
                     tr.innerHTML = `
-                        <td class="px-6 py-4 font-extrabold text-sm text-gray-900 dark:text-white">${g.name}</td>
+                        <td class="px-6 py-4 font-extrabold text-sm text-gray-900 dark:text-white">${esc(g.name)}</td>
                         <td class="px-6 py-4 text-center text-sm font-bold text-gray-600 dark:text-gray-300">${g.count} Rekod</td>
                         <td class="px-6 py-4 text-right text-sm font-bold text-gray-600 dark:text-gray-300">${formatRM(g.tAmt)}</td>
                         <td class="px-6 py-4 text-right text-sm text-pbi-green font-extrabold">${formatRM(g.tPaid)}</td>
@@ -1637,16 +1843,16 @@
                 listBody.innerHTML += `
                     <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                         <td class="p-3 text-center align-middle">
-                            <input type="checkbox" class="claim-cb w-4 h-4 rounded text-pbi-blue focus:ring-pbi-blue cursor-pointer" data-type="${c.type}" value="${c.id}" onchange="recalcTotal()">
+                            <input type="checkbox" class="claim-cb w-4 h-4 rounded text-pbi-blue focus:ring-pbi-blue cursor-pointer" data-type="${esc(c.type)}" value="${esc(c.id)}" onchange="recalcTotal()">
                         </td>
                         <td class="p-3 align-middle">
-                            <div class="font-extrabold text-gray-900 dark:text-white">${c.id}</div>
-                            <div class="text-xs font-bold text-gray-500 dark:text-gray-400 mt-0.5">${formatDate(c.date)} | ${c.type}</div>
+                            <div class="font-extrabold text-gray-900 dark:text-white">${esc(c.id)}</div>
+                            <div class="text-xs font-bold text-gray-500 dark:text-gray-400 mt-0.5">${esc(formatDate(c.date))} | ${esc(c.type)}</div>
                         </td>
                         <td class="p-3 text-right align-middle font-bold text-gray-700 dark:text-gray-300">${formatRM(bal)}</td>
                         <td class="p-3 text-right align-middle">
-                            <input type="number" id="pay_input_${c.id}" class="w-24 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-right text-gray-900 dark:text-white font-extrabold text-sm focus:outline-none focus:ring-2 focus:ring-pbi-blue disabled:opacity-50" max="${bal}" value="${bal}" step="0.01" disabled oninput="recalcTotal(this, ${bal})">
-                            <input type="hidden" id="max_pay_${c.id}" value="${bal}">
+                            <input type="number" id="pay_input_${esc(c.id)}" class="w-24 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-right text-gray-900 dark:text-white font-extrabold text-sm focus:outline-none focus:ring-2 focus:ring-pbi-blue disabled:opacity-50" max="${bal}" value="${bal}" step="0.01" disabled oninput="recalcTotal(this, ${bal})">
+                            <input type="hidden" id="max_pay_${esc(c.id)}" value="${bal}">
                         </td>
                     </tr>
                 `;
@@ -1719,61 +1925,64 @@
 
         function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); document.getElementById('paymentForm').reset(); }
         
+        // Admin sahaja. Role disemak semula di pelayan (Teknik #4) -
+        // menyembunyikan butang di UI bukan security boundary.
         function confirmPayment(e) {
             e.preventDefault();
             const total = recalcTotal();
-            if(document.getElementById('btnConfirmPayment').disabled) return;
-            if(total <= 0) return;
+            if (document.getElementById('btnConfirmPayment').disabled) return;
+            if (total <= 0) return;
 
             const name = document.getElementById('modalPayeeName').value;
             const fileInput = document.getElementById('pReceipt');
             if (fileInput.files.length === 0) return;
-            let file = fileInput.files[0];
+            const file = fileInput.files[0];
 
             showLoadingOverlay("Merekod pembayaran...");
 
-            let updates = [];
-            const cbs = document.querySelectorAll('.claim-cb:checked');
-            cbs.forEach(cb => {
+            const updates = [];
+            document.querySelectorAll('.claim-cb:checked').forEach(cb => {
                 const id = cb.value;
                 const payAmt = parseFloat(document.getElementById('pay_input_' + id).value) || 0;
                 const claim = claimsData.find(c => c.id === id);
-                if(claim && payAmt > 0) {
-                    let newPaid = claim.paid + payAmt;
-                    let newStatus = (newPaid >= claim.amount) ? 'Telah Dibayar' : 'Separa Dibayar';
+                if (claim && payAmt > 0) {
+                    const newPaid = claim.paid + payAmt;
+                    const newStatus = (newPaid >= claim.amount) ? 'Telah Dibayar' : 'Separa Dibayar';
                     updates.push({ id: id, status: newStatus, paid: newPaid });
                 }
             });
 
-            let reader = new FileReader();
-            reader.onload = async function() {
-                let payload = { action: 'updatePayment', name: name, fileName: file.name, fileMimeType: file.type, fileBase64: reader.result.split(',')[1], updates: updates };
+            const reader = new FileReader();
+            reader.onload = async function () {
                 try {
-                    let response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-                    let result = await response.json();
-                    if(result.status === 'success') {
-                        updates.forEach(u => {
-                            let claim = claimsData.find(c => c.id === u.id);
-                            if(claim) { 
-                                claim.paid = u.paid; claim.status = u.status; 
-                                claim.payReceiptUrl = claim.payReceiptUrl ? claim.payReceiptUrl + ', ' + result.fileUrl : result.fileUrl; 
-                                claim.payDate = claim.payDate ? claim.payDate + ', ' + new Date().toISOString() : new Date().toISOString(); 
-                            }
-                        });
-                        closePaymentModal(); updateAdminTable(); updatePendingBadge(); 
-                        hideLoadingOverlay();
-                        setTimeout(() => showSuccessPopup(`Bayaran sebanyak ${formatRM(total)} untuk ${name} berjaya direkod.`), 350);
-                    } else throw new Error(result.message);
-                } catch (error) { 
+                    const result = await api('updatePayment', {
+                        name: name,
+                        fileName: file.name,
+                        fileMimeType: file.type,
+                        fileBase64: reader.result.split(',')[1],
+                        updates: updates
+                    });
+                    updates.forEach(u => {
+                        const claim = claimsData.find(c => c.id === u.id);
+                        if (claim) {
+                            claim.paid = u.paid; claim.status = u.status;
+                            claim.payReceiptUrl = claim.payReceiptUrl ? claim.payReceiptUrl + ', ' + result.fileUrl : result.fileUrl;
+                            claim.payDate = claim.payDate ? claim.payDate + ', ' + new Date().toISOString() : new Date().toISOString();
+                        }
+                    });
+                    closePaymentModal(); updateAdminTable(); updatePendingBadge();
                     hideLoadingOverlay();
-                    alert("Ralat Pembayaran! Sila semak pautan Apps Script."); 
-                } 
+                    setTimeout(() => showSuccessPopup('Bayaran sebanyak ' + formatRM(total) + ' untuk ' + name + ' berjaya direkod.'), 350);
+                } catch (error) {
+                    hideLoadingOverlay();
+                    if (!/^Unauthorized/i.test(error.message)) alert("Ralat Pembayaran: " + error.message);
+                }
             };
             reader.readAsDataURL(file);
         }
 
         function viewAdminDetails(n) {
-            document.getElementById('detailName').innerText = n;
+            document.getElementById('detailName').textContent = n;
             const tb = document.getElementById('detailsTableBody'); tb.innerHTML = '';
             
             getAdminFilteredClaims().filter(c => c.name === n).sort((a,b) => b.timestamp - a.timestamp).forEach(c => {
@@ -1781,12 +1990,12 @@
                 const cCol = b === 0 ? 'text-pbi-green' : (c.paid > 0 ? 'text-yellow-600' : 'text-red-500');
                 
                 let docsHtml = '<div class="flex flex-col items-center justify-center space-y-1.5">';
-                if (c.receiptUrl) docsHtml += `<button onclick="openReceiptViewer('${c.receiptUrl}', 'Resit Tuntutan Pekerja (ID: ${c.id})')" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-pbi-blue border border-blue-200 rounded text-[10px] font-bold w-full transition-colors"><i class="ph-fill ph-file-pdf mr-1"></i> Staf</button>`;
+                if (c.receiptUrl) docsHtml += `<button onclick="openReceiptViewer('${esc(jsStr(c.receiptUrl))}', 'Resit Tuntutan Pekerja (ID: ${esc(jsStr(c.id))})')" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-pbi-blue border border-blue-200 rounded text-[10px] font-bold w-full transition-colors"><i class="ph-fill ph-file-pdf mr-1"></i> Staf</button>`;
                 
                 if (c.payReceiptUrl) {
                     let payUrls = c.payReceiptUrl.split(',').map(s=>s.trim()).filter(Boolean);
                     payUrls.forEach((url, idx) => {
-                        docsHtml += `<button onclick="openReceiptViewer('${url}', 'Bukti Bayaran HR ${idx+1} (ID: ${c.id})')" class="px-3 py-1.5 bg-green-50 hover:bg-green-100 text-pbi-green border border-green-200 rounded text-[10px] font-bold w-full mt-1 transition-colors"><i class="ph-fill ph-receipt mr-1"></i> HR ${payUrls.length > 1 ? (idx+1) : ''}</button>`;
+                        docsHtml += `<button onclick="openReceiptViewer('${esc(jsStr(url))}', 'Bukti Bayaran HR ${idx+1} (ID: ${esc(jsStr(c.id))})')" class="px-3 py-1.5 bg-green-50 hover:bg-green-100 text-pbi-green border border-green-200 rounded text-[10px] font-bold w-full mt-1 transition-colors"><i class="ph-fill ph-receipt mr-1"></i> HR ${payUrls.length > 1 ? (idx+1) : ''}</button>`;
                     });
                 }
                 if (!c.receiptUrl && !c.payReceiptUrl) docsHtml += `<span class="text-[10px] text-gray-400 font-bold uppercase">Tiada Fail</span>`;
@@ -1794,12 +2003,12 @@
 
                 const tr = document.createElement('tr'); tr.className = 'hover:bg-gray-50 dark:hover:bg-[#2e2e2e] transition-colors';
                 tr.innerHTML = `
-                    <td class="px-5 py-4 text-xs text-gray-900 dark:text-gray-300"><b>${c.id}</b><br><span class="text-[11px] text-gray-500">${formatDate(c.date)}</span></td>
-                    <td class="px-5 py-4 text-xs font-bold text-gray-700 dark:text-gray-400">${c.desc||c.type}</td>
+                    <td class="px-5 py-4 text-xs text-gray-900 dark:text-gray-300"><b>${esc(c.id)}</b><br><span class="text-[11px] text-gray-500">${esc(formatDate(c.date))}</span></td>
+                    <td class="px-5 py-4 text-xs font-bold text-gray-700 dark:text-gray-400">${esc(c.desc||c.type)}</td>
                     <td class="px-5 py-4 text-xs text-right font-extrabold">${formatRM(c.amount)}</td>
                     <td class="px-5 py-4 text-xs text-right font-extrabold text-pbi-green">${formatRM(c.paid)}</td>
                     <td class="px-5 py-4 text-xs text-right font-extrabold ${b>0?'text-red-500':'text-gray-500'}">${formatRM(b)}</td>
-                    <td class="px-5 py-4 text-[10px] uppercase tracking-wider text-center font-extrabold ${cCol}">${c.status}</td>
+                    <td class="px-5 py-4 text-[10px] uppercase tracking-wider text-center font-extrabold ${cCol}">${esc(c.status)}</td>
                     <td class="px-5 py-3 align-middle">${docsHtml}</td>
                 `;
                 tb.appendChild(tr);
@@ -1847,10 +2056,10 @@
                                 <i class="ph-fill ph-receipt text-4xl text-pbi-green mr-4"></i>
                                 <div>
                                     <p class="text-sm font-bold text-gray-900 dark:text-white">Bukti Pembayaran HR ${payUrls.length > 1 ? '#' + (idx+1) : ''}</p>
-                                    <p class="text-[11px] font-semibold text-gray-500 dark:text-gray-400 mt-0.5">Tarikh: ${pDate}</p>
+                                    <p class="text-[11px] font-semibold text-gray-500 dark:text-gray-400 mt-0.5">Tarikh: ${esc(pDate)}</p>
                                 </div>
                             </div>
-                            <button onclick="openReceiptViewer('${url}', 'Bukti Bayaran HR ${idx+1}')" class="px-4 py-2 bg-white dark:bg-[#252525] shadow-sm border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-bold text-pbi-green hover:text-green-700 transition-colors whitespace-nowrap">Buka Bukti</button>
+                            <button onclick="openReceiptViewer('${esc(jsStr(url))}', 'Bukti Bayaran HR ${idx+1}')" class="px-4 py-2 bg-white dark:bg-[#252525] shadow-sm border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-bold text-pbi-green hover:text-green-700 transition-colors whitespace-nowrap">Buka Bukti</button>
                         </div>
                     `;
                 });
@@ -1862,8 +2071,8 @@
             let canEdit = currentUser.isSuperadmin || c.status === 'Menunggu';
             if (canEdit) {
                 actionContainer.innerHTML = `
-                    <button onclick="openEditModal('${c.id}')" class="px-4 py-2.5 bg-white dark:bg-[#1f1f1f] text-pbi-orange border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-orange-50 dark:hover:bg-gray-800 font-bold rounded-lg text-sm transition-colors"><i class="ph ph-pencil-simple mr-1 text-lg align-text-bottom"></i> Kemaskini</button>
-                    <button onclick="confirmDelete('${c.id}')" class="px-4 py-2.5 bg-white dark:bg-[#1f1f1f] text-red-500 border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-red-50 dark:hover:bg-gray-800 font-bold rounded-lg text-sm transition-colors"><i class="ph ph-trash mr-1 text-lg align-text-bottom"></i> Padam</button>
+                    <button onclick="openEditModal('${esc(jsStr(c.id))}')" class="px-4 py-2.5 bg-white dark:bg-[#1f1f1f] text-pbi-orange border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-orange-50 dark:hover:bg-gray-800 font-bold rounded-lg text-sm transition-colors"><i class="ph ph-pencil-simple mr-1 text-lg align-text-bottom"></i> Kemaskini</button>
+                    <button onclick="confirmDelete('${esc(jsStr(c.id))}')" class="px-4 py-2.5 bg-white dark:bg-[#1f1f1f] text-red-500 border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-red-50 dark:hover:bg-gray-800 font-bold rounded-lg text-sm transition-colors"><i class="ph ph-trash mr-1 text-lg align-text-bottom"></i> Padam</button>
                 `;
             }
             actionContainer.innerHTML += `<button onclick="closeTransactionModal()" class="px-6 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white font-bold rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ml-auto">Tutup</button>`;
@@ -1971,26 +2180,35 @@
         async function submitEditClaim(e) {
             e.preventDefault();
             const id = document.getElementById('editId').value;
-            const name = document.getElementById('editName').value;
             const btn = document.getElementById('btnSubmitEdit');
-            
-            if (document.getElementById('btnSubmitEdit').disabled) return;
-            
+            if (btn.disabled) return;
+
+            const type = document.getElementById('eType').value;
+            const mealSiang = document.getElementById('eMealSiang').checked;
+            const mealMalam = document.getElementById('eMealMalam').checked;
+
             let finalDesc = document.getElementById('eDesc').value;
-            if (document.getElementById('eType').value === 'Makan & Minum') {
-                let mealStr = [];
-                if (document.getElementById('eMealSiang').checked) mealStr.push("Siang");
-                if (document.getElementById('eMealMalam').checked) mealStr.push("Malam");
-                if (mealStr.length > 0) finalDesc = finalDesc ? `${finalDesc} [Sesi: ${mealStr.join(', ')}]` : `[Sesi: ${mealStr.join(', ')}]`;
+            if (type === 'Makan & Minum') {
+                const mealStr = [];
+                if (mealSiang) mealStr.push("Siang");
+                if (mealMalam) mealStr.push("Malam");
+                if (mealStr.length > 0) {
+                    finalDesc = finalDesc ? finalDesc + ' [Sesi: ' + mealStr.join(', ') + ']'
+                                          : '[Sesi: ' + mealStr.join(', ') + ']';
+                }
             }
-            
+
+            // Pemilikan rekod disemak semula di pelayan - staff hanya boleh
+            // mengubah tuntutan sendiri walaupun payload diubah dari DevTools.
             const payload = {
-                action: 'editClaim', id: id, name: name,
+                id: id,
                 date: document.getElementById('eDate').value,
-                pax: parseInt(document.getElementById('ePax').value),
-                type: document.getElementById('eType').value,
+                pax: parseInt(document.getElementById('ePax').value, 10),
+                type: type,
                 desc: finalDesc,
-                amount: parseFloat(document.getElementById('eAmount').value)
+                amount: parseFloat(document.getElementById('eAmount').value),
+                mealSiang: mealSiang,
+                mealMalam: mealMalam
             };
 
             const fileInput = document.getElementById('eReceipt');
@@ -1998,45 +2216,36 @@
             btn.innerHTML = '<i class="ph ph-spinner animate-spin mr-2"></i> Menyimpan...'; btn.disabled = true;
             showLoadingOverlay("Mengemaskini tuntutan...");
 
-            if (fileInput.files.length > 0) {
-                let filePromises = Array.from(fileInput.files).map(file => {
-                    return new Promise((resolve, reject) => {
-                        let reader = new FileReader();
+            try {
+                if (fileInput.files.length > 0) {
+                    payload.files = await Promise.all(Array.from(fileInput.files).map(file => new Promise((resolve, reject) => {
+                        const reader = new FileReader();
                         reader.onload = () => resolve({
-                            fileName: file.name,
-                            fileMimeType: file.type,
+                            fileName: file.name, fileMimeType: file.type,
                             fileBase64: reader.result.split(',')[1]
                         });
                         reader.onerror = reject;
                         reader.readAsDataURL(file);
-                    });
-                });
-                let filesData = await Promise.all(filePromises);
-                payload.files = filesData;
-            }
+                    })));
+                }
 
-            try {
-                let response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-                let res = await response.json();
-                
-                if(res.status === 'success') {
-                    let claim = claimsData.find(c => c.id === id);
-                    if (claim) {
-                        claim.date = payload.date;
-                        claim.pax = payload.pax;
-                        claim.type = payload.type;
-                        claim.desc = payload.desc;
-                        claim.amount = payload.amount;
-                        if (res.fileUrl) claim.receiptUrl = res.fileUrl; // new comma string
-                    }
-                    closeEditModal(); updateDashboard();
-                    if(!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
-                    updatePendingBadge();
-                    handleTypeChange('new'); 
-                    showSuccessPopup("Tuntutan anda berjaya dikemaskini.");
-                } else throw new Error(res.message);
+                const res = await api('editClaim', payload);
+                const claim = claimsData.find(c => c.id === id);
+                if (claim) {
+                    claim.date = payload.date;
+                    claim.pax = payload.pax;
+                    claim.type = payload.type;
+                    claim.desc = payload.desc;
+                    claim.amount = payload.amount;
+                    if (res.fileUrl) claim.receiptUrl = res.fileUrl;
+                }
+                closeEditModal(); updateDashboard();
+                if (!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
+                updatePendingBadge();
+                handleTypeChange('new');
+                showSuccessPopup("Tuntutan anda berjaya dikemaskini.");
             } catch (err) {
-                alert("Ralat Kemaskini: " + err.message);
+                if (!/^Unauthorized/i.test(err.message)) alert("Ralat Kemaskini: " + err.message);
             } finally {
                 btn.innerHTML = oriBtn; btn.disabled = false; hideLoadingOverlay();
             }
@@ -2049,28 +2258,27 @@
         }
         function closeDeleteModal() { document.getElementById('deleteConfirmModal').classList.add('hidden'); }
         
-        function executeDeleteClaim() {
+        async function executeDeleteClaim() {
             const id = document.getElementById('deleteClaimId').value;
             const btn = document.getElementById('btnConfirmDelete');
             const oriBtn = btn.innerHTML;
-            
+
             btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Memadam...'; btn.disabled = true;
             showLoadingOverlay("Memadam tuntutan...");
-            
-            fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteClaim', id: id }) })
-            .then(res => res.json())
-            .then(res => {
-                if(res.status === 'success') {
-                    claimsData = claimsData.filter(c => c.id !== id);
-                    closeDeleteModal(); updateDashboard();
-                    if(!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
-                    updatePendingBadge();
-                    handleTypeChange('new'); 
-                    showSuccessPopup("Tuntutan telah selamat dipadam.");
-                } else throw new Error(res.message);
-            })
-            .catch(err => alert("Ralat Padam: " + err.message))
-            .finally(() => { btn.innerHTML = oriBtn; btn.disabled = false; hideLoadingOverlay(); });
+
+            try {
+                await api('deleteClaim', { id: id });
+                claimsData = claimsData.filter(c => c.id !== id);
+                closeDeleteModal(); updateDashboard();
+                if (!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
+                updatePendingBadge();
+                handleTypeChange('new');
+                showSuccessPopup("Tuntutan telah selamat dipadam.");
+            } catch (err) {
+                if (!/^Unauthorized/i.test(err.message)) alert("Ralat Padam: " + err.message);
+            } finally {
+                btn.innerHTML = oriBtn; btn.disabled = false; hideLoadingOverlay();
+            }
         }
 
         function resetDashFilter() { document.getElementById('dashStartDate').value = ''; document.getElementById('dashEndDate').value = ''; updateDashboard(); }
@@ -2110,21 +2318,21 @@
                 sortedData.forEach(c => {
                     let cCol = c.amount === c.paid ? 'text-pbi-green' : (c.paid > 0 ? 'text-yellow-600' : 'text-pbi-orange');
                     let canEdit = currentUser.isSuperadmin || c.status === 'Menunggu';
-                    let actionHtml = `<button onclick="viewTransaction('${c.id}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-pbi-blue border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-blue-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center" title="Perincian"><i class="ph ph-eye text-base"></i></button>`;
+                    let actionHtml = `<button onclick="viewTransaction('${esc(jsStr(c.id))}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-pbi-blue border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-blue-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center" title="Perincian"><i class="ph ph-eye text-base"></i></button>`;
                     if (canEdit) {
                         actionHtml += `
-                            <button onclick="openEditModal('${c.id}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-pbi-orange border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-orange-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center ml-1" title="Kemaskini"><i class="ph ph-pencil-simple text-base"></i></button>
-                            <button onclick="confirmDelete('${c.id}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-red-500 border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-red-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center ml-1" title="Padam"><i class="ph ph-trash text-base"></i></button>
+                            <button onclick="openEditModal('${esc(jsStr(c.id))}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-pbi-orange border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-orange-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center ml-1" title="Kemaskini"><i class="ph ph-pencil-simple text-base"></i></button>
+                            <button onclick="confirmDelete('${esc(jsStr(c.id))}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-red-500 border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-red-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center ml-1" title="Padam"><i class="ph ph-trash text-base"></i></button>
                         `;
                     }
 
                     const tr = document.createElement('tr'); tr.className = 'hover:bg-gray-50 dark:hover:bg-[#2e2e2e] transition-colors';
                     tr.innerHTML = `
-                        <td class="px-5 py-4 whitespace-nowrap"><div class="font-extrabold text-gray-900 dark:text-white">${c.id}</div><div class="text-[11px] text-gray-500 font-semibold">${formatDate(c.date)}</div></td>
-                        <td class="px-5 py-4 whitespace-nowrap text-sm font-extrabold text-gray-800 dark:text-gray-200">${c.name}</td>
-                        <td class="px-5 py-4 whitespace-nowrap text-sm font-bold text-gray-600 dark:text-gray-400">${c.type}</td>
+                        <td class="px-5 py-4 whitespace-nowrap"><div class="font-extrabold text-gray-900 dark:text-white">${esc(c.id)}</div><div class="text-[11px] text-gray-500 font-semibold">${esc(formatDate(c.date))}</div></td>
+                        <td class="px-5 py-4 whitespace-nowrap text-sm font-extrabold text-gray-800 dark:text-gray-200">${esc(c.name)}</td>
+                        <td class="px-5 py-4 whitespace-nowrap text-sm font-bold text-gray-600 dark:text-gray-400">${esc(c.type)}</td>
                         <td class="px-5 py-4 whitespace-nowrap text-right text-sm font-extrabold text-gray-900 dark:text-white">${formatRM(c.amount)}</td>
-                        <td class="px-5 py-4 whitespace-nowrap text-center text-[10px] tracking-wider uppercase font-extrabold ${cCol}">${c.status}</td>
+                        <td class="px-5 py-4 whitespace-nowrap text-center text-[10px] tracking-wider uppercase font-extrabold ${cCol}">${esc(c.status)}</td>
                         <td class="px-5 py-4 whitespace-nowrap text-right h-full">
                             <div class="flex justify-end items-center">${actionHtml}</div>
                         </td>
