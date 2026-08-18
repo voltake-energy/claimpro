@@ -4,72 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistem Pengurusan Tuntutan HR</title>
-
-    <!-- ============================================================
-         PERF FIX #6 — HEAD-START FETCH (paling penting)
-
-         Diukur di production (voltakeclaim.netlify.app):
-           t=0      HTML mula parse
-           t=734ms  Tailwind CDN turun, lepas tu compile CSS dalam browser
-           t=1539ms DOMContentLoaded baru fire -> fetch CSV BARU BERMULA
-           t=2664ms employees siap
-           t=3629ms claims siap
-
-         1.5 SAAT PERTAMA langsung tak buat apa-apa network untuk data.
-         Fetch tersekat belakang Tailwind sebab dia dalam DOMContentLoaded.
-
-         Script ni kick off kedua-dua fetch SERTA-MERTA, sebelum Tailwind,
-         sebelum font, sebelum apa-apa. Promise disimpan dalam window.__boot
-         dan diambil kemudian oleh fetchEmployees() / fetchClaims().
-         Fetch jalan serentak dengan Tailwind compile, bukan tunggu dia.
-         ============================================================ -->
-    <script>
-    (function () {
-        window.SHEET_CSV_EMPLOYEES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?output=csv';
-        window.SHEET_CSV_CLAIMS    = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?gid=1560350142&single=true&output=csv';
-
-        var grab = function (url) {
-            return fetch(url)
-                .then(function (r) { return r.ok ? r.text() : Promise.reject(new Error('HTTP ' + r.status)); })
-                .catch(function (e) { console.error('Boot fetch gagal:', url, e); return null; });
-        };
-
-        window.__boot = {
-            t0: Date.now(),
-            emp: grab(window.SHEET_CSV_EMPLOYEES),
-            claims: grab(window.SHEET_CSV_CLAIMS)
-        };
-    })();
-    </script>
     
     <!-- PWA Meta Tags & Icons (Voltake Logo) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#118DFF">
-    <link rel="icon" href="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps=w192" type="image/png">
-    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps=w192">
+    <link rel="icon" href="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" type="image/png">
+    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- PERF: 3 weight sahaja (dulu 6). Jimat ~60KB font. -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
-    <!-- Tailwind CSS
-         NOTA: cdn.tailwindcss.com compile CSS dalam browser setiap kali load (~120KB + kos compile).
-         Langkah seterusnya (Minggu 3): tukar ke CSS pre-built via Netlify build step —
-         command = "npx tailwindcss@3 -i ./src/input.css -o ./styles.css --minify"
-         Selepas tu ganti baris bawah ni dengan: <link rel="stylesheet" href="/styles.css"> -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 
-    <!-- PERF: Phosphor Icons — guna CSS build (regular + fill sahaja), bukan JS build.
-         JS build download runtime loader + semua 6 weight. Kita cuma pakai `ph` dan `ph-fill`. -->
-    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
-    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
-
-    <!-- PERF: Chart.js (~70KB) dan jsPDF + autotable (~105KB) DIBUANG dari <head>.
-         Sekarang di-load on-demand via loadScript() — Chart.js bila buka Dashboard,
-         jsPDF bila klik Export PDF. ~175KB keluar dari critical path. -->
+    <!-- jsPDF untuk Export Laporan PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <script>
         tailwind.config = {
@@ -130,7 +89,7 @@
     <div id="login-view" class="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-[#1a1a1a] z-50 transition-opacity duration-300 px-4 absolute inset-0">
         <div class="bg-white dark:bg-[#252525] rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 w-full max-w-md overflow-hidden flex flex-col">
             <div class="bg-white dark:bg-[#252525] p-6 text-center border-b border-gray-100 dark:border-gray-800">
-                <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps=w192" alt="Voltake Logo" class="h-16 w-auto mx-auto object-contain mb-3">
+                <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" alt="Voltake Logo" class="h-16 w-auto mx-auto object-contain mb-3">
                 <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">ClaimPro HR</h1>
                 <p class="text-gray-500 dark:text-gray-400 text-sm font-medium mt-1">Sistem Pengurusan Tuntutan</p>
             </div>
@@ -189,7 +148,7 @@
         <!-- Sidebar / Navigasi (Desktop) -->
         <aside class="w-64 bg-white dark:bg-[#252525] border-r border-gray-200 dark:border-gray-800 flex flex-col transition-colors z-20 hidden md:flex flex-shrink-0">
             <div class="h-16 flex items-center justify-center px-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#252525]">
-                <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps=w192" alt="Voltake" class="h-8 w-auto object-contain">
+                <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" alt="Voltake" class="h-8 w-auto object-contain">
             </div>
             
             <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
@@ -236,7 +195,7 @@
 
         <!-- Mobile Header & Nav -->
         <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-[#252525] border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4 z-30">
-            <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps=w192" alt="Voltake" class="h-7 w-auto object-contain">
+            <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" alt="Voltake" class="h-7 w-auto object-contain">
             <div class="flex gap-1">
                 <button onclick="refreshData()" class="p-2 text-gray-500 dark:text-gray-400"><i class="ph ph-arrows-clockwise text-xl"></i></button>
                 <button onclick="toggleTheme()" class="p-2 text-gray-500 dark:text-gray-400"><i id="theme-icon-mobile" class="ph ph-moon text-xl"></i></button>
@@ -917,117 +876,9 @@
     <script>
         // --- 0. KONFIGURASI APP SCRIPT URL & CONSTANTS ---
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHOnaNpu1w6YSfVYn1qgKeeg0_4LPTvC98BVMMtysSoX_8xW9SE_mKc1WzVRHB9mfMSg/exec"; 
-        // URL didefinisikan dalam <head> supaya boot script boleh guna. Satu sumber sahaja.
-        const sheetCSVUrl  = window.SHEET_CSV_EMPLOYEES;
-        const claimsCSVUrl = window.SHEET_CSV_CLAIMS;
+        const sheetCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?output=csv';
+        const claimsCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAmoUPtFQhE2f3HCV3B-WgiJNoQuAppdEnFF4Oe2uUXDYk8dWyOjes8Xk7ddPhzIDYz0qkn-p39qq7/pub?gid=1560350142&single=true&output=csv';
         const ANNUAL_MEDICAL_LIMIT = 350;
-
-        // --- 0b. CDN LAZY-LOAD TARGETS ---
-        const CDN_CHARTJS   = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js';
-        const CDN_JSPDF     = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-        const CDN_JSPDF_AT  = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js';
-
-        // --- 0c. CACHE CONFIG ---
-        const CACHE_KEY     = 'claimpro_cache_v1';
-        const CACHE_MAX_AGE = 24 * 60 * 60 * 1000;   // buang cache lebih 24 jam
-
-        // ================================================================
-        // HELPER: escape HTML — WAJIB untuk semua data sheet yang masuk innerHTML.
-        // Tanpa ni, sesiapa yang taip <img src=x onerror=...> dalam field
-        // Description atau Nama boleh run script dalam session admin.
-        // ================================================================
-        const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
-        function esc(v) {
-            return String(v === null || v === undefined ? '' : v).replace(/[&<>"']/g, c => ESC_MAP[c]);
-        }
-        // Untuk data yang masuk dalam onclick="fn('...')" — escape quote JS dulu, lepas tu HTML.
-        function escAttr(v) {
-            return esc(String(v === null || v === undefined ? '' : v).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
-        }
-
-        // ================================================================
-        // HELPER: load script on-demand, sekali sahaja.
-        // ================================================================
-        const _scriptCache = {};
-        function loadScript(src) {
-            if (_scriptCache[src]) return _scriptCache[src];
-            _scriptCache[src] = new Promise((resolve, reject) => {
-                const el = document.createElement('script');
-                el.src = src;
-                el.async = true;
-                el.onload = () => resolve();
-                el.onerror = () => { delete _scriptCache[src]; reject(new Error('Gagal load: ' + src)); };
-                document.head.appendChild(el);
-            });
-            return _scriptCache[src];
-        }
-
-        // ================================================================
-        // HELPER: localStorage cache (stale-while-revalidate).
-        // User nampak data lama SERTA-MERTA, data baru masuk senyap di belakang.
-        // ================================================================
-        function saveCache() {
-            try {
-                localStorage.setItem(CACHE_KEY, JSON.stringify({
-                    t: Date.now(), employees: employeesList, claims: claimsData
-                }));
-            } catch (e) { /* quota penuh / private mode — abaikan, bukan fatal */ }
-        }
-
-        function loadCache() {
-            try {
-                const raw = localStorage.getItem(CACHE_KEY);
-                if (!raw) return null;
-                const c = JSON.parse(raw);
-                if (!c || !c.t || (Date.now() - c.t) > CACHE_MAX_AGE) {
-                    localStorage.removeItem(CACHE_KEY);
-                    return null;
-                }
-                return c;
-            } catch (e) { return null; }
-        }
-
-        // ================================================================
-        // HELPER: compress gambar resit sebelum tukar ke base64.
-        // Gambar kamera telefon 3-8MB → ~300KB. Base64 tambah 33% lagi,
-        // jadi ni potong upload time secara drastik atas mobile data.
-        // Fail bukan-imej (contoh PDF) dilepaskan tanpa diubah.
-        // ================================================================
-        function compressImage(file, maxDim = 1600, quality = 0.8) {
-            return new Promise((resolve) => {
-                if (!file || !file.type || !file.type.startsWith('image/')) return resolve(file);
-                if (file.size < 400 * 1024) return resolve(file);   // dah kecil, tak payah
-
-                const url = URL.createObjectURL(file);
-                const img = new Image();
-                const done = (result) => { URL.revokeObjectURL(url); resolve(result); };
-
-                img.onload = () => {
-                    try {
-                        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-                        const canvas = document.createElement('canvas');
-                        canvas.width  = Math.max(1, Math.round(img.width  * scale));
-                        canvas.height = Math.max(1, Math.round(img.height * scale));
-                        const ctx = canvas.getContext('2d');
-                        ctx.fillStyle = '#ffffff';                       // elak background hitam bila PNG transparent
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        canvas.toBlob((blob) => {
-                            if (!blob || blob.size >= file.size) return done(file);   // tak jimat? guna asal
-                            const newName = file.name.replace(/\.[^.]+$/, '') + '.jpg';
-                            done(new File([blob], newName, { type: 'image/jpeg', lastModified: Date.now() }));
-                        }, 'image/jpeg', quality);
-                    } catch (e) { done(file); }
-                };
-                img.onerror = () => done(file);
-                img.src = url;
-            });
-        }
-
-        // Compress satu senarai fail secara selari.
-        function compressAll(fileList) {
-            return Promise.all(Array.from(fileList).map(f => compressImage(f)));
-        }
 
         // --- 1. STATE VARIABLES ---
         let currentUser = null; 
@@ -1050,127 +901,54 @@
         let currentReceiptTitleBase = "";
 
         // --- 2. INIT & AUTO-LOGIN ---
-        //
-        // PERF FIX #1 — dulu boot block pada `await Promise.all([fetchEmployees(), fetchClaims()])`.
-        // Maknanya login screen tak boleh guna sampai KEDUA-DUA sheet siap download,
-        // walaupun login langsung tak perlukan data claims.
-        //
-        // Sekarang:
-        //   1. Render dari cache dulu kalau ada  → data lama nampak serta-merta
-        //   2. Login screen hidup terus          → user boleh mula taip ID
-        //   3. fetchEmployees() sahaja yang di-await (yang ni memang perlu untuk login)
-        //   4. fetchClaims() jalan di background → tak block apa-apa
-        //
         document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('cDate').valueAsDate = new Date();
-
-            // (1) Warm start dari cache — tiada network, instant.
-            const cached = loadCache();
-            const hasCache = !!(cached && cached.employees && cached.employees.length);
-            if (hasCache) {
-                employeesList = cached.employees;
-                claimsData    = Array.isArray(cached.claims) ? cached.claims : [];
-            }
-
-            // (2) Login screen hidup SERTA-MERTA.
+            
+            showLoadingOverlay("Memuatkan sistem...");
+            await Promise.all([ fetchEmployees(), fetchClaims() ]);
+            hideLoadingOverlay();
+            
             setupLoginSearch();
 
-            // Overlay hanya bila cold start (takde cache). Kalau ada cache, jangan ganggu user.
-            if (!hasCache) showLoadingOverlay("Memuatkan sistem...");
-
-            // (3) Employees — satu-satunya yang login screen perlukan.
-            const empOk = await fetchEmployees();
-            if (!hasCache) hideLoadingOverlay();
-
-            if (!empOk && !hasCache) {
-                showFetchError();
-                return;
-            }
-            renderLoginDropdown(document.getElementById('loginIdInput').value || '');
-            tryAutoLogin();
-
-            // (4) Claims — background, tak block apa-apa.
-            fetchClaims().then(() => {
-                saveCache();
-                if (currentUser) refreshVisibleViews();
-            });
-        });
-
-        // Auto-login dari localStorage — diasingkan supaya boleh dipanggil semula.
-        function tryAutoLogin() {
             const savedUser = localStorage.getItem('claimProUser');
-            if (!savedUser) return;
-            try {
-                const candidate = JSON.parse(savedUser);
-                const stillValid = employeesList.find(e => e.id === candidate.id);
-                if (!stillValid) { localStorage.removeItem('claimProUser'); return; }
-                if (candidate.password !== stillValid.password) {
-                    localStorage.removeItem('claimProUser');
-                    currentUser = null;
-                    return;
-                }
-                currentUser = candidate;
-                currentUser.name = stillValid.name;
-                currentUser.isSuperadmin = (stillValid.designation.toLowerCase() === 'admin');
-                proceedToApp();
-            } catch (e) { console.error("LS Error", e); }
-        }
-
-        // Refresh mana-mana view yang sedang terbuka sahaja.
-        function refreshVisibleViews() {
-            if (!currentUser) return;
-            const adminView = document.getElementById('view-admin');
-            const dashView  = document.getElementById('view-dashboard');
-            if (adminView && !adminView.classList.contains('hidden')) updateAdminTable();
-            if (dashView  && !dashView.classList.contains('hidden'))  updateDashboard();
-            updatePendingBadge();
-            handleTypeChange('new');
-        }
-
-        // Papar error yang jelas bila network gagal — dulu app senyap je, dropdown kosong.
-        function showFetchError() {
-            const dropdown = document.getElementById('loginDropdown');
-            if (dropdown) {
-                dropdown.classList.remove('hidden');
-                dropdown.innerHTML = '<li class="px-4 py-4 text-sm text-red-500 font-bold text-center">' +
-                    '<i class="ph-fill ph-wifi-slash mr-1"></i> Gagal sambung ke pelayan.<br>' +
-                    '<button onclick="location.reload()" class="mt-2 px-4 py-2 bg-pbi-blue text-white rounded-lg text-xs font-bold">Cuba Lagi</button>' +
-                    '</li>';
+            if(savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    const stillValid = employeesList.find(e => e.id === currentUser.id);
+                    if(stillValid) {
+                        if (currentUser.password !== stillValid.password) {
+                            localStorage.removeItem('claimProUser');
+                            currentUser = null;
+                        } else {
+                            currentUser.name = stillValid.name;
+                            currentUser.isSuperadmin = (stillValid.designation.toLowerCase() === 'admin');
+                            proceedToApp();
+                        }
+                    } else {
+                        localStorage.removeItem('claimProUser');
+                    }
+                } catch(e) { console.error("LS Error", e); }
             }
-        }
+        });
 
         function refreshData() {
             showLoadingOverlay("Menyegerakkan data...");
-            Promise.all([fetchEmployees(true), fetchClaims(true)]).then((results) => {
+            Promise.all([fetchEmployees(), fetchClaims()]).then(() => {
                 hideLoadingOverlay();
-                saveCache();
-                if (results.every(Boolean)) {
-                    showSuccessPopup("Data berjaya dikemaskini dari pelayan.");
-                } else {
-                    alert("Sebahagian data gagal disegerakkan. Sila semak sambungan internet anda.");
+                showSuccessPopup("Data berjaya dikemaskini dari pelayan.");
+                if(currentUser) {
+                    if(!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
+                    if(!document.getElementById('view-dashboard').classList.contains('hidden')) updateDashboard();
+                    updatePendingBadge();
+                    handleTypeChange('new'); 
                 }
-                refreshVisibleViews();
             });
         }
 
-        // Ambil hasil dari boot fetch kalau ada, kalau tak fetch baru.
-        // forceNetwork=true untuk butang Refresh (mesti data segar).
-        async function consumeBoot(key, url, forceNetwork) {
-            if (!forceNetwork && window.__boot && window.__boot[key]) {
-                const pending = window.__boot[key];
-                window.__boot[key] = null;          // guna sekali sahaja
-                const text = await pending;
-                if (text !== null) return text;      // boot fetch berjaya
-                // boot fetch gagal -> jatuh ke fetch biasa di bawah
-            }
-            const response = await fetch(url, forceNetwork ? { cache: 'no-store' } : undefined);
-            if (!response.ok) throw new Error('HTTP ' + response.status);
-            return await response.text();
-        }
-
-        async function fetchEmployees(forceNetwork) {
+        async function fetchEmployees() {
             try {
-                const data = await consumeBoot('emp', sheetCSVUrl, forceNetwork);
+                const response = await fetch(sheetCSVUrl);
+                const data = await response.text();
                 const rows = data.split('\n');
                 
                 employeesList = [];
@@ -1188,16 +966,13 @@
                         }
                     }
                 }
-                return true;
-            } catch (error) {
-                console.error("Ralat Employees:", error);
-                return false;   // caller kena tahu ni gagal, bukan senyap
-            }
+            } catch (error) { console.error("Ralat Employees:", error); }
         }
 
-        async function fetchClaims(forceNetwork) {
+        async function fetchClaims() {
             try {
-                const data = await consumeBoot('claims', claimsCSVUrl, forceNetwork);
+                const response = await fetch(claimsCSVUrl);
+                const data = await response.text();
                 const rows = data.split('\n');
                 
                 claimsData = [];
@@ -1236,11 +1011,7 @@
                         claimsData.push({ id, name, date, type, pax, desc, amount, status, receiptUrl, timestamp, paid, payReceiptUrl, payDate });
                     }
                 }
-                return true;
-            } catch (error) {
-                console.error("Ralat Claims:", error);
-                return false;
-            }
+            } catch (error) { console.error("Ralat Claims:", error); }
         }
 
         function setupLoginSearch() {
@@ -1626,12 +1397,8 @@
                 paid: 0, status: 'Menunggu'
             };
 
-            // PERF FIX #5 — compress dulu sebelum base64.
-            // Gambar kamera 3-8MB → ~300KB. Base64 tambah 33% lagi atas tu.
-            const sourceFiles = await compressAll(fileInput.files);
-
             // Baca Semua Fail yang dipilih
-            let filePromises = sourceFiles.map(file => {
+            let filePromises = Array.from(fileInput.files).map(file => {
                 return new Promise((resolve, reject) => {
                     let reader = new FileReader();
                     reader.onload = () => resolve({
@@ -1766,7 +1533,7 @@
                 }
 
                 grps.forEach(g => {
-                    const safeName = escAttr(g.name);   // XSS FIX: escape quote JS + entiti HTML
+                    const safeName = g.name.replace(/'/g, "\\'"); // Betulkan isu tanda petik
                     const isBal = g.bal > 0;
                     const st = isBal ? (g.tPaid > 0 ? 'Separa' : 'Ada Baki') : 'Selesai';
                     const c = isBal ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
@@ -1776,7 +1543,7 @@
 
                     const tr = document.createElement('tr'); tr.className = 'hover:bg-gray-50 dark:hover:bg-[#2e2e2e] transition-colors';
                     tr.innerHTML = `
-                        <td class="px-6 py-4 font-extrabold text-sm text-gray-900 dark:text-white">${esc(g.name)}</td>
+                        <td class="px-6 py-4 font-extrabold text-sm text-gray-900 dark:text-white">${g.name}</td>
                         <td class="px-6 py-4 text-center text-sm font-bold text-gray-600 dark:text-gray-300">${g.count} Rekod</td>
                         <td class="px-6 py-4 text-right text-sm font-bold text-gray-600 dark:text-gray-300">${formatRM(g.tAmt)}</td>
                         <td class="px-6 py-4 text-right text-sm text-pbi-green font-extrabold">${formatRM(g.tPaid)}</td>
@@ -1807,21 +1574,10 @@
             document.body.removeChild(link);
         }
 
-        async function exportAdminPDF() {
+        function exportAdminPDF() {
             if(!currentAdminData || currentAdminData.length === 0) return alert("Tiada data untuk dieksport.");
-
-            // PERF FIX #3 — jsPDF (~105KB) di-load HANYA bila butang ni ditekan,
-            // bukan setiap kali app buka. Kali kedua guna cache, tiada download.
-            showLoadingOverlay("Menyediakan PDF...");
-            try {
-                await loadScript(CDN_JSPDF);
-                await loadScript(CDN_JSPDF_AT);   // autotable kena lepas jsPDF
-            } catch (err) {
-                hideLoadingOverlay();
-                return alert("Gagal memuatkan modul PDF. Sila semak sambungan internet anda.");
-            }
-            hideLoadingOverlay();
-
+            if(!window.jspdf) return alert("Sistem PDF sedang dimuatkan, cuba sebentar lagi.");
+            
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
@@ -1881,16 +1637,16 @@
                 listBody.innerHTML += `
                     <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                         <td class="p-3 text-center align-middle">
-                            <input type="checkbox" class="claim-cb w-4 h-4 rounded text-pbi-blue focus:ring-pbi-blue cursor-pointer" data-type="${esc(c.type)}" value="${esc(c.id)}" onchange="recalcTotal()">
+                            <input type="checkbox" class="claim-cb w-4 h-4 rounded text-pbi-blue focus:ring-pbi-blue cursor-pointer" data-type="${c.type}" value="${c.id}" onchange="recalcTotal()">
                         </td>
                         <td class="p-3 align-middle">
-                            <div class="font-extrabold text-gray-900 dark:text-white">${esc(c.id)}</div>
-                            <div class="text-xs font-bold text-gray-500 dark:text-gray-400 mt-0.5">${esc(formatDate(c.date))} | ${esc(c.type)}</div>
+                            <div class="font-extrabold text-gray-900 dark:text-white">${c.id}</div>
+                            <div class="text-xs font-bold text-gray-500 dark:text-gray-400 mt-0.5">${formatDate(c.date)} | ${c.type}</div>
                         </td>
                         <td class="p-3 text-right align-middle font-bold text-gray-700 dark:text-gray-300">${formatRM(bal)}</td>
                         <td class="p-3 text-right align-middle">
-                            <input type="number" id="pay_input_${esc(c.id)}" class="w-24 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-right text-gray-900 dark:text-white font-extrabold text-sm focus:outline-none focus:ring-2 focus:ring-pbi-blue disabled:opacity-50" max="${bal}" value="${bal}" step="0.01" disabled oninput="recalcTotal(this, ${bal})">
-                            <input type="hidden" id="max_pay_${esc(c.id)}" value="${bal}">
+                            <input type="number" id="pay_input_${c.id}" class="w-24 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-700 text-right text-gray-900 dark:text-white font-extrabold text-sm focus:outline-none focus:ring-2 focus:ring-pbi-blue disabled:opacity-50" max="${bal}" value="${bal}" step="0.01" disabled oninput="recalcTotal(this, ${bal})">
+                            <input type="hidden" id="max_pay_${c.id}" value="${bal}">
                         </td>
                     </tr>
                 `;
@@ -1963,7 +1719,7 @@
 
         function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); document.getElementById('paymentForm').reset(); }
         
-        async function confirmPayment(e) {
+        function confirmPayment(e) {
             e.preventDefault();
             const total = recalcTotal();
             if(document.getElementById('btnConfirmPayment').disabled) return;
@@ -1975,7 +1731,6 @@
             let file = fileInput.files[0];
 
             showLoadingOverlay("Merekod pembayaran...");
-            file = await compressImage(file);   // PERF FIX #5
 
             let updates = [];
             const cbs = document.querySelectorAll('.claim-cb:checked');
@@ -2026,12 +1781,12 @@
                 const cCol = b === 0 ? 'text-pbi-green' : (c.paid > 0 ? 'text-yellow-600' : 'text-red-500');
                 
                 let docsHtml = '<div class="flex flex-col items-center justify-center space-y-1.5">';
-                if (c.receiptUrl) docsHtml += `<button onclick="openReceiptViewer('${escAttr(c.receiptUrl)}', 'Resit Tuntutan Pekerja (ID: ${escAttr(c.id)})')" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-pbi-blue border border-blue-200 rounded text-[10px] font-bold w-full transition-colors"><i class="ph-fill ph-file-pdf mr-1"></i> Staf</button>`;
+                if (c.receiptUrl) docsHtml += `<button onclick="openReceiptViewer('${c.receiptUrl}', 'Resit Tuntutan Pekerja (ID: ${c.id})')" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-pbi-blue border border-blue-200 rounded text-[10px] font-bold w-full transition-colors"><i class="ph-fill ph-file-pdf mr-1"></i> Staf</button>`;
                 
                 if (c.payReceiptUrl) {
                     let payUrls = c.payReceiptUrl.split(',').map(s=>s.trim()).filter(Boolean);
                     payUrls.forEach((url, idx) => {
-                        docsHtml += `<button onclick="openReceiptViewer('${escAttr(url)}', 'Bukti Bayaran HR ${idx+1} (ID: ${escAttr(c.id)})')" class="px-3 py-1.5 bg-green-50 hover:bg-green-100 text-pbi-green border border-green-200 rounded text-[10px] font-bold w-full mt-1 transition-colors"><i class="ph-fill ph-receipt mr-1"></i> HR ${payUrls.length > 1 ? (idx+1) : ''}</button>`;
+                        docsHtml += `<button onclick="openReceiptViewer('${url}', 'Bukti Bayaran HR ${idx+1} (ID: ${c.id})')" class="px-3 py-1.5 bg-green-50 hover:bg-green-100 text-pbi-green border border-green-200 rounded text-[10px] font-bold w-full mt-1 transition-colors"><i class="ph-fill ph-receipt mr-1"></i> HR ${payUrls.length > 1 ? (idx+1) : ''}</button>`;
                     });
                 }
                 if (!c.receiptUrl && !c.payReceiptUrl) docsHtml += `<span class="text-[10px] text-gray-400 font-bold uppercase">Tiada Fail</span>`;
@@ -2039,12 +1794,12 @@
 
                 const tr = document.createElement('tr'); tr.className = 'hover:bg-gray-50 dark:hover:bg-[#2e2e2e] transition-colors';
                 tr.innerHTML = `
-                    <td class="px-5 py-4 text-xs text-gray-900 dark:text-gray-300"><b>${esc(c.id)}</b><br><span class="text-[11px] text-gray-500">${esc(formatDate(c.date))}</span></td>
-                    <td class="px-5 py-4 text-xs font-bold text-gray-700 dark:text-gray-400">${esc(c.desc||c.type)}</td>
+                    <td class="px-5 py-4 text-xs text-gray-900 dark:text-gray-300"><b>${c.id}</b><br><span class="text-[11px] text-gray-500">${formatDate(c.date)}</span></td>
+                    <td class="px-5 py-4 text-xs font-bold text-gray-700 dark:text-gray-400">${c.desc||c.type}</td>
                     <td class="px-5 py-4 text-xs text-right font-extrabold">${formatRM(c.amount)}</td>
                     <td class="px-5 py-4 text-xs text-right font-extrabold text-pbi-green">${formatRM(c.paid)}</td>
                     <td class="px-5 py-4 text-xs text-right font-extrabold ${b>0?'text-red-500':'text-gray-500'}">${formatRM(b)}</td>
-                    <td class="px-5 py-4 text-[10px] uppercase tracking-wider text-center font-extrabold ${cCol}">${esc(c.status)}</td>
+                    <td class="px-5 py-4 text-[10px] uppercase tracking-wider text-center font-extrabold ${cCol}">${c.status}</td>
                     <td class="px-5 py-3 align-middle">${docsHtml}</td>
                 `;
                 tb.appendChild(tr);
@@ -2092,10 +1847,10 @@
                                 <i class="ph-fill ph-receipt text-4xl text-pbi-green mr-4"></i>
                                 <div>
                                     <p class="text-sm font-bold text-gray-900 dark:text-white">Bukti Pembayaran HR ${payUrls.length > 1 ? '#' + (idx+1) : ''}</p>
-                                    <p class="text-[11px] font-semibold text-gray-500 dark:text-gray-400 mt-0.5">Tarikh: ${esc(pDate)}</p>
+                                    <p class="text-[11px] font-semibold text-gray-500 dark:text-gray-400 mt-0.5">Tarikh: ${pDate}</p>
                                 </div>
                             </div>
-                            <button onclick="openReceiptViewer('${escAttr(url)}', 'Bukti Bayaran HR ${idx+1}')" class="px-4 py-2 bg-white dark:bg-[#252525] shadow-sm border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-bold text-pbi-green hover:text-green-700 transition-colors whitespace-nowrap">Buka Bukti</button>
+                            <button onclick="openReceiptViewer('${url}', 'Bukti Bayaran HR ${idx+1}')" class="px-4 py-2 bg-white dark:bg-[#252525] shadow-sm border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-bold text-pbi-green hover:text-green-700 transition-colors whitespace-nowrap">Buka Bukti</button>
                         </div>
                     `;
                 });
@@ -2107,8 +1862,8 @@
             let canEdit = currentUser.isSuperadmin || c.status === 'Menunggu';
             if (canEdit) {
                 actionContainer.innerHTML = `
-                    <button onclick="openEditModal('${escAttr(c.id)}')" class="px-4 py-2.5 bg-white dark:bg-[#1f1f1f] text-pbi-orange border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-orange-50 dark:hover:bg-gray-800 font-bold rounded-lg text-sm transition-colors"><i class="ph ph-pencil-simple mr-1 text-lg align-text-bottom"></i> Kemaskini</button>
-                    <button onclick="confirmDelete('${escAttr(c.id)}')" class="px-4 py-2.5 bg-white dark:bg-[#1f1f1f] text-red-500 border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-red-50 dark:hover:bg-gray-800 font-bold rounded-lg text-sm transition-colors"><i class="ph ph-trash mr-1 text-lg align-text-bottom"></i> Padam</button>
+                    <button onclick="openEditModal('${c.id}')" class="px-4 py-2.5 bg-white dark:bg-[#1f1f1f] text-pbi-orange border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-orange-50 dark:hover:bg-gray-800 font-bold rounded-lg text-sm transition-colors"><i class="ph ph-pencil-simple mr-1 text-lg align-text-bottom"></i> Kemaskini</button>
+                    <button onclick="confirmDelete('${c.id}')" class="px-4 py-2.5 bg-white dark:bg-[#1f1f1f] text-red-500 border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-red-50 dark:hover:bg-gray-800 font-bold rounded-lg text-sm transition-colors"><i class="ph ph-trash mr-1 text-lg align-text-bottom"></i> Padam</button>
                 `;
             }
             actionContainer.innerHTML += `<button onclick="closeTransactionModal()" class="px-6 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white font-bold rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ml-auto">Tutup</button>`;
@@ -2244,8 +1999,7 @@
             showLoadingOverlay("Mengemaskini tuntutan...");
 
             if (fileInput.files.length > 0) {
-                const sourceFiles = await compressAll(fileInput.files);   // PERF FIX #5
-                let filePromises = sourceFiles.map(file => {
+                let filePromises = Array.from(fileInput.files).map(file => {
                     return new Promise((resolve, reject) => {
                         let reader = new FileReader();
                         reader.onload = () => resolve({
@@ -2321,7 +2075,7 @@
 
         function resetDashFilter() { document.getElementById('dashStartDate').value = ''; document.getElementById('dashEndDate').value = ''; updateDashboard(); }
         
-        async function updateDashboard() {
+        function updateDashboard() {
             if(!currentUser) return;
             const sd = document.getElementById('dashStartDate').value; const ed = document.getElementById('dashEndDate').value;
             let roleFiltered = currentUser.isSuperadmin ? claimsData : claimsData.filter(c => c.name === currentUser.name);
@@ -2356,36 +2110,27 @@
                 sortedData.forEach(c => {
                     let cCol = c.amount === c.paid ? 'text-pbi-green' : (c.paid > 0 ? 'text-yellow-600' : 'text-pbi-orange');
                     let canEdit = currentUser.isSuperadmin || c.status === 'Menunggu';
-                    let actionHtml = `<button onclick="viewTransaction('${escAttr(c.id)}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-pbi-blue border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-blue-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center" title="Perincian"><i class="ph ph-eye text-base"></i></button>`;
+                    let actionHtml = `<button onclick="viewTransaction('${c.id}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-pbi-blue border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-blue-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center" title="Perincian"><i class="ph ph-eye text-base"></i></button>`;
                     if (canEdit) {
                         actionHtml += `
-                            <button onclick="openEditModal('${escAttr(c.id)}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-pbi-orange border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-orange-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center ml-1" title="Kemaskini"><i class="ph ph-pencil-simple text-base"></i></button>
-                            <button onclick="confirmDelete('${escAttr(c.id)}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-red-500 border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-red-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center ml-1" title="Padam"><i class="ph ph-trash text-base"></i></button>
+                            <button onclick="openEditModal('${c.id}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-pbi-orange border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-orange-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center ml-1" title="Kemaskini"><i class="ph ph-pencil-simple text-base"></i></button>
+                            <button onclick="confirmDelete('${c.id}')" class="text-xs font-bold bg-white dark:bg-[#1f1f1f] text-red-500 border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-red-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center ml-1" title="Padam"><i class="ph ph-trash text-base"></i></button>
                         `;
                     }
 
                     const tr = document.createElement('tr'); tr.className = 'hover:bg-gray-50 dark:hover:bg-[#2e2e2e] transition-colors';
                     tr.innerHTML = `
-                        <td class="px-5 py-4 whitespace-nowrap"><div class="font-extrabold text-gray-900 dark:text-white">${esc(c.id)}</div><div class="text-[11px] text-gray-500 font-semibold">${esc(formatDate(c.date))}</div></td>
-                        <td class="px-5 py-4 whitespace-nowrap text-sm font-extrabold text-gray-800 dark:text-gray-200">${esc(c.name)}</td>
-                        <td class="px-5 py-4 whitespace-nowrap text-sm font-bold text-gray-600 dark:text-gray-400">${esc(c.type)}</td>
+                        <td class="px-5 py-4 whitespace-nowrap"><div class="font-extrabold text-gray-900 dark:text-white">${c.id}</div><div class="text-[11px] text-gray-500 font-semibold">${formatDate(c.date)}</div></td>
+                        <td class="px-5 py-4 whitespace-nowrap text-sm font-extrabold text-gray-800 dark:text-gray-200">${c.name}</td>
+                        <td class="px-5 py-4 whitespace-nowrap text-sm font-bold text-gray-600 dark:text-gray-400">${c.type}</td>
                         <td class="px-5 py-4 whitespace-nowrap text-right text-sm font-extrabold text-gray-900 dark:text-white">${formatRM(c.amount)}</td>
-                        <td class="px-5 py-4 whitespace-nowrap text-center text-[10px] tracking-wider uppercase font-extrabold ${cCol}">${esc(c.status)}</td>
+                        <td class="px-5 py-4 whitespace-nowrap text-center text-[10px] tracking-wider uppercase font-extrabold ${cCol}">${c.status}</td>
                         <td class="px-5 py-4 whitespace-nowrap text-right h-full">
                             <div class="flex justify-end items-center">${actionHtml}</div>
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
-            }
-
-            // PERF FIX #3 — Chart.js (~70KB) di-load hanya bila Dashboard betul-betul dirender.
-            // Semua KPI + table di atas ni dah siap render sebelum ni, jadi user tak tunggu kosong.
-            try {
-                await loadScript(CDN_CHARTJS);
-            } catch (err) {
-                console.error("Chart.js gagal load:", err);
-                return;   // KPI & table tetap berfungsi, chart je yang tak keluar
             }
 
             const isDark = document.documentElement.classList.contains('dark');
