@@ -1559,8 +1559,7 @@
             
             if (fi.files && fi.files.length > 0) {
                 let displayText = fi.files.length === 1 ? fi.files[0].name : `${fi.files.length} Fail Dipilih`;
-                document.getElementById(did).innerText = displayText; 
-                document.getElementById('selectedFileName').value = displayText;
+                document.getElementById(did).innerText = displayText;
                 oi.value = ""; document.getElementById(odid).innerText = src === 'file' ? 'Buka Kamera Semasa' : 'Pilih Fail(s) / Gambar';
                 document.getElementById('receiptError').classList.add('hidden');
             }
@@ -1570,7 +1569,7 @@
             document.getElementById('claimForm').reset();
             document.getElementById('cReceiptFile').value = ""; document.getElementById('cReceiptCam').value = "";
             document.getElementById('file-name-display').innerText = 'Pilih Fail(s) / Gambar'; document.getElementById('camera-name-display').innerText = 'Buka Kamera Semasa';
-            document.getElementById('selectedFileName').value = ""; document.getElementById('receiptError').classList.add('hidden');
+            document.getElementById('receiptError').classList.add('hidden');
             if(currentUser) document.getElementById('cNameInputLocked').value = currentUser.name;
             handleTypeChange('new');
         }
@@ -1625,18 +1624,29 @@
                 reader.readAsDataURL(file);
             }));
 
+            let r;
             try {
                 payload.files = await Promise.all(filePromises);
-                const r = await api('submitClaim', payload);
-                claimsData.unshift(r.claim);
-
-                resetForm(); updatePendingBadge();
-                hideLoadingOverlay();
-                setTimeout(() => showSuccessPopup('Tuntutan anda (ID: ' + r.claim.id + ') berjaya direkodkan.'), 350);
+                r = await api('submitClaim', payload);
             } catch (error) {
                 hideLoadingOverlay();
                 if (!/^Unauthorized/i.test(error.message)) alert("Ralat: " + error.message);
+                return;
             }
+
+            // Sampai sini tuntutan SUDAH tersimpan dalam Google Sheet.
+            // Sebarang ralat paparan selepas ini tak boleh papar "Ralat" -
+            // nanti staff ingat hantaran gagal dan hantar dua kali.
+            try {
+                claimsData.unshift(r.claim);
+                resetForm();
+                updatePendingBadge();
+            } catch (uiErr) {
+                console.error('Ralat kemas kini paparan selepas simpan:', uiErr);
+            }
+
+            hideLoadingOverlay();
+            setTimeout(() => showSuccessPopup('Tuntutan anda (ID: ' + r.claim.id + ') berjaya direkodkan.'), 350);
         }
 
         function getAdminFilteredClaims() {
@@ -1962,15 +1972,20 @@
                         fileBase64: reader.result.split(',')[1],
                         updates: updates
                     });
-                    updates.forEach(u => {
-                        const claim = claimsData.find(c => c.id === u.id);
-                        if (claim) {
-                            claim.paid = u.paid; claim.status = u.status;
-                            claim.payReceiptUrl = claim.payReceiptUrl ? claim.payReceiptUrl + ', ' + result.fileUrl : result.fileUrl;
-                            claim.payDate = claim.payDate ? claim.payDate + ', ' + new Date().toISOString() : new Date().toISOString();
-                        }
-                    });
-                    closePaymentModal(); updateAdminTable(); updatePendingBadge();
+                    // Bayaran SUDAH direkod dalam Sheet.
+                    try {
+                        updates.forEach(u => {
+                            const claim = claimsData.find(c => c.id === u.id);
+                            if (claim) {
+                                claim.paid = u.paid; claim.status = u.status;
+                                claim.payReceiptUrl = claim.payReceiptUrl ? claim.payReceiptUrl + ', ' + result.fileUrl : result.fileUrl;
+                                claim.payDate = claim.payDate ? claim.payDate + ', ' + new Date().toISOString() : new Date().toISOString();
+                            }
+                        });
+                        closePaymentModal(); updateAdminTable(); updatePendingBadge();
+                    } catch (uiErr) {
+                        console.error('Ralat kemas kini paparan selepas bayaran:', uiErr);
+                    }
                     hideLoadingOverlay();
                     setTimeout(() => showSuccessPopup('Bayaran sebanyak ' + formatRM(total) + ' untuk ' + name + ' berjaya direkod.'), 350);
                 } catch (error) {
@@ -2230,19 +2245,26 @@
                 }
 
                 const res = await api('editClaim', payload);
-                const claim = claimsData.find(c => c.id === id);
-                if (claim) {
-                    claim.date = payload.date;
-                    claim.pax = payload.pax;
-                    claim.type = payload.type;
-                    claim.desc = payload.desc;
-                    claim.amount = payload.amount;
-                    if (res.fileUrl) claim.receiptUrl = res.fileUrl;
+
+                // Kemas kini SUDAH tersimpan. Ralat paparan selepas ini
+                // dilog sahaja, bukan dipapar sebagai kegagalan.
+                try {
+                    const claim = claimsData.find(c => c.id === id);
+                    if (claim) {
+                        claim.date = payload.date;
+                        claim.pax = payload.pax;
+                        claim.type = payload.type;
+                        claim.desc = payload.desc;
+                        claim.amount = payload.amount;
+                        if (res.fileUrl) claim.receiptUrl = res.fileUrl;
+                    }
+                    closeEditModal(); updateDashboard();
+                    if (!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
+                    updatePendingBadge();
+                    handleTypeChange('new');
+                } catch (uiErr) {
+                    console.error('Ralat kemas kini paparan selepas edit:', uiErr);
                 }
-                closeEditModal(); updateDashboard();
-                if (!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
-                updatePendingBadge();
-                handleTypeChange('new');
                 showSuccessPopup("Tuntutan anda berjaya dikemaskini.");
             } catch (err) {
                 if (!/^Unauthorized/i.test(err.message)) alert("Ralat Kemaskini: " + err.message);
@@ -2268,11 +2290,17 @@
 
             try {
                 await api('deleteClaim', { id: id });
-                claimsData = claimsData.filter(c => c.id !== id);
-                closeDeleteModal(); updateDashboard();
-                if (!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
-                updatePendingBadge();
-                handleTypeChange('new');
+
+                // Rekod SUDAH dipadam di pelayan.
+                try {
+                    claimsData = claimsData.filter(c => c.id !== id);
+                    closeDeleteModal(); updateDashboard();
+                    if (!document.getElementById('view-admin').classList.contains('hidden')) updateAdminTable();
+                    updatePendingBadge();
+                    handleTypeChange('new');
+                } catch (uiErr) {
+                    console.error('Ralat kemas kini paparan selepas padam:', uiErr);
+                }
                 showSuccessPopup("Tuntutan telah selamat dipadam.");
             } catch (err) {
                 if (!/^Unauthorized/i.test(err.message)) alert("Ralat Padam: " + err.message);
