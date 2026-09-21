@@ -6,10 +6,8 @@
     <title>Sistem Pengurusan Tuntutan HR</title>
 
     <!-- ============================================================= -->
-    <!-- TEKNIK #6 - Content-Security-Policy                            -->
-    <!-- Hadkan dari mana browser boleh muat script/style/imej.         -->
-    <!-- Versi header penuh (termasuk frame-ancestors) ada di           -->
-    <!-- netlify.toml. Meta ini baseline untuk GitHub Pages.            -->
+    <!-- TEKNIK #6 - Content-Security-Policy                           -->
+    <!-- Hadkan dari mana browser boleh muat script/style/imej.        -->
     <!-- ============================================================= -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
@@ -23,7 +21,7 @@
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="robots" content="noindex, nofollow">
     
-    <!-- PWA Meta Tags & Icons (Voltake Logo) -->
+    <!-- PWA Meta Tags & Icons -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#118DFF">
@@ -80,7 +78,7 @@
 <body class="bg-gray-50 text-gray-800 dark:bg-[#1a1a1a] dark:text-gray-200 font-sans h-screen w-screen overflow-hidden selection:bg-pbi-blue selection:text-white flex flex-col relative">
 
     <!-- ============================================== -->
-    <!-- PUSAT OVERLAY / POPUP (LOADING & SUCCESS) -->
+    <!-- PUSAT OVERLAY / POPUP (LOADING & SUCCESS & ERROR) -->
     <!-- ============================================== -->
     <div id="loadingOverlay" class="fixed inset-0 bg-white/80 dark:bg-black/80 z-[100] flex flex-col items-center justify-center backdrop-blur-md hidden transition-opacity">
         <i class="ph ph-spinner-gap animate-spin text-5xl text-pbi-blue mb-4"></i>
@@ -96,6 +94,19 @@
             <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight">Berjaya!</h3>
             <p id="successMessage" class="text-gray-500 dark:text-gray-400 font-medium mb-6">Tindakan anda telah berjaya direkodkan ke dalam sistem.</p>
             <button onclick="closeSuccessPopup()" class="w-full py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-bold rounded-lg transition-colors">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <div id="errorPopup" class="fixed inset-0 bg-gray-900/60 dark:bg-black/80 z-[100] flex items-center justify-center backdrop-blur-sm hidden transition-opacity">
+        <div class="bg-white dark:bg-[#252525] rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 text-center border border-gray-100 dark:border-gray-800 transform scale-95 transition-transform duration-300">
+            <div class="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-5">
+                <i class="ph-fill ph-x-circle text-5xl text-red-500"></i>
+            </div>
+            <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight">Ralat!</h3>
+            <p id="errorMessage" class="text-gray-500 dark:text-gray-400 font-medium mb-6"></p>
+            <button onclick="closeErrorPopup()" class="w-full py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-bold rounded-lg transition-colors">
                 Tutup
             </button>
         </div>
@@ -148,7 +159,7 @@
     <div id="login-view" class="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-[#1a1a1a] z-50 transition-opacity duration-300 px-4 absolute inset-0">
         <div class="bg-white dark:bg-[#252525] rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 w-full max-w-md overflow-hidden flex flex-col">
             <div class="bg-white dark:bg-[#252525] p-6 text-center border-b border-gray-100 dark:border-gray-800">
-                <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" alt="Voltake Logo" class="h-16 w-auto mx-auto object-contain mb-3">
+                <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" alt="Voltake Logo" class="h-16 w-auto mx-auto object-contain mb-3" onerror="this.src='https://placehold.co/200x80/118DFF/ffffff?text=Voltake'">
                 <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">ClaimPro HR</h1>
                 <p class="text-gray-500 dark:text-gray-400 text-sm font-medium mt-1">Sistem Pengurusan Tuntutan</p>
             </div>
@@ -197,7 +208,6 @@
                     Log Masuk <i class="ph ph-sign-in ml-2 text-xl"></i>
                 </button>
 
-                <!-- TEKNIK #7 - Notis PDPA (Notice & Choice Principle) -->
                 <p class="text-[11px] leading-relaxed text-gray-500 dark:text-gray-500 mt-5 text-center">
                     Dengan log masuk, anda bersetuju sistem ini memproses nama, ID pekerja dan
                     rekod tuntutan anda untuk tujuan pentadbiran pembayaran.
@@ -219,7 +229,7 @@
         <!-- Sidebar / Navigasi (Desktop) -->
         <aside class="w-64 bg-white dark:bg-[#252525] border-r border-gray-200 dark:border-gray-800 flex flex-col transition-colors z-20 hidden md:flex flex-shrink-0">
             <div class="h-16 flex items-center justify-center px-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#252525]">
-                <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" alt="Voltake" class="h-8 w-auto object-contain">
+                <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" alt="Voltake" class="h-8 w-auto object-contain" onerror="this.src='https://placehold.co/100x40/118DFF/ffffff?text=Voltake'">
             </div>
             
             <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
@@ -266,7 +276,7 @@
 
         <!-- Mobile Header & Nav -->
         <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-[#252525] border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4 z-30">
-            <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" alt="Voltake" class="h-7 w-auto object-contain">
+            <img src="https://lh3.googleusercontent.com/d/1UNatuJ8TQ5I7ab4qUqmblWzSSMpHlZps" alt="Voltake" class="h-7 w-auto object-contain" onerror="this.src='https://placehold.co/80x30/118DFF/ffffff?text=Voltake'">
             <div class="flex gap-1">
                 <button onclick="refreshData()" class="p-2 text-gray-500 dark:text-gray-400"><i class="ph ph-arrows-clockwise text-xl"></i></button>
                 <button onclick="toggleTheme()" class="p-2 text-gray-500 dark:text-gray-400"><i id="theme-icon-mobile" class="ph ph-moon text-xl"></i></button>
@@ -298,7 +308,6 @@
             <!-- VIEW 1: Borang Tuntutan Pekerja -->
             <div id="view-submit" class="view-section flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-3xl mx-auto">
 
-                <!-- TEKNIK #2 - peringatan lembut selagi masih guna kata laluan default -->
                 <div id="defaultPwdNag" class="hidden mb-6 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-xl p-4 flex items-start gap-3">
                     <i class="ph-fill ph-shield-warning text-2xl text-amber-500 flex-shrink-0 mt-0.5"></i>
                     <div class="flex-1">
@@ -893,8 +902,13 @@
                     <tbody id="detailsTableBody" class="bg-white dark:bg-[#252525] divide-y divide-gray-100 dark:divide-gray-800"></tbody>
                 </table>
             </div>
-            <div class="mt-5 pt-5 flex justify-end border-t border-gray-100 dark:border-gray-800 shrink-0">
-                <button onclick="closeDetailsModal()" class="px-8 py-3 bg-gray-100 dark:bg-gray-800 font-bold rounded-lg text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Tutup Paparan</button>
+            <!-- BUTTON MUAT TURUN INDIVIDU DITAMBAH DI SINI -->
+            <div class="mt-5 pt-5 flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-gray-100 dark:border-gray-800 shrink-0">
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button onclick="exportSingleAdminCSV()" class="px-4 py-3 sm:py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg text-xs transition-colors flex-1 sm:flex-none flex items-center justify-center shadow-sm"><i class="ph-fill ph-file-csv mr-1.5 text-base"></i> Muat Turun CSV</button>
+                    <button onclick="exportSingleAdminPDF()" class="px-4 py-3 sm:py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs transition-colors flex-1 sm:flex-none flex items-center justify-center shadow-sm"><i class="ph-fill ph-file-pdf mr-1.5 text-base"></i> Muat Turun PDF</button>
+                </div>
+                <button onclick="closeDetailsModal()" class="w-full sm:w-auto px-8 py-3 sm:py-2.5 bg-gray-100 dark:bg-gray-800 font-bold rounded-lg text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Tutup Paparan</button>
             </div>
         </div>
     </div>
@@ -976,10 +990,6 @@
         // ==========================================================
         // 0. KONFIGURASI
         // ==========================================================
-        // TEKNIK #1 - Tiada URL "Publish to Web" di sini.
-        // Semua data masuk/keluar melalui satu endpoint Apps Script yang
-        // di-gate session token. URL ini bukan rahsia - ia endpoint awam,
-        // tetapi setiap action di sebaliknya perlukan token yang sah.
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkELWbe3DewtG-t6HYYpleeLPNouDpctw2pKFapibT7ebIo60CFRr1hBecT8c8Y5R20w/exec";
 
         const ANNUAL_MEDICAL_LIMIT = 350;
@@ -990,8 +1000,8 @@
         // --- 1. STATE VARIABLES ---
         let sessionToken = null;
         let currentUser = null;
-        let employeesList = [];   // senarai dalam app (selepas login)
-        let loginStaffList = [];  // senarai untuk dropdown login sahaja (ID + nama)
+        let employeesList = [];   
+        let loginStaffList = [];  
         let claimsData = [];
         let currentFilter = 'Ada Baki';
         let currentAdminData = [];
@@ -1011,9 +1021,6 @@
         // ==========================================================
         // TEKNIK #6 - HELPER ESCAPE (anti-XSS)
         // ==========================================================
-        // Data dari Sheet/input pengguna TIDAK BOLEH masuk innerHTML
-        // mentah-mentah. esc() untuk kandungan HTML, jsStr() untuk nilai
-        // yang dimasukkan ke dalam atribut onclick.
         function esc(v) {
             return String(v === null || v === undefined ? '' : v)
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -1026,7 +1033,7 @@
         }
 
         // ==========================================================
-        // TEKNIK #3 - LAPISAN API (token dilampirkan setiap request)
+        // TEKNIK #3 - LAPISAN API
         // ==========================================================
         async function api(action, payload, opts) {
             opts = opts || {};
@@ -1038,8 +1045,6 @@
 
             let res;
             try {
-                // Sengaja tanpa header Content-Type supaya kekal "simple request"
-                // (tiada CORS preflight ke Apps Script).
                 res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body) });
             } catch (err) {
                 throw new Error('Tiada sambungan ke pelayan. Semak internet anda.');
@@ -1058,7 +1063,7 @@
         }
 
         // ==========================================================
-        // 2. INIT & AUTO-LOGIN (guna remember-token, bukan password)
+        // 2. INIT & AUTO-LOGIN
         // ==========================================================
         document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('cDate').valueAsDate = new Date();
@@ -1068,7 +1073,6 @@
             await loadStaffList();
             preselectLastUser();
 
-            // Cuba sambung semula sesi tanpa taip password
             const remember = localStorage.getItem(LS_REMEMBER);
             if (remember) {
                 try {
@@ -1088,7 +1092,6 @@
             hideLoadingOverlay();
         });
 
-        /** Senarai staf untuk dropdown login - ID & nama sahaja, tiada password. */
         async function loadStaffList() {
             try {
                 const r = await api('getStaffList', {}, { noToken: true });
@@ -1101,7 +1104,6 @@
             }
         }
 
-        /** Isi semula ID terakhir supaya staff tak perlu cari nama tiap kali login. */
         function preselectLastUser() {
             const lastId = localStorage.getItem(LS_LASTID);
             if (!lastId) return;
@@ -1114,7 +1116,6 @@
             document.getElementById('btnLogin').disabled = false;
         }
 
-        /** Muat data selepas login. Penapisan ikut role dibuat di pelayan. */
         async function loadData() {
             const r = await api('getData', {});
             claimsData = r.claims || [];
@@ -1155,7 +1156,7 @@
                 }
             } catch (err) {
                 hideLoadingOverlay();
-                if (!/^Unauthorized/i.test(err.message)) alert("Ralat memuat data: " + err.message);
+                if (!/^Unauthorized/i.test(err.message)) showErrorPopup("Ralat memuat data: " + err.message);
             }
         }
 
@@ -1207,12 +1208,6 @@
             });
         }
 
-        // ==========================================================
-        // TEKNIK #3 + #4 - LOGIN DISAHKAN DI PELAYAN
-        // ==========================================================
-        // Versi lama membandingkan password dalam browser selepas download
-        // seluruh Sheet. Sekarang browser tak pernah nampak password sesiapa;
-        // ia hanya hantar ID + password dan terima token kalau betul.
         async function handleLogin() {
             const hidId = document.getElementById('loginSelectedId').value;
             const errId = document.getElementById('loginError');
@@ -1283,7 +1278,6 @@
             }, 300);
         }
 
-        /** Logout: revoke token di PELAYAN, bukan sekadar padam dari browser. */
         async function logout() {
             const token = sessionToken;
             const remember = localStorage.getItem(LS_REMEMBER);
@@ -1299,7 +1293,6 @@
             showLoginScreen();
         }
 
-        /** Dipanggil bila pelayan tolak token (tamat tempoh / dibatalkan). */
         function forceLogout(message) {
             clearLocalSession();
             showLoginScreen();
@@ -1362,6 +1355,17 @@
             sp.classList.add('opacity-0'); sp.firstElementChild.classList.add('scale-95'); sp.firstElementChild.classList.remove('scale-100');
             setTimeout(() => sp.classList.add('hidden'), 300);
         }
+        
+        function showErrorPopup(msg) {
+            document.getElementById('errorMessage').innerText = msg || "Ralat tidak diketahui berlaku.";
+            const sp = document.getElementById('errorPopup');
+            sp.classList.remove('hidden'); setTimeout(() => { sp.classList.remove('opacity-0'); sp.firstElementChild.classList.remove('scale-95'); sp.firstElementChild.classList.add('scale-100'); }, 10);
+        }
+        function closeErrorPopup() {
+            const sp = document.getElementById('errorPopup');
+            sp.classList.add('opacity-0'); sp.firstElementChild.classList.add('scale-95'); sp.firstElementChild.classList.remove('scale-100');
+            setTimeout(() => sp.classList.add('hidden'), 300);
+        }
 
         function navigate(viewId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
@@ -1400,7 +1404,6 @@
 
         function closePasswordModal() { document.getElementById('changePasswordModal').classList.add('hidden'); }
 
-        // TEKNIK #2 + #4 - kata laluan lama disahkan di PELAYAN
         async function submitChangePassword(e) {
             e.preventDefault();
             const oldPwd = document.getElementById('pwdOld').value;
@@ -1426,7 +1429,6 @@
 
             try {
                 const r = await api('changePassword', { oldPassword: oldPwd, newPassword: newPwd });
-                // Pelayan batalkan semua sesi lama dan beri token baharu
                 sessionToken = r.token;
                 localStorage.setItem(LS_TOKEN, r.token);
                 localStorage.removeItem(LS_REMEMBER);
@@ -1473,7 +1475,6 @@
             const inputAmt = parseFloat(inputAmtEl.value) || 0;
             let isValid = true;
 
-            // Medical check for New Form only
             if (mode === 'new') {
                 const medWarnText = document.getElementById('medicalWarnText');
                 if (type === 'Perubatan') {
@@ -1494,7 +1495,6 @@
                 }
             }
 
-            // Makan & Minum Limit Check
             const mealWarnText = document.getElementById(prefix + 'MealWarnText');
             const mealLimitText = document.getElementById(prefix + 'MealLimitText');
 
@@ -1536,7 +1536,6 @@
                 if (mealLimitText) mealLimitText.classList.add('hidden');
             }
 
-            // UI Submit Button styling
             const btnSubmit = document.getElementById(mode === 'new' ? 'btnSubmitClaim' : 'btnSubmitEdit');
             if (!isValid) {
                 inputAmtEl.classList.add('border-red-500', 'ring-red-500');
@@ -1602,8 +1601,6 @@
                 }
             }
 
-            // Nota: ID tuntutan dan nama pemilik dijana di PELAYAN dari session,
-            // bukan dihantar dari browser (Teknik #4).
             const payload = {
                 date: document.getElementById('cDate').value,
                 type: type,
@@ -1630,13 +1627,10 @@
                 r = await api('submitClaim', payload);
             } catch (error) {
                 hideLoadingOverlay();
-                if (!/^Unauthorized/i.test(error.message)) alert("Ralat: " + error.message);
+                if (!/^Unauthorized/i.test(error.message)) showErrorPopup("Ralat: " + error.message);
                 return;
             }
 
-            // Sampai sini tuntutan SUDAH tersimpan dalam Google Sheet.
-            // Sebarang ralat paparan selepas ini tak boleh papar "Ralat" -
-            // nanti staff ingat hantaran gagal dan hantar dua kali.
             try {
                 claimsData.unshift(r.claim);
                 resetForm();
@@ -1654,7 +1648,7 @@
             const ed = document.getElementById('adminEndDate') ? document.getElementById('adminEndDate').value : '';
             
             return claimsData.filter(c => {
-                const cd = new Date(c.timestamp); // Filter ikut tarikh timestamp direkodkan
+                const cd = new Date(c.timestamp); 
                 if (sd && ed) { 
                     const e = new Date(ed); e.setHours(23,59,59); 
                     return cd >= new Date(sd) && cd <= e; 
@@ -1674,11 +1668,13 @@
             updateAdminTable();
         }
 
+        // DIUBAH: Tambah array claims[] untuk menyokong ciri muat turun terperinci.
         function getGroupedData() {
             const g = {};
             getAdminFilteredClaims().forEach(c => {
                 if(!g[c.name]) g[c.name] = { name: c.name, count: 0, tAmt: 0, tPaid: 0, bal: 0, claims: [], lastActivity: 0 };
                 g[c.name].count++; g[c.name].tAmt += c.amount; g[c.name].tPaid += c.paid; g[c.name].bal += (c.amount - c.paid);
+                g[c.name].claims.push(c);
                 if(c.timestamp > g[c.name].lastActivity) g[c.name].lastActivity = c.timestamp;
             });
             return Object.values(g).sort((a,b) => b.lastActivity - a.lastActivity);
@@ -1721,7 +1717,6 @@
             // Simpan currentAdminData untuk fungsi muat turun laporan
             currentAdminData = grps;
 
-            // Update Summary Cards
             let sumKasar = 0, sumDibayar = 0, sumBaki = 0;
             grps.forEach(g => { sumKasar += g.tAmt; sumDibayar += g.tPaid; sumBaki += g.bal; });
             document.getElementById('adminSumKasar').innerText = formatRM(sumKasar);
@@ -1749,7 +1744,7 @@
                 }
 
                 grps.forEach(g => {
-                    const safeName = jsStr(g.name); // TEKNIK #6 - escape untuk atribut onclick
+                    const safeName = jsStr(g.name);
                     const isBal = g.bal > 0;
                     const st = isBal ? (g.tPaid > 0 ? 'Separa' : 'Ada Baki') : 'Selesai';
                     const c = isBal ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
@@ -1772,53 +1767,165 @@
             }
         }
 
+        // DIUBAH: CSV yang memaparkan butiran lengkap untuk setiap baris dan menggunakan Blob (atasi isu teks panjang & aksara).
         function exportAdminCSV() {
-            if(!currentAdminData || currentAdminData.length === 0) return alert("Tiada data untuk dieksport.");
-            let csvContent = "data:text/csv;charset=utf-8,Nama Pekerja,Bil. Tuntutan,Kasar (RM),Dibayar (RM),Baki (RM)\n";
+            if(!currentAdminData || currentAdminData.length === 0) return showErrorPopup("Tiada data untuk dieksport.");
+            let csvContent = "Nama Pekerja,ID Tuntutan,Tarikh,Kategori/Tujuan,Kasar (RM),Dibayar (RM),Baki (RM),Status\n";
             
             currentAdminData.forEach(g => {
-                let row = `"${g.name}",${g.count},${g.tAmt.toFixed(2)},${g.tPaid.toFixed(2)},${g.bal.toFixed(2)}`;
-                csvContent += row + "\n";
+                const sortedClaims = g.claims.sort((a,b) => b.timestamp - a.timestamp);
+                sortedClaims.forEach(c => {
+                    let b = c.amount - c.paid;
+                    let desc = (c.desc || c.type).replace(/"/g, '""');
+                    let row = `"${g.name}","${c.id}","${formatDate(c.date)}","${desc}",${c.amount.toFixed(2)},${c.paid.toFixed(2)},${b.toFixed(2)},"${c.status}"`;
+                    csvContent += row + "\n";
+                });
+                // Baris Ringkasan Staf
+                csvContent += `"${g.name}","JUMLAH KESELURUHAN","","","${g.tAmt.toFixed(2)}","${g.tPaid.toFixed(2)}","${g.bal.toFixed(2)}",""\n\n`;
             });
 
-            const encodedUri = encodeURI(csvContent);
+            const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: "text/csv;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Laporan_HR_${new Date().toISOString().slice(0,10)}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            link.href = url;
+            link.download = `Laporan_Terperinci_HR_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
 
+        // DIUBAH: PDF Eksport yang menjana 1 muka surat untuk setiap pekerja berserta rekod terperinci mereka.
         function exportAdminPDF() {
-            if(!currentAdminData || currentAdminData.length === 0) return alert("Tiada data untuk dieksport.");
-            if(!window.jspdf) return alert("Sistem PDF sedang dimuatkan, cuba sebentar lagi.");
+            if(!currentAdminData || currentAdminData.length === 0) return showErrorPopup("Tiada data untuk dieksport.");
+            if(!window.jspdf) return showErrorPopup("Sistem PDF sedang dimuatkan, cuba sebentar lagi.");
             
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
-            doc.setFontSize(16);
-            doc.text("Laporan Semakan Pukal Tuntutan HR", 14, 15);
-            doc.setFontSize(10);
-            doc.text("Tarikh Janaan: " + formatDate(new Date()), 14, 22);
+            currentAdminData.forEach((g, index) => {
+                if (index > 0) doc.addPage(); // 1 Staff per muka surat
+                
+                doc.setFontSize(16);
+                doc.setTextColor(17, 141, 255);
+                doc.text("Laporan Terperinci Tuntutan Pekerja", 14, 15);
 
-            let tableData = currentAdminData.map(g => [
-                g.name, 
-                g.count + " Rekod", 
-                "RM " + g.tAmt.toFixed(2), 
-                "RM " + g.tPaid.toFixed(2), 
-                "RM " + g.bal.toFixed(2)
+                doc.setFontSize(11);
+                doc.setTextColor(50, 50, 50);
+                doc.text(`Nama Pekerja: ${g.name}`, 14, 23);
+                doc.text(`Tarikh Janaan: ${formatDate(new Date())}`, 14, 29);
+
+                doc.setFontSize(10);
+                doc.text(`Jumlah Kasar: RM ${g.tAmt.toFixed(2)}  |  Dibayar: RM ${g.tPaid.toFixed(2)}  |  Baki: RM ${g.bal.toFixed(2)}`, 14, 35);
+
+                const sortedClaims = g.claims.sort((a,b) => b.timestamp - a.timestamp);
+                let tableData = sortedClaims.map(c => [
+                    c.id + "\n" + formatDate(c.date), 
+                    c.desc || c.type, 
+                    "RM " + c.amount.toFixed(2), 
+                    "RM " + c.paid.toFixed(2), 
+                    "RM " + (c.amount - c.paid).toFixed(2),
+                    c.status
+                ]);
+
+                doc.autoTable({
+                    head: [['ID / Tarikh', 'Tujuan / Kategori', 'Kasar', 'Dibayar', 'Baki', 'Status']],
+                    body: tableData,
+                    startY: 40,
+                    theme: 'striped',
+                    headStyles: { fillColor: [17, 141, 255] },
+                    styles: { fontSize: 9, cellPadding: 3 },
+                    columnStyles: {
+                        2: { halign: 'right' },
+                        3: { halign: 'right' },
+                        4: { halign: 'right' },
+                        5: { halign: 'center' }
+                    }
+                });
+            });
+
+            doc.save(`Laporan_Terperinci_HR_${new Date().toISOString().slice(0,10)}.pdf`);
+        }
+
+        // BARU: Helpert dan Fungsi untuk Eksport Individu melalui paparan Modal Details
+        function getSingleStaffData() {
+            const n = document.getElementById('detailName').textContent;
+            const claims = getAdminFilteredClaims().filter(c => c.name === n);
+            let g = { name: n, count: 0, tAmt: 0, tPaid: 0, bal: 0, claims: [] };
+            claims.forEach(c => {
+                g.count++; g.tAmt += c.amount; g.tPaid += c.paid; g.bal += (c.amount - c.paid);
+                g.claims.push(c);
+            });
+            return [g];
+        }
+
+        function exportSingleAdminCSV() {
+            const data = getSingleStaffData();
+            if(!data || data[0].claims.length === 0) return showErrorPopup("Tiada data untuk dieksport.");
+
+            let csvContent = "Nama Pekerja,ID Tuntutan,Tarikh,Kategori/Tujuan,Kasar (RM),Dibayar (RM),Baki (RM),Status\n";
+            const g = data[0];
+            const sortedClaims = g.claims.sort((a,b) => b.timestamp - a.timestamp);
+            sortedClaims.forEach(c => {
+                let b = c.amount - c.paid;
+                let desc = (c.desc || c.type).replace(/"/g, '""');
+                let row = `"${g.name}","${c.id}","${formatDate(c.date)}","${desc}",${c.amount.toFixed(2)},${c.paid.toFixed(2)},${b.toFixed(2)},"${c.status}"`;
+                csvContent += row + "\n";
+            });
+            csvContent += `"${g.name}","JUMLAH KESELURUHAN","","","${g.tAmt.toFixed(2)}","${g.tPaid.toFixed(2)}","${g.bal.toFixed(2)}",""\n`;
+
+            const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: "text/csv;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `Laporan_${g.name.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function exportSingleAdminPDF() {
+            const data = getSingleStaffData();
+            if(!data || data[0].claims.length === 0) return showErrorPopup("Tiada data untuk dieksport.");
+            if(!window.jspdf) return showErrorPopup("Sistem PDF sedang dimuatkan, cuba sebentar lagi.");
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const g = data[0];
+
+            doc.setFontSize(16);
+            doc.setTextColor(17, 141, 255);
+            doc.text("Laporan Terperinci Tuntutan Pekerja", 14, 15);
+            doc.setFontSize(11);
+            doc.setTextColor(50, 50, 50);
+            doc.text(`Nama Pekerja: ${g.name}`, 14, 23);
+            doc.text(`Tarikh Janaan: ${formatDate(new Date())}`, 14, 29);
+            doc.setFontSize(10);
+            doc.text(`Jumlah Kasar: RM ${g.tAmt.toFixed(2)}  |  Dibayar: RM ${g.tPaid.toFixed(2)}  |  Baki: RM ${g.bal.toFixed(2)}`, 14, 35);
+
+            const sortedClaims = g.claims.sort((a,b) => b.timestamp - a.timestamp);
+            let tableData = sortedClaims.map(c => [
+                c.id + "\n" + formatDate(c.date),
+                c.desc || c.type,
+                "RM " + c.amount.toFixed(2),
+                "RM " + c.paid.toFixed(2),
+                "RM " + (c.amount - c.paid).toFixed(2),
+                c.status
             ]);
 
             doc.autoTable({
-                head: [['Nama Pekerja', 'Bil. Tuntutan', 'Kasar', 'Dibayar', 'Baki']],
+                head: [['ID / Tarikh', 'Tujuan / Kategori', 'Kasar', 'Dibayar', 'Baki', 'Status']],
                 body: tableData,
-                startY: 28,
+                startY: 40,
                 theme: 'striped',
-                headStyles: { fillColor: [17, 141, 255] }
+                headStyles: { fillColor: [17, 141, 255] },
+                styles: { fontSize: 9, cellPadding: 3 },
+                columnStyles: {
+                    2: { halign: 'right' },
+                    3: { halign: 'right' },
+                    4: { halign: 'right' },
+                    5: { halign: 'center' }
+                }
             });
 
-            doc.save(`Laporan_HR_${new Date().toISOString().slice(0,10)}.pdf`);
+            doc.save(`Laporan_${g.name.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.pdf`);
         }
 
         function getMedicalPaid(empName, year) {
@@ -1935,8 +2042,6 @@
 
         function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); document.getElementById('paymentForm').reset(); }
         
-        // Admin sahaja. Role disemak semula di pelayan (Teknik #4) -
-        // menyembunyikan butang di UI bukan security boundary.
         function confirmPayment(e) {
             e.preventDefault();
             const total = recalcTotal();
@@ -1972,7 +2077,6 @@
                         fileBase64: reader.result.split(',')[1],
                         updates: updates
                     });
-                    // Bayaran SUDAH direkod dalam Sheet.
                     try {
                         updates.forEach(u => {
                             const claim = claimsData.find(c => c.id === u.id);
@@ -1990,7 +2094,7 @@
                     setTimeout(() => showSuccessPopup('Bayaran sebanyak ' + formatRM(total) + ' untuk ' + name + ' berjaya direkod.'), 350);
                 } catch (error) {
                     hideLoadingOverlay();
-                    if (!/^Unauthorized/i.test(error.message)) alert("Ralat Pembayaran: " + error.message);
+                    if (!/^Unauthorized/i.test(error.message)) showErrorPopup("Ralat Pembayaran: " + error.message);
                 }
             };
             reader.readAsDataURL(file);
@@ -2104,7 +2208,6 @@
         }
 
         function openReceiptViewer(urlData, title) {
-            // Ia kini menyokong comma-separated string
             currentReceiptUrls = urlData.split(',').map(s=>s.trim()).filter(Boolean);
             currentReceiptIndex = 0;
             currentReceiptTitleBase = title || "Paparan Dokumen";
@@ -2117,7 +2220,6 @@
             let total = currentReceiptUrls.length;
             let currentUrl = currentReceiptUrls[currentReceiptIndex];
             
-            // Adjust title with numbering
             if(total > 1) {
                 document.getElementById('receiptViewerTitle').innerText = `${currentReceiptTitleBase} (${currentReceiptIndex + 1}/${total})`;
                 document.getElementById('btnPrevReceipt').classList.remove('hidden');
@@ -2128,7 +2230,6 @@
                 document.getElementById('btnNextReceipt').classList.add('hidden');
             }
 
-            // Replace view with preview
             let previewUrl = currentUrl;
             if (previewUrl.includes('drive.google.com/file/d/')) previewUrl = previewUrl.replace(/\/view.*/, '/preview');
             document.getElementById('receiptIframe').src = previewUrl;
@@ -2138,8 +2239,8 @@
         function changeReceiptSlide(delta) {
             currentReceiptIndex += delta;
             let total = currentReceiptUrls.length;
-            if(currentReceiptIndex < 0) currentReceiptIndex = total - 1; // loop back
-            if(currentReceiptIndex >= total) currentReceiptIndex = 0; // loop start
+            if(currentReceiptIndex < 0) currentReceiptIndex = total - 1; 
+            if(currentReceiptIndex >= total) currentReceiptIndex = 0; 
             updateReceiptSlideView();
         }
         
@@ -2213,8 +2314,6 @@
                 }
             }
 
-            // Pemilikan rekod disemak semula di pelayan - staff hanya boleh
-            // mengubah tuntutan sendiri walaupun payload diubah dari DevTools.
             const payload = {
                 id: id,
                 date: document.getElementById('eDate').value,
@@ -2246,8 +2345,6 @@
 
                 const res = await api('editClaim', payload);
 
-                // Kemas kini SUDAH tersimpan. Ralat paparan selepas ini
-                // dilog sahaja, bukan dipapar sebagai kegagalan.
                 try {
                     const claim = claimsData.find(c => c.id === id);
                     if (claim) {
@@ -2267,7 +2364,7 @@
                 }
                 showSuccessPopup("Tuntutan anda berjaya dikemaskini.");
             } catch (err) {
-                if (!/^Unauthorized/i.test(err.message)) alert("Ralat Kemaskini: " + err.message);
+                if (!/^Unauthorized/i.test(err.message)) showErrorPopup("Ralat Kemaskini: " + err.message);
             } finally {
                 btn.innerHTML = oriBtn; btn.disabled = false; hideLoadingOverlay();
             }
@@ -2291,7 +2388,6 @@
             try {
                 await api('deleteClaim', { id: id });
 
-                // Rekod SUDAH dipadam di pelayan.
                 try {
                     claimsData = claimsData.filter(c => c.id !== id);
                     closeDeleteModal(); updateDashboard();
@@ -2303,7 +2399,7 @@
                 }
                 showSuccessPopup("Tuntutan telah selamat dipadam.");
             } catch (err) {
-                if (!/^Unauthorized/i.test(err.message)) alert("Ralat Padam: " + err.message);
+                if (!/^Unauthorized/i.test(err.message)) showErrorPopup("Ralat Padam: " + err.message);
             } finally {
                 btn.innerHTML = oriBtn; btn.disabled = false; hideLoadingOverlay();
             }
